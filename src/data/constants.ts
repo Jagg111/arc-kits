@@ -56,10 +56,10 @@ export const TIER_LABELS: Record<string, string> = {
 };
 
 export const TIER_COLORS: Record<string, string> = {
-  "1": "#22c55e",
-  "2": "#3b82f6",
-  "3": "#a855f7",
-  "3+": "#f59e0b",
+  "1": "#ffffff",
+  "2": "#27BC57",
+  "3": "#3b82f6",
+  "3+": "#CB3098",
 };
 
 export const GRADE_COLORS: Record<string, string> = {

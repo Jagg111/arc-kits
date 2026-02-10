@@ -17,17 +17,36 @@ export default function ModOption({ mod, onSelect }: ModOptionProps) {
           <div className="text-xs text-gray-500 mt-1">{mod.desc}</div>
         </div>
       </div>
-      <div className="flex gap-2">
-        {tiers.map((t) => (
-          <button
-            key={String(t)}
-            onClick={() => onSelect(mod.fam, t)}
-            className="flex-1 px-4 py-3 rounded-lg font-bold hover:brightness-125 transition-all shadow-md hover:shadow-lg"
-            style={{ backgroundColor: TIER_COLORS[String(t)], color: "white" }}
-          >
-            {TIER_LABELS[String(t)]}
-          </button>
-        ))}
+      <div className="space-y-2">
+        {tiers.map((t) => {
+          const tier = mod.tiers[t]!;
+          const color = TIER_COLORS[String(t)];
+          return (
+            <button
+              key={String(t)}
+              onClick={() => onSelect(mod.fam, t)}
+              className="w-full text-left p-3 rounded-lg hover:brightness-125 transition-all border border-transparent hover:border-gray-500"
+              style={{ backgroundColor: color + "18" }}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className="shrink-0 px-2 py-0.5 rounded text-xs font-bold mt-0.5"
+                  style={{ backgroundColor: color, color: "white" }}
+                >
+                  {TIER_LABELS[String(t)]}
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm text-gray-200">{tier.e}</div>
+                  {tier.cr ? (
+                    <div className="text-xs text-orange-400 mt-1">{tier.cr}</div>
+                  ) : (
+                    <div className="text-xs text-green-500 mt-1">Free</div>
+                  )}
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

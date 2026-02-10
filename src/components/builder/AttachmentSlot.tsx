@@ -46,6 +46,21 @@ export default function AttachmentSlot({
             >
               {TIER_LABELS[String(equipped.tier)]}
             </div>
+            {(() => {
+              const family = families.find((f) => f.fam === equipped.fam);
+              const tierData = family?.tiers[equipped.tier];
+              if (!tierData) return null;
+              return (
+                <>
+                  <div className="text-sm text-gray-300 mt-2">{tierData.e}</div>
+                  {tierData.cr ? (
+                    <div className="text-xs text-orange-400 mt-1">{tierData.cr}</div>
+                  ) : (
+                    <div className="text-xs text-green-500 mt-1">Free</div>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       ) : (
