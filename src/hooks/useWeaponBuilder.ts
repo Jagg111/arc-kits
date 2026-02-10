@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import type { EquippedState, TierKey, ViewMode } from "../types";
+import type { EquippedState, TierKey } from "../types";
 import { WEAPONS } from "../data/weapons";
 import { GOAL_PRESETS } from "../data/presets";
 
@@ -7,7 +7,6 @@ export function useWeaponBuilder() {
   const [gun, setGun] = useState<string | null>(null);
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [equipped, setEquipped] = useState<EquippedState>({});
-  const [viewMode, setViewMode] = useState<ViewMode>("goals");
 
   const gunObj = useMemo(
     () => WEAPONS.find((w) => w.id === gun) ?? null,
@@ -18,7 +17,6 @@ export function useWeaponBuilder() {
     setGun(id);
     setSelectedGoal(null);
     setEquipped({});
-    setViewMode("goals");
   }, []);
 
   const applyGoalBuild = useCallback(
@@ -57,25 +55,18 @@ export function useWeaponBuilder() {
     setGun(null);
     setSelectedGoal(null);
     setEquipped({});
-    setViewMode("goals");
   }, []);
-
-  const goToCustom = useCallback(() => setViewMode("custom"), []);
-  const goToGoals = useCallback(() => setViewMode("goals"), []);
 
   return {
     gun,
     gunObj,
     selectedGoal,
     equipped,
-    viewMode,
     selectWeapon,
     applyGoalBuild,
     equipMod,
     removeMod,
     clearAll,
     resetSelection,
-    goToCustom,
-    goToGoals,
   };
 }

@@ -25,19 +25,19 @@ export const CLASS_COLORS: Record<WeaponClass, string> = {
 };
 
 export const AMMO_COLORS: Record<AmmoType, string> = {
-  Light: "#a3e635",
-  Medium: "#fbbf24",
-  Heavy: "#f87171",
-  Shotgun: "#fb923c",
-  Special: "#818cf8",
+  Light: "#e6da35",
+  Medium: "#2439fb",
+  Heavy: "#d21818",
+  Shotgun: "#e38c8c",
+  Special: "#21c204",
 };
 
 export const RARITY_COLORS: Record<Rarity, string> = {
-  Common: "#9ca3af",
-  Uncommon: "#22c55e",
+  Common: "#6C6B69",
+  Uncommon: "#27BC57",
   Rare: "#3b82f6",
-  Epic: "#a855f7",
-  Legendary: "#f59e0b",
+  Epic: "#CB3098",
+  Legendary: "#FFC301",
 };
 
 export const RARITY_ORDER: Record<Rarity, number> = {
@@ -66,8 +66,8 @@ export const GRADE_COLORS: Record<string, string> = {
   S: "#f59e0b",
   A: "#22c55e",
   B: "#3b82f6",
-  C: "#a855f7",
-  D: "#9ca3af",
+  C: "#eab308",
+  D: "#f97316",
   F: "#ef4444",
 };
 

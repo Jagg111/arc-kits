@@ -3,8 +3,7 @@ import { useBuildCost } from "./hooks/useBuildCost";
 import { useCumulativeEffects } from "./hooks/useCumulativeEffects";
 import Header from "./components/layout/Header";
 import WeaponPicker from "./components/weapons/WeaponPicker";
-import GoalSelection from "./components/goals/GoalSelection";
-import CustomBuilder from "./components/builder/CustomBuilder";
+import WeaponBuilder from "./components/builder/WeaponBuilder";
 
 export default function App() {
   const {
@@ -12,15 +11,12 @@ export default function App() {
     gunObj,
     selectedGoal,
     equipped,
-    viewMode,
     selectWeapon,
     applyGoalBuild,
     equipMod,
     removeMod,
     clearAll,
     resetSelection,
-    goToCustom,
-    goToGoals,
   } = useWeaponBuilder();
 
   const buildCost = useBuildCost(equipped);
@@ -33,27 +29,17 @@ export default function App() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {!gun && <WeaponPicker onSelect={selectWeapon} />}
 
-        {gun && gunObj && viewMode === "goals" && (
-          <GoalSelection
+        {gun && gunObj && (
+          <WeaponBuilder
             weapon={gunObj}
             selectedGoal={selectedGoal}
             equipped={equipped}
             buildCost={buildCost}
-            onSelectGoal={applyGoalBuild}
-            onCustomize={goToCustom}
-          />
-        )}
-
-        {gun && gunObj && viewMode === "custom" && (
-          <CustomBuilder
-            weapon={gunObj}
-            equipped={equipped}
-            buildCost={buildCost}
             cumulativeEffects={cumulativeEffects}
+            onSelectGoal={applyGoalBuild}
             onEquip={equipMod}
             onRemove={removeMod}
             onClearAll={clearAll}
-            onBack={goToGoals}
           />
         )}
       </div>

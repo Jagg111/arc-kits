@@ -80,8 +80,6 @@ export interface GoalPreset {
 
 export type GoalPresets = Record<string, GoalPreset>;
 
-export type ViewMode = "goals" | "custom";
-
 export interface CumulativeEffect {
   stat: string;
   mods: { name: string; effect: string; value: number }[];
