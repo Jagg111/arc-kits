@@ -1,4 +1,4 @@
-import type { WeaponClass, AmmoType, Rarity, TierKey } from "../types";
+import type { WeaponClass, AmmoType, Rarity } from "../types";
 
 export const CLASS_LABELS: Record<WeaponClass, string> = {
   AR: "Assault Rifle",
@@ -48,18 +48,12 @@ export const RARITY_ORDER: Record<Rarity, number> = {
   Legendary: 5,
 };
 
-export const TIER_LABELS: Record<string, string> = {
-  "1": "T1",
-  "2": "T2",
-  "3": "T3",
-  "3+": "T3+",
-};
-
-export const TIER_COLORS: Record<string, string> = {
-  "1": "#ffffff",
-  "2": "#27BC57",
-  "3": "#3b82f6",
-  "3+": "#CB3098",
+export const RARITY_LABELS: Record<Rarity, string> = {
+  Common: "I",
+  Uncommon: "II",
+  Rare: "III",
+  Epic: "III",
+  Legendary: "★",
 };
 
 export const GRADE_COLORS: Record<string, string> = {
@@ -103,6 +97,3 @@ export const BASE_MAG_SIZES: Record<string, number> = {
   equalizer: 80,
 };
 
-export function tierKey(t: TierKey): string {
-  return String(t);
-}

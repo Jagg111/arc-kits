@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import type { EquippedState, TierKey } from "../types";
+import type { EquippedState, Rarity } from "../types";
 import { WEAPONS } from "../data/weapons";
 import { GOAL_PRESETS } from "../data/presets";
 
@@ -32,7 +32,7 @@ export function useWeaponBuilder() {
   );
 
   const equipMod = useCallback(
-    (slot: string, fam: string, tier: TierKey) => {
+    (slot: string, fam: string, tier: Rarity) => {
       setEquipped((prev) => ({ ...prev, [slot]: { fam, tier } }));
     },
     [],

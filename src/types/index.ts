@@ -41,18 +41,17 @@ export type SlotType =
   | "Stock"
   | "Tech Mod";
 
-export type TierKey = 1 | 2 | 3 | "3+";
-
 export interface TierData {
-  e: string;
+  e: string[];
   cr?: string;
+  img?: string;
 }
 
 export interface ModFamily {
   fam: string;
   desc: string;
   leg?: boolean;
-  tiers: Partial<Record<TierKey, TierData>>;
+  tiers: Partial<Record<Rarity, TierData>>;
   w: string[];
   poor?: string[];
 }
@@ -61,7 +60,7 @@ export type ModFamilies = Record<SlotType, ModFamily[]>;
 
 export interface EquippedMod {
   fam: string;
-  tier: TierKey;
+  tier: Rarity;
 }
 
 export type EquippedState = Record<string, EquippedMod>;

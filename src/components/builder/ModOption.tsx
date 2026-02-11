@@ -1,13 +1,13 @@
-import type { ModFamily, TierKey } from "../../types";
-import { TIER_LABELS, TIER_COLORS } from "../../data/constants";
+import type { ModFamily, Rarity } from "../../types";
+import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
 
 interface ModOptionProps {
   mod: ModFamily;
-  onSelect: (fam: string, tier: TierKey) => void;
+  onSelect: (fam: string, tier: Rarity) => void;
 }
 
 export default function ModOption({ mod, onSelect }: ModOptionProps) {
-  const tiers = Object.keys(mod.tiers) as unknown as TierKey[];
+  const tiers = Object.keys(mod.tiers) as Rarity[];
 
   return (
     <div className="p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors">
@@ -20,23 +20,40 @@ export default function ModOption({ mod, onSelect }: ModOptionProps) {
       <div className="space-y-2">
         {tiers.map((t) => {
           const tier = mod.tiers[t]!;
-          const color = TIER_COLORS[String(t)];
+          const color = RARITY_COLORS[t];
           return (
             <button
-              key={String(t)}
+              key={t}
               onClick={() => onSelect(mod.fam, t)}
               className="w-full text-left p-3 rounded-lg hover:brightness-125 transition-all border border-transparent hover:border-gray-500"
               style={{ backgroundColor: color + "18" }}
             >
               <div className="flex items-start gap-3">
-                <span
-                  className="shrink-0 px-2 py-0.5 rounded text-xs font-bold mt-0.5"
-                  style={{ backgroundColor: color, color: "white" }}
-                >
-                  {TIER_LABELS[String(t)]}
-                </span>
-                <div className="min-w-0">
-                  <div className="text-sm text-gray-200">{tier.e}</div>
+                {tier.img && (
+                  <img
+                    src={tier.img}
+                    alt={`${mod.fam} ${RARITY_LABELS[t]}`}
+                    loading="lazy"
+                    className="shrink-0 w-12 h-12 rounded object-contain bg-gray-900"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span
+                      className="shrink-0 px-2 py-0.5 rounded text-xs font-bold"
+                      style={{ backgroundColor: color, color: "white" }}
+                    >
+                      {RARITY_LABELS[t]}
+                    </span>
+                    <span className="text-xs font-medium" style={{ color }}>
+                      {t}
+                    </span>
+                  </div>
+                  <ul className="text-sm text-gray-200 space-y-0.5">
+                    {tier.e.map((effect, i) => (
+                      <li key={i}>{effect}</li>
+                    ))}
+                  </ul>
                   {tier.cr ? (
                     <div className="text-xs text-orange-400 mt-1">{tier.cr}</div>
                   ) : (

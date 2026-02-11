@@ -35,15 +35,31 @@ const MOST_STOCK = ALL_IDS.filter(
     ].includes(x),
 );
 
+/** Build a wiki thumbnail URL at 96px (retina-ready for 48px display). */
+const W = (hash: string, file: string) =>
+  `https://arcraiders.wiki/w/images/thumb/${hash}/${file}/96px-${file}.webp`;
+
 export const MOD_FAMILIES: ModFamilies = {
   Muzzle: [
     {
       fam: "Compensator",
       desc: "Reduces bloom",
       tiers: {
-        1: { e: "25% Reduced Per-Shot Dispersion", cr: "6x Metal Parts, 1x Wire" },
-        2: { e: "35% Reduced Per-Shot Dispersion", cr: "2x Mechanical Components, 4x Wire" },
-        3: { e: "50% Reduced Per-Shot Dispersion", cr: "2x Mod Components, 8x Wire" },
+        Common: {
+          e: ["20% Reduced Per-Shot Dispersion", "10% Reduced Max Shot Dispersion"],
+          cr: "6x Metal Parts, 1x Wires",
+          img: W("5/5f", "Compensator_I.png"),
+        },
+        Uncommon: {
+          e: ["40% Reduced Per-Shot Dispersion", "20% Reduced Max Shot Dispersion"],
+          cr: "2x Mechanical Components, 4x Wires",
+          img: W("0/0a", "Compensator_II.png"),
+        },
+        Rare: {
+          e: ["60% Reduced Per-Shot Dispersion", "30% Reduced Max Shot Dispersion", "20% Increased Durability Burn Rate"],
+          cr: "2x Mod Components, 8x Wires",
+          img: W("a/af", "Compensator_III.png"),
+        },
       },
       w: MOST_MUZZLE,
       poor: ["ferro"],
@@ -52,9 +68,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Muzzle Brake",
       desc: "Reduces recoil",
       tiers: {
-        1: { e: "15% Reduced Recoil", cr: "6x Metal Parts, 1x Wire" },
-        2: { e: "20% Reduced Recoil", cr: "2x Mechanical Components, 4x Wire" },
-        3: { e: "25% Reduced Recoil", cr: "2x Mod Components, 8x Wire" },
+        Common: {
+          e: ["15% Reduced Horizontal Recoil", "15% Reduced Vertical Recoil"],
+          cr: "6x Metal Parts, 1x Wires",
+          img: W("4/4f", "Muzzle_Brake_I.png"),
+        },
+        Uncommon: {
+          e: ["20% Reduced Horizontal Recoil", "20% Reduced Vertical Recoil"],
+          cr: "2x Mechanical Components, 4x Wires",
+          img: W("2/23", "Muzzle_Brake_II.png"),
+        },
+        Rare: {
+          e: ["25% Reduced Horizontal Recoil", "25% Reduced Vertical Recoil", "20% Increased Durability Burn Rate"],
+          cr: "2x Mod Components, 8x Wires",
+          img: W("a/a2", "Muzzle_Brake_III.png"),
+        },
       },
       w: MOST_MUZZLE,
       poor: ["ferro"],
@@ -63,9 +91,20 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Silencer",
       desc: "Reduces noise",
       tiers: {
-        2: { e: "20% Reduced Noise", cr: "2x Mechanical Components, 4x Wire" },
-        3: { e: "40% Reduced Noise", cr: "2x Mod Components, 8x Wire" },
-        "3+": { e: "60% Reduced Noise", cr: "3x Mod Components, 15x Wire" },
+        Uncommon: {
+          e: ["20% Reduced Noise"],
+          cr: "2x Mechanical Components, 4x Wires",
+          img: W("f/f7", "Silencer_I.png"),
+        },
+        Rare: {
+          e: ["40% Reduced Noise"],
+          cr: "2x Mod Components, 8x Wires",
+          img: W("c/c0", "Silencer_II.png"),
+        },
+        Epic: {
+          e: ["60% Reduced Noise", "20% Increased Durability Burn Rate"],
+          img: W("3/3e", "Silencer_III.png"),
+        },
       },
       w: MOST_MUZZLE,
     },
@@ -73,7 +112,11 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Extended Barrel",
       desc: "Increases velocity",
       tiers: {
-        3: { e: "+25% Bullet Velocity", cr: "2x Mod Components, 8x Wire" },
+        Rare: {
+          e: ["25% Increased Bullet Velocity", "15% Increased Vertical Recoil"],
+          cr: "2x Mod Components, 8x Wires",
+          img: W("2/2f", "Extended_Barrel.png"),
+        },
       },
       w: [
         "osprey", "stitcher", "ferro", "arpeggio", "anvil", "burletta",
@@ -86,9 +129,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Shotgun Choke",
       desc: "Tightens spread",
       tiers: {
-        1: { e: "20% Reduced Dispersion", cr: "6x Metal Parts, 1x Wire" },
-        2: { e: "30% Reduced Dispersion", cr: "2x Mechanical Components, 4x Wire" },
-        3: { e: "40% Reduced Dispersion", cr: "2x Mod Components, 8x Wire" },
+        Common: {
+          e: ["10% Reduced Base Dispersion"],
+          cr: "6x Metal Parts, 1x Wires",
+          img: W("0/07", "Shotgun_Choke_I.png"),
+        },
+        Uncommon: {
+          e: ["20% Reduced Base Dispersion"],
+          cr: "2x Mechanical Components, 4x Wires",
+          img: W("6/63", "Shotgun_Choke_II.png"),
+        },
+        Rare: {
+          e: ["30% Reduced Base Dispersion", "20% Increased Durability Burn Rate"],
+          cr: "2x Mod Components, 8x Wires",
+          img: W("3/36", "Shotgun_Choke_III.png"),
+        },
       },
       w: ["vulcano", "iltoro"],
     },
@@ -96,7 +151,11 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Shotgun Silencer",
       desc: "Reduces noise",
       tiers: {
-        3: { e: "50% Reduced Noise", cr: "2x Mod Components, 8x Wire" },
+        Rare: {
+          e: ["50% Reduced Noise"],
+          cr: "2x Mod Components, 8x Wires",
+          img: W("4/4d", "Shotgun_Silencer.png"),
+        },
       },
       w: ["vulcano", "iltoro"],
     },
@@ -106,9 +165,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Angled Grip",
       desc: "Reduces horizontal recoil",
       tiers: {
-        1: { e: "20% Reduced H-Recoil", cr: "6x Plastic Parts, 1x Duct Tape" },
-        2: { e: "30% Reduced H-Recoil", cr: "2x Mechanical Components, 3x Duct Tape" },
-        3: { e: "40% Reduced H-Recoil", cr: "2x Mod Components, 5x Duct Tape" },
+        Common: {
+          e: ["20% Reduced Horizontal Recoil"],
+          cr: "6x Plastic Parts, 1x Duct Tape",
+          img: W("b/b5", "Angled_Grip_I.png"),
+        },
+        Uncommon: {
+          e: ["30% Reduced Horizontal Recoil"],
+          cr: "2x Mechanical Components, 3x Duct Tape",
+          img: W("2/2b", "Angled_Grip_II.png"),
+        },
+        Rare: {
+          e: ["40% Reduced Horizontal Recoil", "30% Reduced ADS Speed"],
+          cr: "2x Mod Components, 5x Duct Tape",
+          img: W("0/0f", "Angled_Grip_III.png"),
+        },
       },
       w: MOST_UB,
       poor: ["ferro"],
@@ -117,9 +188,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Vertical Grip",
       desc: "Reduces vertical recoil",
       tiers: {
-        1: { e: "20% Reduced V-Recoil", cr: "6x Plastic Parts, 1x Duct Tape" },
-        2: { e: "30% Reduced V-Recoil", cr: "2x Mechanical Components, 3x Duct Tape" },
-        3: { e: "40% Reduced V-Recoil", cr: "2x Mod Components, 5x Duct Tape" },
+        Common: {
+          e: ["20% Reduced Vertical Recoil"],
+          cr: "6x Plastic Parts, 1x Duct Tape",
+          img: W("4/4d", "Vertical_Grip_I.png"),
+        },
+        Uncommon: {
+          e: ["30% Reduced Vertical Recoil"],
+          cr: "2x Mechanical Components, 3x Duct Tape",
+          img: W("3/3c", "Vertical_Grip_II.png"),
+        },
+        Rare: {
+          e: ["40% Reduced Vertical Recoil", "30% Reduced ADS Speed"],
+          cr: "2x Mod Components, 5x Duct Tape",
+          img: W("2/20", "Vertical_Grip_III.png"),
+        },
       },
       w: MOST_UB,
       poor: ["ferro"],
@@ -129,22 +212,12 @@ export const MOD_FAMILIES: ModFamilies = {
       desc: "Both recoil directions",
       leg: true,
       tiers: {
-        3: { e: "30% Reduced Recoil", cr: "2x Mod Components, 5x Duct Tape" },
+        Legendary: {
+          e: ["30% Reduced Horizontal Recoil", "30% Reduced Vertical Recoil", "30% Reduced ADS Speed"],
+          img: W("8/89", "Horizontal_Grip.png"),
+        },
       },
       w: MOST_UB,
-      poor: ["ferro"],
-    },
-    {
-      fam: "Kinetic Converter",
-      desc: "+15% Fire Rate",
-      leg: true,
-      tiers: {
-        3: { e: "+15% Fire Rate" },
-      },
-      w: [
-        "arpeggio", "rattler", "kettle", "vulcano", "osprey", "torrente",
-        "ferro", "iltoro", "bettina", "stitcher", "bobcat", "tempest", "renegade",
-      ],
       poor: ["ferro"],
     },
   ],
@@ -153,9 +226,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Extended Light Magazine",
       desc: "More rounds",
       tiers: {
-        1: { e: "+5 Magazine Size", cr: "6x Plastic Parts, 1x Steel Spring" },
-        2: { e: "+10 Magazine Size", cr: "2x Mechanical Components, 3x Steel Spring" },
-        3: { e: "+15 Magazine Size", cr: "2x Mod Components, 5x Steel Spring" },
+        Common: {
+          e: ["+5 Magazine Size"],
+          cr: "6x Plastic Parts, 1x Steel Spring",
+          img: W("2/23", "Extended_Light_Mag_I.png"),
+        },
+        Uncommon: {
+          e: ["+10 Magazine Size"],
+          cr: "2x Mechanical Components, 3x Steel Spring",
+          img: W("c/cf", "Extended_Light_Mag_II.png"),
+        },
+        Rare: {
+          e: ["+15 Magazine Size"],
+          cr: "2x Mod Components, 5x Steel Spring",
+          img: W("4/40", "Extended_Light_Mag_III.png"),
+        },
       },
       w: ["bobcat", "stitcher", "kettle", "hairpin", "burletta"],
     },
@@ -165,9 +250,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Extended Medium Magazine",
       desc: "More rounds",
       tiers: {
-        1: { e: "+4 Magazine Size", cr: "6x Plastic Parts, 1x Steel Spring" },
-        2: { e: "+8 Magazine Size", cr: "2x Mechanical Components, 3x Steel Spring" },
-        3: { e: "+12 Magazine Size", cr: "2x Mod Components, 5x Steel Spring" },
+        Common: {
+          e: ["+4 Magazine Size"],
+          cr: "6x Plastic Parts, 1x Steel Spring",
+          img: W("4/44", "Extended_Medium_Mag_I.png"),
+        },
+        Uncommon: {
+          e: ["+8 Magazine Size"],
+          cr: "2x Mechanical Components, 3x Steel Spring",
+          img: W("5/50", "Extended_Medium_Mag_II.png"),
+        },
+        Rare: {
+          e: ["+12 Magazine Size"],
+          cr: "2x Mod Components, 5x Steel Spring",
+          img: W("a/a1", "Extended_Medium_Mag_III.png"),
+        },
       },
       w: ["arpeggio", "venator", "torrente", "renegade", "osprey", "tempest"],
     },
@@ -177,9 +274,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Extended Shotgun Magazine",
       desc: "More shells",
       tiers: {
-        1: { e: "+2 Magazine Size", cr: "6x Plastic Parts, 1x Steel Spring" },
-        2: { e: "+4 Magazine Size", cr: "2x Mechanical Components, 3x Steel Spring" },
-        3: { e: "+6 Magazine Size", cr: "2x Mod Components, 5x Steel Spring" },
+        Common: {
+          e: ["+2 Magazine Size"],
+          cr: "6x Plastic Parts, 1x Steel Spring",
+          img: W("9/9b", "Extended_Shotgun_Mag_I.png"),
+        },
+        Uncommon: {
+          e: ["+4 Magazine Size"],
+          cr: "2x Mechanical Components, 3x Steel Spring",
+          img: W("4/4f", "Extended_Shotgun_Mag_II.png"),
+        },
+        Rare: {
+          e: ["+6 Magazine Size"],
+          cr: "2x Mod Components, 5x Steel Spring",
+          img: W("7/77", "Extended_Shotgun_Mag_III.png"),
+        },
       },
       w: ["iltoro", "vulcano"],
     },
@@ -189,9 +298,21 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Stable Stock",
       desc: "Faster recovery",
       tiers: {
-        1: { e: "40% Recovery", cr: "7x Rubber Parts, 1x Duct Tape" },
-        2: { e: "60% Recovery", cr: "2x Mechanical Components, 3x Duct Tape" },
-        3: { e: "50% Recovery", cr: "2x Mod Components, 5x Duct Tape" },
+        Common: {
+          e: ["20% Reduced Recoil Recovery Duration", "20% Reduced Dispersion Recovery Time"],
+          cr: "7x Rubber Parts, 1x Duct Tape",
+          img: W("8/8d", "Stable_Stock_I.png"),
+        },
+        Uncommon: {
+          e: ["35% Reduced Recoil Recovery Duration", "35% Reduced Dispersion Recovery Time"],
+          cr: "2x Mechanical Components, 3x Duct Tape",
+          img: W("b/b4", "Stable_Stock_II.png"),
+        },
+        Rare: {
+          e: ["50% Reduced Recoil Recovery Duration", "50% Reduced Dispersion Recovery Time", "20% Increased Equip Time", "20% Increased Unequip Time"],
+          cr: "2x Mod Components, 5x Duct Tape",
+          img: W("e/eb", "Stable_Stock_III.png"),
+        },
       },
       w: MOST_STOCK,
     },
@@ -199,7 +320,11 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Padded Stock",
       desc: "All-in-one stability",
       tiers: {
-        3: { e: "30% Reduced Recoil/Dispersion", cr: "2x Mod Components, 5x Duct Tape" },
+        Rare: {
+          e: ["15% Reduced Vertical Recoil", "15% Reduced Horizontal Recoil", "20% Reduced Per-Shot Dispersion", "20% Increased Equip Time", "20% Increased Unequip Time", "30% Reduced ADS Speed"],
+          cr: "2x Mod Components, 5x Duct Tape",
+          img: W("4/4b", "Padded_Stock.png"),
+        },
       },
       w: MOST_STOCK,
     },
@@ -207,9 +332,29 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Lightweight Stock",
       desc: "Fast ADS",
       tiers: {
-        3: { e: "+200% ADS Speed", cr: "2x Mod Components, 5x Duct Tape" },
+        Rare: {
+          e: ["200% Increased ADS Speed", "30% Reduced Equip Time", "30% Reduced Unequip Time", "50% Increased Vertical Recoil", "50% Increased Recoil Recovery Time"],
+          cr: "2x Mod Components, 5x Duct Tape",
+          img: W("c/cb", "Lightweight_Stock.png"),
+        },
       },
       w: MOST_STOCK,
+    },
+    {
+      fam: "Kinetic Converter",
+      desc: "+15% Fire Rate",
+      leg: true,
+      tiers: {
+        Legendary: {
+          e: ["15% Increased Fire Rate", "20% Increased Horizontal Recoil", "20% Increased Vertical Recoil"],
+          img: W("7/71", "Kinetic_Converter.png"),
+        },
+      },
+      w: [
+        "arpeggio", "rattler", "kettle", "vulcano", "osprey", "torrente",
+        "ferro", "iltoro", "bettina", "stitcher", "bobcat", "tempest", "renegade",
+      ],
+      poor: ["ferro"],
     },
   ],
   "Tech Mod": [
@@ -218,7 +363,10 @@ export const MOD_FAMILIES: ModFamilies = {
       desc: "Spread shot",
       leg: true,
       tiers: {
-        3: { e: "+3 Projectiles" },
+        Legendary: {
+          e: ["+3 Projectiles Per Shot", "70% Reduced Projectile Damage"],
+          img: W("e/ef", "Anvil_Splitter.png"),
+        },
       },
       w: ["anvil"],
     },

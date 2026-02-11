@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Weapon, EquippedState, SlotType, TierKey, CumulativeEffect } from "../../types";
+import type { Weapon, EquippedState, SlotType, Rarity, CumulativeEffect } from "../../types";
 import { GOAL_PRESETS } from "../../data/presets";
 import WeaponHeader from "../goals/WeaponHeader";
 import AttachmentSlot from "./AttachmentSlot";
@@ -11,7 +11,7 @@ interface WeaponBuilderProps {
   buildCost: Record<string, number>;
   cumulativeEffects: CumulativeEffect[];
   onSelectGoal: (key: string) => void;
-  onEquip: (slot: string, fam: string, tier: TierKey) => void;
+  onEquip: (slot: string, fam: string, tier: Rarity) => void;
   onRemove: (slot: string) => void;
   onClearAll: () => void;
 }
