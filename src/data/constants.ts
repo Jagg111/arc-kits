@@ -57,12 +57,16 @@ export const RARITY_LABELS: Record<Rarity, string> = {
 };
 
 export const GRADE_COLORS: Record<string, string> = {
-  S: "#f59e0b",
-  A: "#22c55e",
-  B: "#3b82f6",
-  C: "#eab308",
-  D: "#f97316",
-  F: "#ef4444",
+  S: "#22c55e",
+  A: "#4ade80",
+  B: "#facc15",
+  C: "#fb923c",
+  D: "#ef4444",
+  F: "#6b7280",
+};
+
+export const GRADE_ORDER: Record<string, number> = {
+  S: 1, A: 2, B: 3, C: 4, D: 5, F: 6,
 };
 
 export const AMMO_TYPES: AmmoType[] = [

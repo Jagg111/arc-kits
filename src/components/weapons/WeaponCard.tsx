@@ -29,12 +29,6 @@ export default function WeaponCard({ weapon, onSelect }: WeaponCardProps) {
         {CLASS_LABELS[weapon.weaponClass]} · {weapon.fireMode}
       </p>
 
-      {/* Quick stats */}
-      <div className="flex items-center gap-3 mb-2 text-xs text-gray-400">
-        <span>DMG {weapon.damage}</span>
-        <span>RNG {weapon.range}m</span>
-      </div>
-
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: GRADE_COLORS[weapon.pvp] + "22", color: GRADE_COLORS[weapon.pvp] }}>
