@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # ArcKits — Arc Raiders Weapon Builder
 
 ## What This Is
@@ -42,6 +46,7 @@ src/
     useWeaponBuilder.ts    — Core state: selected weapon, goal, equipped mods + all actions
     useBuildCost.ts        — Computes total crafting materials from equipped mods
     useCumulativeEffects.ts — Aggregates stat bonuses across equipped mods via regex
+    useBuildUrl.ts         — URL query param sync for shareable builds
 
   components/              — UI organized by feature domain
     layout/Header.tsx      — Sticky header with reset button
@@ -52,13 +57,15 @@ src/
     builder/               — Mod builder screen
       WeaponBuilder.tsx    — Main builder layout (goal picker + slots + stats)
       AttachmentSlot.tsx   — Single slot: shows equipped mod or mod picker
-      ModOption.tsx        — Tier selection buttons for one mod family
+      ModDrawer.tsx        — Mobile-friendly mod selection drawer
+      ModFamilySection.tsx — Mod family display with tier selection buttons
+      StatsSummaryBar.tsx  — Mobile bottom bar (goals/stats/cost tabs)
     goals/                 — Goal/preset related components
       WeaponHeader.tsx     — Weapon info display with stat badges
-      GoalCard.tsx         — Goal preset card (defined but unused in App)
+      GoalCard.tsx         — Goal preset card
     shared/                — Reusable leaf components
       Badge.tsx            — Colored label pill
-      CostDisplay.tsx      — Cost breakdown display (defined but unused in App)
+      CostDisplay.tsx      — Cost breakdown display (currently unused)
 ```
 
 ## Key Architecture Decisions
@@ -67,6 +74,7 @@ src/
 - No Context API or global state — prop drilling is sufficient for 15 components
 - Dynamic colors use inline styles with hex color + alpha suffix (e.g., `color + "22"`)
 - All color palettes defined as lookup objects in `src/data/constants.ts`
+- URL state sync via `useBuildUrl` hook — builds are shareable via query params (`?w=tempest&m=Muzzle:Compensator:Rare,...`), synced with `history.replaceState`
 
 ## How to Add Game Content
 - **New weapon**: Add entry to `src/data/weapons.ts`, add preset builds in `src/data/presets.ts`
