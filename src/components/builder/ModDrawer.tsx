@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { SlotType, Rarity, ModFamily } from "../../types";
 import { MOD_FAMILIES } from "../../data/mods";
-import ModFamilyAccordion from "./ModFamilyAccordion";
+import ModFamilySection from "./ModFamilySection";
 
 interface ModDrawerProps {
   slot: SlotType;
@@ -11,7 +11,6 @@ interface ModDrawerProps {
 }
 
 export default function ModDrawer({ slot, weaponId, onEquip, onClose }: ModDrawerProps) {
-  const [expandedFamily, setExpandedFamily] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const families = (MOD_FAMILIES[slot] ?? []).filter((f: ModFamily) =>
@@ -69,13 +68,9 @@ export default function ModDrawer({ slot, weaponId, onEquip, onClose }: ModDrawe
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {families.map((fam: ModFamily) => (
-            <ModFamilyAccordion
+            <ModFamilySection
               key={fam.fam}
               mod={fam}
-              isExpanded={expandedFamily === fam.fam}
-              onToggle={() =>
-                setExpandedFamily((prev) => (prev === fam.fam ? null : fam.fam))
-              }
               onSelect={handleSelect}
             />
           ))}

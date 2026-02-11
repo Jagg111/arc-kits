@@ -3,7 +3,6 @@ import type { CumulativeEffect, GoalPreset } from "../../types";
 import { GOAL_PRESETS } from "../../data/presets";
 
 interface StatsSummaryBarProps {
-  filledCount: number;
   totalSlots: number;
   buildCost: Record<string, number>;
   cumulativeEffects: CumulativeEffect[];
@@ -15,7 +14,6 @@ interface StatsSummaryBarProps {
 }
 
 export default function StatsSummaryBar({
-  filledCount,
   totalSlots,
   buildCost,
   cumulativeEffects,
@@ -143,7 +141,7 @@ export default function StatsSummaryBar({
       >
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-300 font-medium">
-            {filledCount}/{totalSlots} slots
+            Build Stats
           </span>
           {totalMaterials > 0 && (
             <span className="text-sm text-orange-400 font-medium">

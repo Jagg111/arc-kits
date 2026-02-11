@@ -4,7 +4,8 @@
       "Bash(dir:*)",
       "Bash(npx tsc:*)",
       "WebFetch(domain:arcraiders.wiki)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

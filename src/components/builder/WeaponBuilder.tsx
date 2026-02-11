@@ -36,7 +36,6 @@ export default function WeaponBuilder({
 
   const hasEquipped = Object.keys(equipped).length > 0;
   const hasCost = Object.keys(buildCost).length > 0;
-  const filledCount = weapon.slots.filter((s) => equipped[s]).length;
   const totalSlots = weapon.slots.length;
 
   // Show goal-first flow when weapon first selected, no mods, no goal, not dismissed
@@ -87,13 +86,20 @@ export default function WeaponBuilder({
                 onSelect={handleSelectGoal}
               />
             ))}
+            {/* Build Manually tile */}
+            <button
+              onClick={() => setGoalDismissed(true)}
+              className="flex items-center gap-4 p-5 rounded-xl border border-gray-600 bg-gray-800/50 hover:border-gray-400 hover:bg-gray-800 transition-all text-left"
+            >
+              <svg className="w-8 h-8 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l5.653-4.655m3.586-3.586a2.548 2.548 0 013.586 3.586m-6.586-6.586l6.586 6.586" />
+              </svg>
+              <div className="min-w-0">
+                <div className="font-bold text-white">Build Manually</div>
+                <div className="text-sm text-gray-400 mt-0.5">Pick your own attachments slot by slot</div>
+              </div>
+            </button>
           </div>
-          <button
-            onClick={() => setGoalDismissed(true)}
-            className="text-sm text-gray-500 hover:text-gray-300 transition-colors font-medium"
-          >
-            Skip — build manually
-          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -224,19 +230,6 @@ export default function WeaponBuilder({
 
           {/* Attachment Slots */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Build Progress */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-orange-500 rounded-full transition-all duration-300"
-                  style={{ width: `${totalSlots > 0 ? (filledCount / totalSlots) * 100 : 0}%` }}
-                />
-              </div>
-              <span className="text-sm text-gray-400 font-medium shrink-0">
-                {filledCount}/{totalSlots}
-              </span>
-            </div>
-
             {/* Slot Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {weapon.slots.map((slot) => (
@@ -267,7 +260,6 @@ export default function WeaponBuilder({
 
       {/* Mobile Stats Summary Bar */}
       <StatsSummaryBar
-        filledCount={filledCount}
         totalSlots={totalSlots}
         buildCost={buildCost}
         cumulativeEffects={cumulativeEffects}
