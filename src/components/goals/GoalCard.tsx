@@ -30,13 +30,11 @@ export default function GoalCard({
       <div className="text-5xl mb-3">{goal.icon}</div>
       <h4 className="font-bold text-xl mb-2">{goal.name}</h4>
       <p className="text-sm text-gray-400 mb-3">{goal.desc}</p>
-      {isSelected && (
-        <div className="pt-3 border-t border-orange-500/30">
-          <p className="text-sm text-orange-200 font-semibold">
-            ✓ {build.fix}
-          </p>
-        </div>
-      )}
+      <div className="pt-3 border-t border-gray-700">
+        <p className={`text-sm font-semibold ${isSelected ? "text-orange-200" : "text-gray-500"}`}>
+          {isSelected ? "✓ " : ""}{build.fix}
+        </p>
+      </div>
     </button>
   );
 }
