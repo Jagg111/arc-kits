@@ -1,12 +1,22 @@
+// ============================================================================
+// FILE: data/presets.ts
+// PURPOSE: Pre-built recommended loadouts organized by build goal
+// USED BY: useWeaponBuilder (applies a preset), WeaponBuilder + GoalCard (displays goals),
+//          StatsSummaryBar (mobile goal picker)
+// NOTE: The keys inside each goal's `builds` object MUST match weapon `id` values from weapons.ts.
+//       If a weapon ID isn't listed under a goal, that goal won't appear for that weapon.
+// ============================================================================
+
 import type { GoalPresets } from "../types";
 
+// Each goal preset provides a recommended mod loadout per weapon.
+// Goals: fix (address weakness), budget (cheap), recoil (stability), stealth, pvp, arc (robots)
 export const GOAL_PRESETS: GoalPresets = {
   fix: {
     icon: "🎯",
     name: "Fix This Gun",
     desc: "Addresses biggest weakness",
     builds: {
-      hairpin: { slots: { "Light Magazine": { fam: "Extended Light Magazine", tier: "Uncommon" } }, fix: "Extends stealth capacity" },
       burletta: { slots: { Muzzle: { fam: "Compensator", tier: "Uncommon" }, "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" } }, fix: "Fixes tiny mag + bloom" },
       kettle: { slots: { Muzzle: { fam: "Compensator", tier: "Uncommon" }, Underbarrel: { fam: "Vertical Grip", tier: "Common" }, "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" }, Stock: { fam: "Stable Stock", tier: "Uncommon" } }, fix: "Eliminates bloom" },
       stitcher: { slots: { Muzzle: { fam: "Muzzle Brake", tier: "Uncommon" }, Underbarrel: { fam: "Vertical Grip", tier: "Uncommon" }, "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" }, Stock: { fam: "Stable Stock", tier: "Common" } }, fix: "Tames wild kick" },
@@ -19,7 +29,7 @@ export const GOAL_PRESETS: GoalPresets = {
       osprey: { slots: { Muzzle: { fam: "Extended Barrel", tier: "Rare" }, Stock: { fam: "Lightweight Stock", tier: "Rare" } }, fix: "Velocity + snap-aim" },
       tempest: { slots: { Muzzle: { fam: "Muzzle Brake", tier: "Uncommon" }, Underbarrel: { fam: "Vertical Grip", tier: "Rare" }, "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" } }, fix: "Controls vertical climb" },
       ferro: { slots: { Stock: { fam: "Lightweight Stock", tier: "Rare" } }, fix: "Fixes sluggish ADS" },
-      anvil: { slots: { Muzzle: { fam: "Compensator", tier: "Rare" } }, fix: "Tightens dispersion" },
+      anvil: { slots: { Muzzle: { fam: "Compensator", tier: "Uncommon" } }, fix: "Tighten dispersion" },
       bettina: { slots: { Muzzle: { fam: "Muzzle Brake", tier: "Rare" }, Underbarrel: { fam: "Horizontal Grip", tier: "Legendary" }, Stock: { fam: "Stable Stock", tier: "Uncommon" } }, fix: "Controls full-auto" },
       iltoro: { slots: { "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Uncommon" }, "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Uncommon" } }, fix: "Tightens spread" },
       vulcano: { slots: { "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" }, "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" } }, fix: "Reliable pellets" },
@@ -62,10 +72,9 @@ export const GOAL_PRESETS: GoalPresets = {
     desc: "Silencers, low noise",
     builds: {
       osprey: { slots: { Muzzle: { fam: "Silencer", tier: "Uncommon" }, Stock: { fam: "Stable Stock", tier: "Uncommon" } }, fix: "Silent snipes" },
-      anvil: { slots: { Muzzle: { fam: "Silencer", tier: "Uncommon" } }, fix: "Quiet power" },
+      anvil: { slots: { Muzzle: { fam: "Silencer", tier: "Rare" } }, fix: "Quiet power" },
       vulcano: { slots: { "Shotgun Muzzle": { fam: "Shotgun Silencer", tier: "Rare" }, "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" } }, fix: "Silent clear" },
       burletta: { slots: { Muzzle: { fam: "Silencer", tier: "Uncommon" }, "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" } }, fix: "Stealth pistol" },
-      hairpin: { slots: { "Light Magazine": { fam: "Extended Light Magazine", tier: "Uncommon" } }, fix: "Extended stealth" },
     },
   },
   pvp: {
@@ -75,7 +84,6 @@ export const GOAL_PRESETS: GoalPresets = {
     builds: {
       tempest: { slots: { Muzzle: { fam: "Muzzle Brake", tier: "Uncommon" }, Underbarrel: { fam: "Vertical Grip", tier: "Rare" }, "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" } }, fix: "AR king" },
       vulcano: { slots: { "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" }, "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" } }, fix: "Fastest TTK" },
-      anvil: { slots: { Muzzle: { fam: "Compensator", tier: "Rare" } }, fix: "Meta cannon" },
       stitcher: { slots: { Muzzle: { fam: "Compensator", tier: "Rare" }, "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" } }, fix: "High DPS" },
       venator: { slots: { Underbarrel: { fam: "Horizontal Grip", tier: "Legendary" }, "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" } }, fix: "Top pistol" },
     },
@@ -86,7 +94,6 @@ export const GOAL_PRESETS: GoalPresets = {
     desc: "Robot combat optimized",
     builds: {
       ferro: { slots: { Stock: { fam: "Stable Stock", tier: "Uncommon" } }, fix: "Boss killer" },
-      anvil: { slots: { Muzzle: { fam: "Compensator", tier: "Uncommon" } }, fix: "Heavy precision" },
       bettina: { slots: { Muzzle: { fam: "Compensator", tier: "Rare" }, Underbarrel: { fam: "Vertical Grip", tier: "Uncommon" }, Stock: { fam: "Stable Stock", tier: "Rare" } }, fix: "Heavy accuracy" },
       tempest: { slots: { Muzzle: { fam: "Compensator", tier: "Uncommon" }, Underbarrel: { fam: "Vertical Grip", tier: "Uncommon" }, "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" } }, fix: "Sustained DPS" },
       renegade: { slots: { Muzzle: { fam: "Compensator", tier: "Uncommon" }, "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" }, Stock: { fam: "Stable Stock", tier: "Uncommon" } }, fix: "ARC breaking" },
