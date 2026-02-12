@@ -1,8 +1,24 @@
+// ============================================================================
+// FILE: data/mods.ts
+// PURPOSE: All mod families organized by attachment slot type
+// USED BY: AttachmentSlot (filters mods for a slot), ModDrawer (lists available mods),
+//          useBuildCost (looks up crafting costs), useCumulativeEffects (reads effect strings)
+// IMPORTS FROM: types (ModFamilies), weapons.ts (for building weapon compatibility lists)
+//
+// HOW WEAPON COMPATIBILITY WORKS:
+// Each mod family has a `w` array listing which weapon IDs can equip that mod.
+// Helper arrays like MOST_MUZZLE exclude weapons that lack a muzzle slot.
+// The `poor` array (optional) marks weapons where the mod gives little benefit.
+// ============================================================================
+
 import type { ModFamilies } from "../types";
 import { WEAPONS } from "./weapons";
 
+// Build helper arrays of weapon IDs for common compatibility patterns.
+// These start with ALL weapon IDs and exclude the ones that don't have the relevant slot.
 const ALL_IDS = WEAPONS.map((w) => w.id);
 
+// Weapons that have a standard Muzzle slot (excludes shotguns, specials, hairpin, venator)
 const MOST_MUZZLE = ALL_IDS.filter(
   (x) =>
     ![
@@ -17,11 +33,13 @@ const MOST_MUZZLE = ALL_IDS.filter(
     ].includes(x),
 );
 
+// Weapons that have an Underbarrel slot
 const MOST_UB = ALL_IDS.filter(
   (x) =>
     !["hairpin", "burletta", "anvil", "torrente", "jupiter", "equalizer"].includes(x),
 );
 
+// Weapons that have a Stock slot
 const MOST_STOCK = ALL_IDS.filter(
   (x) =>
     ![
@@ -35,10 +53,13 @@ const MOST_STOCK = ALL_IDS.filter(
     ].includes(x),
 );
 
-/** Build a wiki thumbnail URL at 96px (retina-ready for 48px display). */
+// Build a wiki thumbnail URL at 96px (retina-ready for 48px display).
+// `hash` is the wiki image path hash, `file` is the filename.
 const W = (hash: string, file: string) =>
   `https://arcraiders.wiki/w/images/thumb/${hash}/${file}/96px-${file}.webp`;
 
+// The main mod data structure. Keyed by SlotType, each entry is an array of ModFamily objects.
+// Each ModFamily has: fam (name), desc, tiers (with effects + costs), w (compatible weapons).
 export const MOD_FAMILIES: ModFamilies = {
   Muzzle: [
     {

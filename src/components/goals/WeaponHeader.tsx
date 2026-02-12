@@ -1,3 +1,11 @@
+// ============================================================================
+// FILE: components/goals/WeaponHeader.tsx
+// PURPOSE: Large weapon info card shown at the top of the builder screen
+// USED BY: WeaponBuilder.tsx
+// Shows weapon name, class/ammo/rarity badges, description, and known weakness.
+// Uses the Badge component for each colored pill label.
+// ============================================================================
+
 import type { Weapon } from "../../types";
 import { CLASS_LABELS, CLASS_COLORS, AMMO_COLORS, RARITY_COLORS, GRADE_COLORS } from "../../data/constants";
 import Badge from "../shared/Badge";

@@ -1,3 +1,17 @@
+// ============================================================================
+// FILE: components/builder/AttachmentSlot.tsx
+// PURPOSE: Renders a single attachment slot — either showing the equipped mod or an empty "+" button
+// USED BY: WeaponBuilder.tsx (one per slot in the weapon's slots array)
+//
+// TWO RENDER PATHS:
+//   1. Equipped: Shows mod image, name, tier badge, effects list, and a remove (X) button.
+//      Clicking the card opens the ModDrawer to swap to a different mod.
+//   2. Empty: Shows a dashed-border button with "+" icon. Clicking opens the ModDrawer.
+//
+// The `families` filter ensures only mods compatible with the current weapon are considered.
+// The `w` array on each ModFamily lists which weapon IDs can use that mod.
+// ============================================================================
+
 import type { EquippedMod, ModFamily, SlotType, Rarity } from "../../types";
 import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
 import { MOD_FAMILIES } from "../../data/mods";

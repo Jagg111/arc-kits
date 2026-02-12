@@ -1,3 +1,9 @@
+// ============================================================================
+// FILE: components/weapons/AmmoGroup.tsx
+// PURPOSE: Renders a group of weapon cards under an ammo type heading (e.g. "Light Ammo")
+// USED BY: WeaponPicker.tsx
+// ============================================================================
+
 import type { AmmoType, Weapon } from "../../types";
 import { AMMO_COLORS } from "../../data/constants";
 import WeaponCard from "./WeaponCard";

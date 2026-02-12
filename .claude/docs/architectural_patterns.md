@@ -17,7 +17,7 @@ This keeps App as a thin wiring layer with no business logic of its own.
 No Context API, Redux, or any global state. Data flows strictly parent-to-child via props, and user actions flow child-to-parent via callback props.
 
 Example chain for equipping a mod:
-- `ModOption` calls `onSelect(famName, tier)` (src/components/builder/ModOption.tsx:23)
+- `ModFamilySection` calls `onSelect(famName, tier)` (src/components/builder/ModFamilySection.tsx:23)
 - `AttachmentSlot` wraps it: `onEquip(slot, famName, tier)` (src/components/builder/AttachmentSlot.tsx:57)
 - `WeaponBuilder` passes through to `onEquip` prop (src/components/builder/WeaponBuilder.tsx:189)
 - `App` calls `equipMod` from `useWeaponBuilder` (src/App.tsx:40)
@@ -26,7 +26,7 @@ Example chain for equipping a mod:
 
 Every component defines its own props interface at the top of the file, named `[ComponentName]Props`. No shared prop interfaces — each component is self-documenting. Props are always destructured in the function signature.
 
-Files using this pattern: Header.tsx:1, Badge.tsx:1, CostDisplay.tsx:1, WeaponCard.tsx:4, AmmoGroup.tsx:5, WeaponPicker.tsx:6, GoalCard.tsx:3, ModOption.tsx:4, AttachmentSlot.tsx:6, WeaponHeader.tsx:5, WeaponBuilder.tsx:7.
+Files using this pattern: Header.tsx:1, Badge.tsx:1, WeaponCard.tsx:4, AmmoGroup.tsx:5, WeaponPicker.tsx:6, GoalCard.tsx:3, ModFamilySection.tsx:4, AttachmentSlot.tsx:6, WeaponHeader.tsx:5, WeaponBuilder.tsx:7.
 
 ## 4. Tailwind + Inline Styles for Dynamic Colors
 
@@ -42,7 +42,7 @@ The `"22"` suffix is a hex alpha value (~13% opacity) for semi-transparent backg
 - WeaponCard.tsx:22-25
 - GoalCard.tsx:24-28
 - AttachmentSlot.tsx:45
-- ModOption.tsx:26
+- ModFamilySection.tsx:26
 
 ## 5. Color Constants as Lookup Tables
 
@@ -91,9 +91,9 @@ Game data uses human-readable strings for effects and costs. Two hooks parse the
 Components are grouped by feature domain, not by component type:
 - `components/layout/` — app chrome (Header)
 - `components/weapons/` — weapon selection flow (WeaponPicker → AmmoGroup → WeaponCard)
-- `components/builder/` — mod builder flow (WeaponBuilder → AttachmentSlot → ModOption)
+- `components/builder/` — mod builder flow (WeaponBuilder → AttachmentSlot → ModFamilySection)
 - `components/goals/` — goal/preset display (WeaponHeader, GoalCard)
-- `components/shared/` — reusable leaf components (Badge, CostDisplay)
+- `components/shared/` — reusable leaf components (Badge)
 
 Each folder contains related components that form a feature-specific subtree.
 

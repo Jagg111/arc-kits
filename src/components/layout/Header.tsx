@@ -1,3 +1,10 @@
+// ============================================================================
+// FILE: components/layout/Header.tsx
+// PURPOSE: Sticky top bar with app title, weapon name, and "Change Weapon" button
+// USED BY: App.tsx
+// NOTE: Weapon name is shown inline on desktop (sm:inline) and below the title on mobile
+// ============================================================================
+
 interface HeaderProps {
   hasWeapon: boolean;
   weaponName?: string;

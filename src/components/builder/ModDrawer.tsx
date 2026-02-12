@@ -1,3 +1,17 @@
+// ============================================================================
+// FILE: components/builder/ModDrawer.tsx
+// PURPOSE: Slide-in drawer for selecting a mod for a specific slot
+// USED BY: WeaponBuilder.tsx (opened when user clicks an AttachmentSlot)
+//
+// ANIMATION: Uses a two-step approach for the slide-in:
+//   1. Component mounts with `isOpen = false` (drawer is off-screen via translate-x-full)
+//   2. `requestAnimationFrame` sets `isOpen = true` on next frame (triggers CSS transition)
+//   3. On close, sets `isOpen = false` first, then removes component after 300ms delay
+//
+// SCROLL LOCK: Sets `document.body.style.overflow = "hidden"` to prevent background scrolling
+// while the drawer is open. Restored on unmount via the useEffect cleanup function.
+// ============================================================================
+
 import { useState, useEffect } from "react";
 import type { SlotType, Rarity, ModFamily } from "../../types";
 import { MOD_FAMILIES } from "../../data/mods";

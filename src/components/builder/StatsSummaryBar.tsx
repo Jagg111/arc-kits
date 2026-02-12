@@ -1,3 +1,13 @@
+// ============================================================================
+// FILE: components/builder/StatsSummaryBar.tsx
+// PURPOSE: Mobile-only bottom bar showing build stats, goals, effects, and costs
+// USED BY: WeaponBuilder.tsx
+//
+// This is the mobile equivalent of the desktop sidebar in WeaponBuilder.
+// Hidden on desktop (lg:hidden). Shows a collapsed bar at the bottom that expands
+// upward to reveal goal picker, cumulative effects, cost breakdown, and clear button.
+// ============================================================================
+
 import { useState } from "react";
 import type { CumulativeEffect, GoalPreset } from "../../types";
 import { GOAL_PRESETS } from "../../data/presets";

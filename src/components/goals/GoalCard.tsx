@@ -1,3 +1,11 @@
+// ============================================================================
+// FILE: components/goals/GoalCard.tsx
+// PURPOSE: Clickable card for a single goal preset (e.g. "Fix This Gun", "Budget Build")
+// USED BY: WeaponBuilder.tsx (in the goal-first flow grid)
+// NOTE: Returns null if the goal has no build defined for the current weapon.
+//       The `build.fix` text (e.g. "Controls vertical climb") is shown at the bottom.
+// ============================================================================
+
 import type { GoalPreset } from "../../types";
 
 interface GoalCardProps {

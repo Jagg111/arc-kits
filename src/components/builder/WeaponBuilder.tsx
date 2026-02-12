@@ -1,3 +1,19 @@
+// ============================================================================
+// FILE: components/builder/WeaponBuilder.tsx
+// PURPOSE: Main builder screen layout — orchestrates goals, attachment slots, stats, and costs
+// USED BY: App.tsx (shown when a weapon is selected)
+//
+// THREE RENDERING STATES:
+//   1. No slots — shows a "No Attachment Slots" message (e.g. Jupiter, Equalizer)
+//   2. Goal-first flow — shown when weapon first selected, before any mods are equipped.
+//      Displays goal preset cards + a "Build Manually" option.
+//   3. Main builder — shows attachment slot grid + sidebar (desktop) / bottom bar (mobile)
+//
+// DESKTOP vs MOBILE:
+//   Desktop: 3-column grid — sidebar (col 1) has goals/stats/cost, slots (cols 2-3)
+//   Mobile: Slots only + StatsSummaryBar fixed at bottom of screen
+// ============================================================================
+
 import { useState } from "react";
 import type { Weapon, EquippedState, SlotType, Rarity, CumulativeEffect } from "../../types";
 import { GOAL_PRESETS } from "../../data/presets";
@@ -30,9 +46,9 @@ export default function WeaponBuilder({
   onRemove,
   onClearAll,
 }: WeaponBuilderProps) {
-  const [activeSlot, setActiveSlot] = useState<SlotType | null>(null);
-  const [goalDismissed, setGoalDismissed] = useState(false);
-  const [goalExpanded, setGoalExpanded] = useState(true);
+  const [activeSlot, setActiveSlot] = useState<SlotType | null>(null);  // Which slot's ModDrawer is open
+  const [goalDismissed, setGoalDismissed] = useState(false);           // Has user dismissed the goal-first flow
+  const [goalExpanded, setGoalExpanded] = useState(true);              // Is the goal picker expanded in sidebar
 
   const hasEquipped = Object.keys(equipped).length > 0;
   const hasCost = Object.keys(buildCost).length > 0;
@@ -53,6 +69,7 @@ export default function WeaponBuilder({
     setGoalDismissed(false);
   };
 
+  // Filter goals to only those that have a build defined for this weapon
   const availableGoals = Object.entries(GOAL_PRESETS).filter(
     ([, goal]) => goal.builds[weapon.id],
   );

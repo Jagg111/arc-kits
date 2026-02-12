@@ -1,3 +1,15 @@
+// ============================================================================
+// FILE: App.tsx
+// PURPOSE: Root component — wires all hooks together and passes data to UI components
+// USED BY: main.tsx (mounted into the DOM)
+//
+// This is a thin "wiring" layer with no business logic of its own.
+// It calls the custom hooks, then passes their return values as props to components.
+// The app has two screens:
+//   1. WeaponPicker — shown when no weapon is selected (gun === null)
+//   2. WeaponBuilder — shown when a weapon is selected
+// ============================================================================
+
 import { useWeaponBuilder } from "./hooks/useWeaponBuilder";
 import { useBuildCost } from "./hooks/useBuildCost";
 import { useCumulativeEffects } from "./hooks/useCumulativeEffects";
@@ -7,6 +19,7 @@ import WeaponPicker from "./components/weapons/WeaponPicker";
 import WeaponBuilder from "./components/builder/WeaponBuilder";
 
 export default function App() {
+  // Core state: selected weapon, goal, equipped mods, and all action functions
   const {
     gun,
     gunObj,
@@ -20,9 +33,11 @@ export default function App() {
     resetSelection,
   } = useWeaponBuilder();
 
+  // Computed values derived from equipped mods (recalculated when equipped changes)
   const buildCost = useBuildCost(equipped);
   const cumulativeEffects = useCumulativeEffects(equipped);
 
+  // Sync build state with URL params so builds are shareable via link
   useBuildUrl(gun, equipped, selectWeapon, equipMod);
 
   return (

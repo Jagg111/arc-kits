@@ -1,3 +1,13 @@
+// ============================================================================
+// FILE: components/builder/ModFamilySection.tsx
+// PURPOSE: Displays a single mod family in the ModDrawer with tier selection buttons
+// USED BY: ModDrawer.tsx (one per compatible mod family for the slot)
+//
+// Each tier button shows the tier image, rarity badge, effects list, and crafting cost.
+// The background color uses the `color + "18"` hex alpha pattern (~9% opacity) to give
+// each tier a subtle tint matching its rarity color.
+// ============================================================================
+
 import type { ModFamily, Rarity } from "../../types";
 import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
 

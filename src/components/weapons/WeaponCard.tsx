@@ -1,3 +1,11 @@
+// ============================================================================
+// FILE: components/weapons/WeaponCard.tsx
+// PURPOSE: Clickable card for a single weapon on the picker screen
+// USED BY: AmmoGroup.tsx
+// NOTE: The colored stripe at the top indicates rarity. Grade badges use the
+//       color + "22" pattern for a semi-transparent background (see Badge.tsx).
+// ============================================================================
+
 import type { Weapon } from "../../types";
 import { CLASS_LABELS, GRADE_COLORS, RARITY_COLORS } from "../../data/constants";
 

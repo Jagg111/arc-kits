@@ -1,3 +1,13 @@
+// ============================================================================
+// FILE: components/weapons/WeaponPicker.tsx
+// PURPOSE: Weapon selection screen — groups weapons by ammo type with sort options
+// USED BY: App.tsx (shown when no weapon is selected)
+// IMPORTS FROM: weapons.ts, constants.ts (for sort ordering), AmmoGroup component
+//
+// Weapons are grouped by ammo type (Light, Medium, Heavy, Shotgun, Special).
+// Users can sort within each group by Rarity, PVP grade, or ARC grade.
+// ============================================================================
+
 import { useState } from "react";
 import { WEAPONS } from "../../data/weapons";
 import { AMMO_TYPES, RARITY_ORDER, GRADE_ORDER } from "../../data/constants";

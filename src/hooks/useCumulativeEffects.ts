@@ -1,7 +1,24 @@
+// ============================================================================
+// FILE: hooks/useCumulativeEffects.ts
+// PURPOSE: Aggregates stat bonuses from all equipped mods into cumulative totals
+// USED BY: App.tsx (passes result to WeaponBuilder sidebar and StatsSummaryBar)
+// IMPORTS FROM: mods.ts (to look up effect strings per mod tier)
+//
+// HOW IT WORKS:
+// Each equipped mod has an array of effect strings (e.g. "20% Reduced Vertical Recoil").
+// This hook tests each effect against a table of regex patterns (STAT_PATTERNS below).
+// When a pattern matches, it extracts the numeric value and groups it by stat name.
+// The result is an array of CumulativeEffect objects, each showing the stat, contributing
+// mods, and the total combined value.
+// ============================================================================
+
 import { useMemo } from "react";
 import type { EquippedState, CumulativeEffect } from "../types";
 import { MOD_FAMILIES } from "../data/mods";
 
+// Regex patterns for extracting stat values from effect strings.
+// Each entry maps a stat name to a pattern that captures the numeric value.
+// The `unit` field determines display format: "%" for percentages, "" for flat values.
 const STAT_PATTERNS: { stat: string; pattern: RegExp; unit: string }[] = [
   { stat: "Horizontal Recoil", pattern: /(\d+)%\s+(?:Reduced|Increased)\s+Horizontal\s+Recoil/i, unit: "%" },
   { stat: "Vertical Recoil", pattern: /(\d+)%\s+(?:Reduced|Increased)\s+Vertical\s+Recoil(?!\s+Recovery)/i, unit: "%" },
@@ -25,13 +42,16 @@ const STAT_PATTERNS: { stat: string; pattern: RegExp; unit: string }[] = [
 export function useCumulativeEffects(equipped: EquippedState): CumulativeEffect[] {
   return useMemo(() => {
     const allFams = Object.values(MOD_FAMILIES).flat();
+    // Map from stat name to its cumulative effect data
     const statMap = new Map<string, CumulativeEffect>();
 
+    // Loop through every equipped mod
     for (const [, { fam: famName, tier }] of Object.entries(equipped)) {
       const famObj = allFams.find((f) => f.fam === famName);
       const tierData = famObj?.tiers[tier];
       if (!tierData) continue;
 
+      // Test each effect string against all stat patterns
       for (const effect of tierData.e) {
         for (const { stat, pattern, unit } of STAT_PATTERNS) {
           const match = effect.match(pattern);
@@ -44,7 +64,7 @@ export function useCumulativeEffects(equipped: EquippedState): CumulativeEffect[
           const entry = statMap.get(stat)!;
           entry.mods.push({ name: famName, effect, value });
           entry.total += value;
-          break;
+          break; // First matching pattern wins — stop checking other patterns for this effect
         }
       }
     }
