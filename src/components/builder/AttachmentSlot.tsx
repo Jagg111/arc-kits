@@ -29,7 +29,7 @@ export default function AttachmentSlot({
 
     return (
       <div
-        className="bg-gray-900 rounded-xl border border-gray-700 p-3 flex items-center gap-3 cursor-pointer hover:border-gray-600 transition-colors"
+        className="bg-gray-900 rounded-xl border border-gray-700 p-3 flex items-start gap-3 cursor-pointer hover:border-gray-600 transition-colors"
         onClick={() => onOpenDrawer(slot)}
       >
         {tierData?.img && (
@@ -50,9 +50,11 @@ export default function AttachmentSlot({
               {RARITY_LABELS[equipped.tier]}
             </span>
           </div>
-          <div className="text-xs text-gray-400 mt-0.5 truncate">
-            {tierData?.e[0] ?? slot}
-          </div>
+          <ul className="text-xs text-gray-400 mt-0.5 space-y-0.5">
+            {tierData?.e.map((effect, i) => (
+              <li key={i}>{effect}</li>
+            )) ?? <li>{slot}</li>}
+          </ul>
         </div>
         <button
           onClick={(e) => {
