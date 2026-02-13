@@ -4,12 +4,14 @@
 // USED BY: ModDrawer.tsx (one per compatible mod family for the slot)
 //
 // Each tier button shows the tier image, rarity badge, effects list, and crafting cost.
+// Crafting costs are displayed as rarity-colored pills with material icons via CostPill.
 // The background color uses the `color + "18"` hex alpha pattern (~9% opacity) to give
 // each tier a subtle tint matching its rarity color.
 // ============================================================================
 
 import type { ModFamily, Rarity } from "../../types";
 import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
+import CostPill from "../shared/CostPill";
 
 interface ModFamilySectionProps {
   mod: ModFamily;
@@ -74,12 +76,7 @@ export default function ModFamilySection({
                   {tier.cr ? (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {tier.cr.split(", ").map((mat) => (
-                        <span
-                          key={mat}
-                          className="px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/15 text-orange-400"
-                        >
-                          {mat}
-                        </span>
+                        <CostPill key={mat} cost={mat} />
                       ))}
                     </div>
                   ) : (

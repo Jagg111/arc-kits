@@ -5,6 +5,7 @@
 //
 // TWO RENDER PATHS:
 //   1. Equipped: Shows mod image, name, tier badge, effects list, and a remove (X) button.
+//      Crafting costs are displayed as rarity-colored pills with material icons via CostPill.
 //      Clicking the card opens the ModDrawer to swap to a different mod.
 //   2. Empty: Shows a dashed-border button with "+" icon. Clicking opens the ModDrawer.
 //
@@ -15,6 +16,7 @@
 import type { EquippedMod, ModFamily, SlotType, Rarity } from "../../types";
 import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
 import { MOD_FAMILIES } from "../../data/mods";
+import CostPill from "../shared/CostPill";
 
 interface AttachmentSlotProps {
   slot: SlotType;
@@ -72,12 +74,7 @@ export default function AttachmentSlot({
           {tierData?.cr ? (
             <div className="flex flex-wrap gap-1 mt-1.5">
               {tierData.cr.split(", ").map((mat) => (
-                <span
-                  key={mat}
-                  className="px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/15 text-orange-400"
-                >
-                  {mat}
-                </span>
+                <CostPill key={mat} cost={mat} />
               ))}
             </div>
           ) : (

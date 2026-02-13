@@ -40,7 +40,7 @@ src/
     weapons.ts             — Weapon definitions (id, stats, slots, grades)
     mods.ts                — Mod families by slot type (tiers, effects, costs, compatibility)
     presets.ts             — Goal-based preset builds (fix, budget, recoil, stealth, pvp, arc)
-    constants.ts           — Label maps, color maps, rarity ordering
+    constants.ts           — Label maps, color maps, rarity ordering, crafting material metadata
 
   hooks/                   — Business logic (state + computed values)
     useWeaponBuilder.ts    — Core state: selected weapon, goal, equipped mods + all actions
@@ -65,6 +65,7 @@ src/
       GoalCard.tsx         — Goal preset card
     shared/                — Reusable leaf components
       Badge.tsx            — Colored label pill
+      CostPill.tsx         — Rarity-colored crafting cost pill with material icon
       CostDisplay.tsx      — Cost breakdown display (currently unused)
 ```
 
@@ -81,6 +82,7 @@ src/
 - **New mod family**: Add to the appropriate slot array in `src/data/mods.ts`, set `w` (weapon compatibility) array
 - **New goal preset**: Add new key to `GOAL_PRESETS` in `src/data/presets.ts` with icon, name, desc, and per-weapon builds
 - **New stat type for effects**: Add regex pattern to `STAT_PATTERNS` in `src/hooks/useCumulativeEffects.ts:5-16`
+- **New crafting material**: Add entry to `MATERIAL_INFO` in `src/data/constants.ts` with its rarity and wiki thumbnail URL
 
 ## Type System
 All types in `src/types/index.ts`. Key interfaces:

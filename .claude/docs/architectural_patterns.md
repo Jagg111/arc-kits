@@ -52,8 +52,11 @@ All color values are centralized in `src/data/constants.ts` as `Record<string, s
 - `RARITY_COLORS` — rarity tier to hex color
 - `TIER_COLORS` — mod tier (1/2/3/3+) to hex color
 - `GRADE_COLORS` — letter grade (S/A/B/C/D/F) to hex color
+- `MATERIAL_INFO` — crafting material name to `{ rarity, img }` (rarity resolves to color via `RARITY_COLORS`)
 
 Components import the relevant map and index into it at render time. Never hardcode color values in components.
+
+Crafting cost pills use the `CostPill` shared component (src/components/shared/CostPill.tsx) which parses cost strings like `"6x Metal Parts"`, looks up the material in `MATERIAL_INFO`, and renders a rarity-colored pill with an icon thumbnail. Total cost sections in WeaponBuilder and StatsSummaryBar use `MATERIAL_INFO` directly for icon + color lookup.
 
 ## 6. Immutable State Updates
 
@@ -80,6 +83,7 @@ Game data uses human-readable strings for effects and costs. Two hooks parse the
 **Cost parsing** (src/hooks/useBuildCost.ts:16):
 - Pattern: `/(\d+)x\s+(.+)/` matches strings like `"6x Metal Parts"`
 - Input comes from `TierData.cr` field, comma-separated
+- Parsed material names are also used by `CostPill` and total cost sections to resolve rarity color + icon via `MATERIAL_INFO` in constants.ts
 
 **Effect parsing** (src/hooks/useCumulativeEffects.ts:5-16):
 - `STAT_PATTERNS` array of `{ stat, pattern, unit }` objects

@@ -17,6 +17,7 @@
 import { useState } from "react";
 import type { Weapon, EquippedState, SlotType, Rarity, CumulativeEffect } from "../../types";
 import { GOAL_PRESETS } from "../../data/presets";
+import { MATERIAL_INFO, RARITY_COLORS } from "../../data/constants";
 import WeaponHeader from "../goals/WeaponHeader";
 import GoalCard from "../goals/GoalCard";
 import AttachmentSlot from "./AttachmentSlot";
@@ -221,15 +222,24 @@ export default function WeaponBuilder({
                   Total Cost
                 </h4>
                 <div className="space-y-2">
-                  {Object.entries(buildCost).map(([item, qty]) => (
-                    <div
-                      key={item}
-                      className="flex items-center justify-between text-sm bg-gray-800 rounded-lg px-3 py-2"
-                    >
-                      <span className="text-gray-300">{item}</span>
-                      <span className="text-orange-400 font-bold">{qty}x</span>
-                    </div>
-                  ))}
+                  {Object.entries(buildCost).map(([item, qty]) => {
+                    const info = MATERIAL_INFO[item];
+                    const color = info ? RARITY_COLORS[info.rarity] : "#9ca3af";
+                    return (
+                      <div
+                        key={item}
+                        className="flex items-center justify-between text-sm bg-gray-800 rounded-lg px-3 py-2"
+                      >
+                        <span className="flex items-center gap-2 text-gray-300">
+                          {info?.img && (
+                            <img src={info.img} alt={item} loading="lazy" className="w-5 h-5 object-contain" />
+                          )}
+                          {item}
+                        </span>
+                        <span className="font-bold" style={{ color }}>{qty}x</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
