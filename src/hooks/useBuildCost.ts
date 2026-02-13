@@ -1,8 +1,11 @@
 // ============================================================================
 // FILE: hooks/useBuildCost.ts
-// PURPOSE: Computes total crafting material costs from all equipped mods
+// PURPOSE: Computes total crafting material costs from all equipped mods,
+//          sorted by rarity (Legendary → Common) then alphabetically,
+//          with Mechanical Components prioritized within Uncommon (craftable at refiner)
 // USED BY: App.tsx (passes result to WeaponBuilder and StatsSummaryBar for display)
-// IMPORTS FROM: mods.ts (to look up crafting cost strings per mod tier)
+// IMPORTS FROM: mods.ts (to look up crafting cost strings per mod tier),
+//              constants.ts (MATERIAL_INFO for rarity lookup, RARITY_ORDER for sorting)
 //
 // HOW IT WORKS:
 // Each mod tier has a `cr` (crafting cost) string like "6x Metal Parts, 1x Wires".
@@ -13,6 +16,7 @@
 import { useMemo } from "react";
 import type { EquippedState } from "../types";
 import { MOD_FAMILIES } from "../data/mods";
+import { MATERIAL_INFO, RARITY_ORDER } from "../data/constants";
 
 export function useBuildCost(equipped: EquippedState): Record<string, number> {
   return useMemo(() => {
@@ -34,6 +38,17 @@ export function useBuildCost(equipped: EquippedState): Record<string, number> {
       }
     }
 
-    return materials;
+    // Sort materials by rarity (Legendary first → Common last), then alphabetically within each tier.
+    // Mechanical Components is prioritized within Uncommon since it's craftable at the refiner.
+    const sorted = Object.entries(materials).sort(([a], [b]) => {
+      const ra = RARITY_ORDER[MATERIAL_INFO[a]?.rarity ?? "Common"];
+      const rb = RARITY_ORDER[MATERIAL_INFO[b]?.rarity ?? "Common"];
+      if (ra !== rb) return rb - ra;
+      if (a === "Mechanical Components") return -1;
+      if (b === "Mechanical Components") return 1;
+      return a.localeCompare(b);
+    });
+
+    return Object.fromEntries(sorted);
   }, [equipped]);
 }

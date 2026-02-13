@@ -7,7 +7,7 @@ Patterns observed across multiple files in the ArcKits codebase.
 All application state lives in `useWeaponBuilder` (src/hooks/useWeaponBuilder.ts:6-72). It owns three `useState` calls (`gun`, `selectedGoal`, `equipped`) and exposes 6 `useCallback` actions + 1 `useMemo` derived value. `App.tsx:8-20` destructures the full return value and passes pieces down as props.
 
 Computed values are separate hooks consumed in App:
-- `useBuildCost` (src/hooks/useBuildCost.ts:5-24) — parses craft cost strings into material totals
+- `useBuildCost` (src/hooks/useBuildCost.ts:5-24) — parses craft cost strings into material totals, sorted by rarity (Legendary → Common) then alphabetically, with Mechanical Components prioritized in Uncommon
 - `useCumulativeEffects` (src/hooks/useCumulativeEffects.ts:18-46) — aggregates stat bonuses via regex
 
 This keeps App as a thin wiring layer with no business logic of its own.
@@ -84,6 +84,7 @@ Game data uses human-readable strings for effects and costs. Two hooks parse the
 - Pattern: `/(\d+)x\s+(.+)/` matches strings like `"6x Metal Parts"`
 - Input comes from `TierData.cr` field, comma-separated
 - Parsed material names are also used by `CostPill` and total cost sections to resolve rarity color + icon via `MATERIAL_INFO` in constants.ts
+- After accumulation, materials are sorted by `RARITY_ORDER` (descending — rare first) then alphabetically, with "Mechanical Components" always first among Uncommon materials (craftable at the refiner). The returned `Record` has a stable display order via JS insertion-order iteration
 
 **Effect parsing** (src/hooks/useCumulativeEffects.ts:5-16):
 - `STAT_PATTERNS` array of `{ stat, pattern, unit }` objects

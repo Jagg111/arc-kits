@@ -44,7 +44,7 @@ src/
 
   hooks/                   — Business logic (state + computed values)
     useWeaponBuilder.ts    — Core state: selected weapon, goal, equipped mods + all actions
-    useBuildCost.ts        — Computes total crafting materials from equipped mods
+    useBuildCost.ts        — Computes total crafting materials from equipped mods, sorted by rarity (rare first) then name
     useCumulativeEffects.ts — Aggregates stat bonuses across equipped mods via regex
     useBuildUrl.ts         — URL query param sync for shareable builds
 
