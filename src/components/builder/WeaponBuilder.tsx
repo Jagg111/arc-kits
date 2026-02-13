@@ -292,6 +292,7 @@ export default function WeaponBuilder({
         <ModDrawer
           slot={activeSlot}
           weaponId={weapon.id}
+          equippedMod={equipped[activeSlot]}
           onEquip={onEquip}
           onClose={() => setActiveSlot(null)}
         />

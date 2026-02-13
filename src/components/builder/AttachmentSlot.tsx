@@ -69,6 +69,20 @@ export default function AttachmentSlot({
               <li key={i}>{effect}</li>
             )) ?? <li>{slot}</li>}
           </ul>
+          {tierData?.cr ? (
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {tierData.cr.split(", ").map((mat) => (
+                <span
+                  key={mat}
+                  className="px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/15 text-orange-400"
+                >
+                  {mat}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="text-xs text-green-500 mt-1">Free</div>
+          )}
         </div>
         <button
           onClick={(e) => {

@@ -12,20 +12,22 @@
 // while the drawer is open. Restored on unmount via the useEffect cleanup function.
 // ============================================================================
 
-import { useState, useEffect } from "react";
-import type { SlotType, Rarity, ModFamily } from "../../types";
+import { useState, useEffect, useRef } from "react";
+import type { SlotType, Rarity, ModFamily, EquippedMod } from "../../types";
 import { MOD_FAMILIES } from "../../data/mods";
 import ModFamilySection from "./ModFamilySection";
 
 interface ModDrawerProps {
   slot: SlotType;
   weaponId: string;
+  equippedMod?: EquippedMod;
   onEquip: (slot: string, fam: string, tier: Rarity) => void;
   onClose: () => void;
 }
 
-export default function ModDrawer({ slot, weaponId, onEquip, onClose }: ModDrawerProps) {
+export default function ModDrawer({ slot, weaponId, equippedMod, onEquip, onClose }: ModDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const families = (MOD_FAMILIES[slot] ?? []).filter((f: ModFamily) =>
     f.w.includes(weaponId),
@@ -34,8 +36,20 @@ export default function ModDrawer({ slot, weaponId, onEquip, onClose }: ModDrawe
   useEffect(() => {
     requestAnimationFrame(() => setIsOpen(true));
     document.body.style.overflow = "hidden";
+
+    // After slide-in animation completes, scroll to equipped mod's family section
+    const scrollTimer = equippedMod
+      ? setTimeout(() => {
+          const target = scrollRef.current?.querySelector(
+            `[data-mod-family="${equippedMod.fam}"]`,
+          );
+          target?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 350)
+      : undefined;
+
     return () => {
       document.body.style.overflow = "";
+      clearTimeout(scrollTimer);
     };
   }, []);
 
@@ -80,11 +94,12 @@ export default function ModDrawer({ slot, weaponId, onEquip, onClose }: ModDrawe
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-2">
           {families.map((fam: ModFamily) => (
             <ModFamilySection
               key={fam.fam}
               mod={fam}
+              equippedTier={fam.fam === equippedMod?.fam ? equippedMod.tier : undefined}
               onSelect={handleSelect}
             />
           ))}

@@ -13,17 +13,19 @@ import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
 
 interface ModFamilySectionProps {
   mod: ModFamily;
+  equippedTier?: Rarity;
   onSelect: (fam: string, tier: Rarity) => void;
 }
 
 export default function ModFamilySection({
   mod,
+  equippedTier,
   onSelect,
 }: ModFamilySectionProps) {
   const tiers = Object.keys(mod.tiers) as Rarity[];
 
   return (
-    <div className="border border-gray-700 rounded-lg overflow-hidden">
+    <div data-mod-family={mod.fam} className="border border-gray-700 rounded-lg overflow-hidden">
       <div className="p-3 bg-gray-800">
         <div className="font-semibold text-white text-sm">{mod.fam}</div>
         <div className="text-xs text-gray-500 mt-0.5 truncate">{mod.desc}</div>
@@ -33,12 +35,15 @@ export default function ModFamilySection({
         {tiers.map((t) => {
           const tier = mod.tiers[t]!;
           const color = RARITY_COLORS[t];
+          const isEquipped = t === equippedTier;
           return (
             <button
               key={t}
               onClick={() => onSelect(mod.fam, t)}
-              className="w-full text-left p-3 rounded-lg hover:brightness-125 transition-all border border-transparent hover:border-gray-500"
-              style={{ backgroundColor: color + "18" }}
+              className={`w-full text-left p-3 rounded-lg hover:brightness-125 transition-all border ${
+                isEquipped ? "border-current ring-1 ring-current" : "border-transparent hover:border-gray-500"
+              }`}
+              style={{ backgroundColor: color + (isEquipped ? "30" : "18"), color: isEquipped ? color : undefined }}
             >
               <div className="flex items-start gap-3">
                 {tier.img && (
@@ -67,7 +72,16 @@ export default function ModFamilySection({
                     ))}
                   </ul>
                   {tier.cr ? (
-                    <div className="text-xs text-orange-400 mt-1">{tier.cr}</div>
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {tier.cr.split(", ").map((mat) => (
+                        <span
+                          key={mat}
+                          className="px-1.5 py-0.5 rounded text-xs font-medium bg-orange-500/15 text-orange-400"
+                        >
+                          {mat}
+                        </span>
+                      ))}
+                    </div>
                   ) : (
                     <div className="text-xs text-green-500 mt-1">Free</div>
                   )}
