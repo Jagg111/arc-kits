@@ -36,7 +36,7 @@ export const CLASS_COLORS: Record<WeaponClass, string> = {
 // Hex colors for each ammo type — used in AmmoGroup headings and badges
 export const AMMO_COLORS: Record<AmmoType, string> = {
   Light: "#e6da35",
-  Medium: "#2439fb",
+  Medium: "#6285fc",
   Heavy: "#d21818",
   Shotgun: "#e38c8c",
   Special: "#21c204",
@@ -44,7 +44,7 @@ export const AMMO_COLORS: Record<AmmoType, string> = {
 
 // Hex colors for rarity tiers — used for mod tier buttons, badges, and equipped mod display
 export const RARITY_COLORS: Record<Rarity, string> = {
-  Common: "#6C6B69",
+  Common: "#9CA3AF",
   Uncommon: "#27BC57",
   Rare: "#3b82f6",
   Epic: "#CB3098",
@@ -76,7 +76,7 @@ export const GRADE_COLORS: Record<string, string> = {
   B: "#facc15",
   C: "#fb923c",
   D: "#ef4444",
-  F: "#6b7280",
+  F: "#9CA3AF",
 };
 
 // Numeric ordering for sorting weapons by grade (lower = better grade)
