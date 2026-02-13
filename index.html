@@ -7,6 +7,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Flash-prevention: set data-theme before React loads to avoid FOUC -->
+    <script>
+      (function() {
+        var t = localStorage.getItem('arckit-theme');
+        document.documentElement.setAttribute('data-theme',
+          t === 'light' || t === 'dark' ? t
+          : (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light')
+        );
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -33,7 +33,7 @@ export default function WeaponPicker({ onSelect }: WeaponPickerProps) {
     <div className="space-y-4">
       <div>
         <h2 className="text-2xl font-bold mb-2">Choose Your Weapon</h2>
-        <p className="text-gray-400 text-sm">
+        <p className="text-text-secondary text-sm">
           Select the weapon you want to build
         </p>
       </div>
@@ -44,8 +44,8 @@ export default function WeaponPicker({ onSelect }: WeaponPickerProps) {
             onClick={() => setSortMode(opt.value)}
             className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
               sortMode === opt.value
-                ? "bg-orange-500 text-white"
-                : "bg-gray-800 text-gray-400 hover:text-gray-200"
+                ? "bg-accent text-white"
+                : "bg-surface-alt text-text-secondary hover:text-text-primary"
             }`}
           >
             {opt.label}

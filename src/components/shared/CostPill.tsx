@@ -5,8 +5,8 @@
 // USED BY: AttachmentSlot.tsx, ModFamilySection.tsx (inline cost pills),
 //          WeaponBuilder.tsx, StatsSummaryBar.tsx (total cost rows)
 //
-// COLOR PATTERN: Uses `color + "20"` for the background (hex alpha ~12% opacity)
-// with the rarity color for the text. Falls back to gray for unknown materials.
+// COLOR PATTERN: Uses color-mix() for a ~13% opacity tinted background with the
+// rarity color for the text. Colors are CSS custom properties that adapt per theme.
 // ============================================================================
 
 import { MATERIAL_INFO, RARITY_COLORS } from "../../data/constants";
@@ -24,7 +24,7 @@ function parseCost(cost: string): { qty: string; name: string } | null {
 
 export default function CostPill({ cost }: CostPillProps) {
   const parsed = parseCost(cost);
-  if (!parsed) return <span className="px-1.5 py-0.5 rounded text-xs font-medium text-gray-400">{cost}</span>;
+  if (!parsed) return <span className="px-1.5 py-0.5 rounded text-xs font-medium text-text-secondary">{cost}</span>;
 
   const info = MATERIAL_INFO[parsed.name];
   const color = info ? RARITY_COLORS[info.rarity] : "#9ca3af";
@@ -32,7 +32,7 @@ export default function CostPill({ cost }: CostPillProps) {
   return (
     <span
       className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
-      style={{ backgroundColor: color + "20", color }}
+      style={{ backgroundColor: `color-mix(in srgb, ${color} 13%, transparent)`, color }}
     >
       {info?.img && (
         <img

@@ -20,35 +20,35 @@ export const CLASS_LABELS: Record<WeaponClass, string> = {
   Special: "Special",
 };
 
-// Hex colors for each weapon class — used for colored badges and highlights
+// Colors for each weapon class — CSS custom properties that adapt per theme
 export const CLASS_COLORS: Record<WeaponClass, string> = {
-  AR: "#3b82f6",
-  BR: "#f59e0b",
-  SMG: "#22c55e",
-  SG: "#ef4444",
-  Pistol: "#a855f7",
-  HC: "#ec4899",
-  LMG: "#f97316",
-  SR: "#06b6d4",
-  Special: "#6b7280",
+  AR: "var(--color-class-ar)",
+  BR: "var(--color-class-br)",
+  SMG: "var(--color-class-smg)",
+  SG: "var(--color-class-sg)",
+  Pistol: "var(--color-class-pistol)",
+  HC: "var(--color-class-hc)",
+  LMG: "var(--color-class-lmg)",
+  SR: "var(--color-class-sr)",
+  Special: "var(--color-class-special)",
 };
 
-// Hex colors for each ammo type — used in AmmoGroup headings and badges
+// Colors for each ammo type — CSS custom properties that adapt per theme
 export const AMMO_COLORS: Record<AmmoType, string> = {
-  Light: "#e6da35",
-  Medium: "#6285fc",
-  Heavy: "#d21818",
-  Shotgun: "#e38c8c",
-  Special: "#21c204",
+  Light: "var(--color-ammo-light)",
+  Medium: "var(--color-ammo-medium)",
+  Heavy: "var(--color-ammo-heavy)",
+  Shotgun: "var(--color-ammo-shotgun)",
+  Special: "var(--color-ammo-special)",
 };
 
-// Hex colors for rarity tiers — used for mod tier buttons, badges, and equipped mod display
+// Colors for rarity tiers — CSS custom properties that adapt per theme
 export const RARITY_COLORS: Record<Rarity, string> = {
-  Common: "#9CA3AF",
-  Uncommon: "#27BC57",
-  Rare: "#3b82f6",
-  Epic: "#CB3098",
-  Legendary: "#FFC301",
+  Common: "var(--color-rarity-common)",
+  Uncommon: "var(--color-rarity-uncommon)",
+  Rare: "var(--color-rarity-rare)",
+  Epic: "var(--color-rarity-epic)",
+  Legendary: "var(--color-rarity-legendary)",
 };
 
 // Numeric ordering for sorting weapons by rarity (lower = more common)
@@ -69,14 +69,14 @@ export const RARITY_LABELS: Record<Rarity, string> = {
   Legendary: "★",
 };
 
-// Colors for letter grades (S through F) — used on weapon cards for PVP/ARC ratings
+// Colors for letter grades (S through F) — CSS custom properties that adapt per theme
 export const GRADE_COLORS: Record<string, string> = {
-  S: "#22c55e",
-  A: "#4ade80",
-  B: "#facc15",
-  C: "#fb923c",
-  D: "#ef4444",
-  F: "#9CA3AF",
+  S: "var(--color-grade-s)",
+  A: "var(--color-grade-a)",
+  B: "var(--color-grade-b)",
+  C: "var(--color-grade-c)",
+  D: "var(--color-grade-d)",
+  F: "var(--color-grade-f)",
 };
 
 // Numeric ordering for sorting weapons by grade (lower = better grade)

@@ -80,19 +80,19 @@ export default function WeaponBuilder({
       <WeaponHeader weapon={weapon} />
 
       {weapon.slots.length === 0 ? (
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center">
+        <div className="bg-surface rounded-xl border border-border-subtle p-12 text-center">
           <div className="text-6xl mb-4">🔒</div>
-          <p className="text-xl text-gray-400 font-semibold mb-2">
+          <p className="text-xl text-text-secondary font-semibold mb-2">
             No Attachment Slots
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-text-muted">
             This weapon cannot be modified
           </p>
         </div>
       ) : showGoalFirst ? (
         /* Goal-first flow */
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-gray-300">Choose a Build Goal</h3>
+          <h3 className="text-lg font-bold text-text-secondary">Choose a Build Goal</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {availableGoals.map(([key, goal]) => (
               <GoalCard
@@ -107,14 +107,14 @@ export default function WeaponBuilder({
             {/* Build Manually tile */}
             <button
               onClick={() => setGoalDismissed(true)}
-              className="flex items-center gap-4 p-5 rounded-xl border border-gray-600 bg-gray-800/50 hover:border-gray-400 hover:bg-gray-800 transition-all text-left"
+              className="flex items-center gap-4 p-5 rounded-xl border border-border bg-surface-alt/50 hover:border-text-secondary hover:bg-surface-alt transition-all text-left"
             >
-              <svg className="w-8 h-8 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <svg className="w-8 h-8 text-text-secondary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l5.653-4.655m3.586-3.586a2.548 2.548 0 013.586 3.586m-6.586-6.586l6.586 6.586" />
               </svg>
               <div className="min-w-0">
-                <div className="font-bold text-white">Build Manually</div>
-                <div className="text-sm text-gray-400 mt-0.5">Pick your own attachments slot by slot</div>
+                <div className="font-bold text-text-primary">Build Manually</div>
+                <div className="text-sm text-text-secondary mt-0.5">Pick your own attachments slot by slot</div>
               </div>
             </button>
           </div>
@@ -124,19 +124,19 @@ export default function WeaponBuilder({
           {/* Sidebar - hidden on mobile, shown on desktop */}
           <div className="hidden lg:block lg:col-span-1 space-y-4 lg:sticky lg:top-16 lg:self-start">
             {/* Goal Picker */}
-            <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
+            <div className="bg-surface rounded-xl border border-border-subtle p-4">
               {selectedGoal && !goalExpanded ? (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{GOAL_PRESETS[selectedGoal].icon}</span>
                     <div>
-                      <div className="font-semibold text-white text-sm">{GOAL_PRESETS[selectedGoal].name}</div>
-                      <div className="text-xs text-gray-400">Active goal</div>
+                      <div className="font-semibold text-text-primary text-sm">{GOAL_PRESETS[selectedGoal].name}</div>
+                      <div className="text-xs text-text-secondary">Active goal</div>
                     </div>
                   </div>
                   <button
                     onClick={() => setGoalExpanded(true)}
-                    className="text-xs text-orange-400 hover:text-orange-300 font-semibold transition-colors"
+                    className="text-xs text-accent-text hover:text-accent-hover font-semibold transition-colors"
                   >
                     Change
                   </button>
@@ -144,11 +144,11 @@ export default function WeaponBuilder({
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Quick Start</h4>
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Quick Start</h4>
                     {selectedGoal && (
                       <button
                         onClick={() => setGoalExpanded(false)}
-                        className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                        className="text-xs text-text-muted hover:text-text-secondary transition-colors"
                       >
                         Collapse
                       </button>
@@ -161,14 +161,14 @@ export default function WeaponBuilder({
                         onClick={() => handleSelectGoal(key)}
                         className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
                           selectedGoal === key
-                            ? "border-orange-500 bg-orange-500/10"
-                            : "border-gray-700 bg-gray-800 hover:border-orange-500/50"
+                            ? "border-accent bg-accent/10"
+                            : "border-border bg-surface-alt hover:border-accent/50"
                         }`}
                       >
                         <span className="text-2xl shrink-0">{goal.icon}</span>
                         <div className="min-w-0">
-                          <div className="font-semibold text-sm text-white">{goal.name}</div>
-                          <div className="text-xs text-gray-400 truncate">{goal.desc}</div>
+                          <div className="font-semibold text-sm text-text-primary">{goal.name}</div>
+                          <div className="text-xs text-text-secondary truncate">{goal.desc}</div>
                         </div>
                       </button>
                     ))}
@@ -179,18 +179,18 @@ export default function WeaponBuilder({
 
             {/* Cumulative Effects */}
             {cumulativeEffects.length > 0 && (
-              <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
-                <h4 className="text-sm text-gray-400 font-semibold mb-3">
+              <div className="bg-surface rounded-xl border border-border-subtle p-4">
+                <h4 className="text-sm text-text-secondary font-semibold mb-3">
                   Cumulative Effects
                 </h4>
                 <div className="space-y-3">
                   {cumulativeEffects.map((effect) => (
-                    <div key={effect.stat} className="bg-gray-800 rounded-lg p-3">
+                    <div key={effect.stat} className="bg-surface-alt rounded-lg p-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-semibold text-text-primary">
                           {effect.stat}
                         </span>
-                        <span className="text-sm font-bold text-orange-400">
+                        <span className="text-sm font-bold text-accent-text">
                           {effect.unit === "%"
                             ? `${effect.total}%`
                             : `+${effect.total}`}
@@ -201,7 +201,7 @@ export default function WeaponBuilder({
                           {effect.mods.map((mod, i) => (
                             <div
                               key={i}
-                              className="flex items-center justify-between text-xs text-gray-400"
+                              className="flex items-center justify-between text-xs text-text-secondary"
                             >
                               <span>{mod.name}</span>
                               <span>{mod.effect}</span>
@@ -217,8 +217,8 @@ export default function WeaponBuilder({
 
             {/* Cost Breakdown */}
             {hasCost && (
-              <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
-                <h4 className="text-sm text-gray-400 font-semibold mb-3">
+              <div className="bg-surface rounded-xl border border-border-subtle p-4">
+                <h4 className="text-sm text-text-secondary font-semibold mb-3">
                   Total Cost
                 </h4>
                 <div className="space-y-2">
@@ -228,9 +228,9 @@ export default function WeaponBuilder({
                     return (
                       <div
                         key={item}
-                        className="flex items-center justify-between text-sm bg-gray-800 rounded-lg px-3 py-2"
+                        className="flex items-center justify-between text-sm bg-surface-alt rounded-lg px-3 py-2"
                       >
-                        <span className="flex items-center gap-2 text-gray-300">
+                        <span className="flex items-center gap-2 text-text-secondary">
                           {info?.img && (
                             <img src={info.img} alt={item} loading="lazy" className="w-5 h-5 object-contain" />
                           )}
@@ -248,7 +248,7 @@ export default function WeaponBuilder({
             {hasEquipped && (
               <button
                 onClick={handleClearGoal}
-                className="w-full px-4 py-3 rounded-lg bg-red-900/30 hover:bg-red-900/40 text-red-400 font-semibold transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-danger-bg hover:bg-danger-bg-hover text-danger-text font-semibold transition-colors"
               >
                 Clear All Attachments
               </button>
@@ -276,7 +276,7 @@ export default function WeaponBuilder({
             {hasEquipped && (
               <button
                 onClick={handleClearGoal}
-                className="lg:hidden w-full px-4 py-3 rounded-lg bg-red-900/30 hover:bg-red-900/40 text-red-400 font-semibold transition-colors"
+                className="lg:hidden w-full px-4 py-3 rounded-lg bg-danger-bg hover:bg-danger-bg-hover text-danger-text font-semibold transition-colors"
               >
                 Clear All Attachments
               </button>

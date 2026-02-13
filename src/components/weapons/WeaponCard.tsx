@@ -20,7 +20,7 @@ export default function WeaponCard({ weapon, onSelect }: WeaponCardProps) {
   return (
     <button
       onClick={() => onSelect(weapon.id)}
-      className="relative p-3 pt-4 rounded-lg border border-gray-800 bg-gray-900 hover:border-orange-500 transition-all text-left group overflow-hidden"
+      className="relative p-3 pt-4 rounded-lg border border-border-subtle bg-surface hover:border-accent transition-all text-left group overflow-hidden"
     >
       {/* Rarity color stripe */}
       <div
@@ -29,25 +29,25 @@ export default function WeaponCard({ weapon, onSelect }: WeaponCardProps) {
       />
 
       <div className="flex items-center justify-between mb-1">
-        <span className="font-semibold text-sm text-white group-hover:text-orange-300 transition-colors">
+        <span className="font-semibold text-sm text-text-primary group-hover:text-accent-hover transition-colors">
           {weapon.name}
         </span>
       </div>
-      <p className="text-xs text-gray-500 mb-2">
+      <p className="text-xs text-text-muted mb-2">
         {CLASS_LABELS[weapon.weaponClass]} · {weapon.fireMode}
       </p>
 
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
-          <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: GRADE_COLORS[weapon.pvp] + "22", color: GRADE_COLORS[weapon.pvp] }}>
+          <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: `color-mix(in srgb, ${GRADE_COLORS[weapon.pvp]} 13%, transparent)`, color: GRADE_COLORS[weapon.pvp] }}>
             PVP {weapon.pvp}
           </span>
-          <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: GRADE_COLORS[weapon.arc] + "22", color: GRADE_COLORS[weapon.arc] }}>
+          <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: `color-mix(in srgb, ${GRADE_COLORS[weapon.arc]} 13%, transparent)`, color: GRADE_COLORS[weapon.arc] }}>
             ARC {weapon.arc}
           </span>
         </div>
         {weapon.slots.length > 0 && (
-          <span className="text-xs text-gray-500 font-medium">
+          <span className="text-xs text-text-muted font-medium">
             {weapon.slots.length} slots
           </span>
         )}

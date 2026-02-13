@@ -1,1 +1,192 @@
 @import "tailwindcss";
+
+/* ============================================================================
+   THEME: Color tokens for dark / light mode
+
+   All colors — both semantic UI colors and game-specific colors (ammo, rarity,
+   class, grade) — are defined here as CSS custom properties, switched via the
+   `data-theme` attribute on <html>.
+
+   Components reference these tokens either through Tailwind utilities registered
+   in the @theme block below (e.g. `bg-surface`, `text-text-primary`) or via
+   `var()` in inline styles for game colors.
+
+   Game color maps in src/data/constants.ts reference these CSS vars so they
+   automatically adapt per theme.
+   ============================================================================ */
+
+/* ── Dark theme (default) ──────────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --color-bg-base:         #030712;  /* gray-950 — gradient endpoints */
+  --color-bg-mid:          #111827;  /* gray-900 — gradient midpoint */
+  --color-surface:         #111827;  /* gray-900 — cards, panels, drawers */
+  --color-surface-alt:     #1f2937;  /* gray-800 — inner cards, inputs, image bg */
+  --color-surface-hover:   #1f2937;  /* gray-800 — hover states */
+  --color-border:          #374151;  /* gray-700 — primary borders */
+  --color-border-subtle:   #1f2937;  /* gray-800 — subtle/secondary borders */
+  --color-text-primary:    #ffffff;  /* white — headings, main text */
+  --color-text-secondary:  #9ca3af;  /* gray-400 — descriptions, labels */
+  --color-text-muted:      #6b7280;  /* gray-500 — tertiary text */
+  --color-text-faint:      #4b5563;  /* gray-600 — placeholder-level text */
+  --color-accent:          #f97316;  /* orange-500 — primary accent */
+  --color-accent-text:     #fb923c;  /* orange-400 — accent in text context */
+  --color-accent-hover:    #fdba74;  /* orange-300 — accent hover/active text */
+  --color-accent-glow:     #f97316;  /* orange-500 — shadow glow color */
+  --color-danger-bg:       rgba(127, 29, 29, 0.3);  /* red-900/30 */
+  --color-danger-bg-hover: rgba(127, 29, 29, 0.4);  /* red-900/40 */
+  --color-danger-text:     #f87171;  /* red-400 */
+  --color-success:         #22c55e;  /* green-500 */
+  --color-backdrop:        rgba(0, 0, 0, 0.5);
+  --color-brand-from:      #fb923c;  /* orange-400 — header gradient start */
+  --color-brand-to:        #ef4444;  /* red-500 — header gradient end */
+
+  /* ── Game colors: Ammo types ── */
+  --color-ammo-light:      #e6da35;
+  --color-ammo-medium:     #6285fc;
+  --color-ammo-heavy:      #d21818;
+  --color-ammo-shotgun:    #e38c8c;
+  --color-ammo-special:    #21c204;
+
+  /* ── Game colors: Rarity tiers ── */
+  --color-rarity-common:    #9CA3AF;
+  --color-rarity-uncommon:  #27BC57;
+  --color-rarity-rare:      #3b82f6;
+  --color-rarity-epic:      #CB3098;
+  --color-rarity-legendary: #FFC301;
+
+  /* ── Game colors: Letter grades ── */
+  --color-grade-s:         #22c55e;
+  --color-grade-a:         #4ade80;
+  --color-grade-b:         #facc15;
+  --color-grade-c:         #fb923c;
+  --color-grade-d:         #ef4444;
+  --color-grade-f:         #9CA3AF;
+
+  /* ── Game colors: Weapon classes ── */
+  --color-class-ar:        #3b82f6;
+  --color-class-br:        #f59e0b;
+  --color-class-smg:       #22c55e;
+  --color-class-sg:        #ef4444;
+  --color-class-pistol:    #a855f7;
+  --color-class-hc:        #ec4899;
+  --color-class-lmg:       #f97316;
+  --color-class-sr:        #06b6d4;
+  --color-class-special:   #6b7280;
+}
+
+/* ── Light theme ───────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --color-bg-base:         #d4d0c8;  /* warm industrial beige — gradient ends */
+  --color-bg-mid:          #e2ded6;  /* lighter warm mid */
+  --color-surface:         #f0ece4;  /* warm off-white — cards, panels */
+  --color-surface-alt:     #e5e1d9;  /* slightly darker inner surface */
+  --color-surface-hover:   #dad6ce;  /* hover state */
+  --color-border:          #c4bfb5;  /* warm gray border */
+  --color-border-subtle:   #d9d5cd;  /* subtle border */
+  --color-text-primary:    #1c1917;  /* stone-900 — near black */
+  --color-text-secondary:  #57534e;  /* stone-600 */
+  --color-text-muted:      #78716c;  /* stone-500 */
+  --color-text-faint:      #a8a29e;  /* stone-400 */
+  --color-accent:          #c2410c;  /* orange-700 — deeper for light bg */
+  --color-accent-text:     #c2410c;  /* orange-700 */
+  --color-accent-hover:    #9a3412;  /* orange-800 */
+  --color-accent-glow:     #c2410c;  /* orange-700 — shadow glow */
+  --color-danger-bg:       rgba(254, 202, 202, 0.5);  /* red-200/50 */
+  --color-danger-bg-hover: rgba(254, 202, 202, 0.7);  /* red-200/70 */
+  --color-danger-text:     #dc2626;  /* red-600 */
+  --color-success:         #16a34a;  /* green-600 */
+  --color-backdrop:        rgba(0, 0, 0, 0.3);
+  --color-brand-from:      #c2410c;  /* orange-700 — header gradient start */
+  --color-brand-to:        #dc2626;  /* red-600 — header gradient end */
+
+  /* ── Game colors: Ammo types (darker for light backgrounds) ── */
+  --color-ammo-light:      #a89200;  /* dark gold */
+  --color-ammo-medium:     #2563eb;  /* blue-600 */
+  --color-ammo-heavy:      #b91c1c;  /* red-800 */
+  --color-ammo-shotgun:    #be123c;  /* rose-700 */
+  --color-ammo-special:    #15803d;  /* green-700 */
+
+  /* ── Game colors: Rarity tiers (deeper for light backgrounds) ── */
+  --color-rarity-common:    #57534e;  /* stone-600 */
+  --color-rarity-uncommon:  #15803d;  /* green-700 */
+  --color-rarity-rare:      #1d4ed8;  /* blue-700 */
+  --color-rarity-epic:      #a21caf;  /* fuchsia-700 */
+  --color-rarity-legendary: #a16207;  /* yellow-700 */
+
+  /* ── Game colors: Letter grades (adjusted for light backgrounds) ── */
+  --color-grade-s:         #15803d;
+  --color-grade-a:         #16a34a;
+  --color-grade-b:         #a16207;
+  --color-grade-c:         #c2410c;
+  --color-grade-d:         #dc2626;
+  --color-grade-f:         #57534e;
+
+  /* ── Game colors: Weapon classes (deeper for light backgrounds) ── */
+  --color-class-ar:        #1d4ed8;
+  --color-class-br:        #b45309;
+  --color-class-smg:       #15803d;
+  --color-class-sg:        #dc2626;
+  --color-class-pistol:    #7e22ce;
+  --color-class-hc:        #be185d;
+  --color-class-lmg:       #c2410c;
+  --color-class-sr:        #0e7490;
+  --color-class-special:   #57534e;
+}
+
+/* ── Register tokens as Tailwind theme values ──────────────────────────────── */
+/* This lets us use e.g. `bg-surface`, `text-text-primary`, `border-border` */
+@theme inline {
+  --color-bg-base: var(--color-bg-base);
+  --color-bg-mid: var(--color-bg-mid);
+  --color-surface: var(--color-surface);
+  --color-surface-alt: var(--color-surface-alt);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-border: var(--color-border);
+  --color-border-subtle: var(--color-border-subtle);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-faint: var(--color-text-faint);
+  --color-accent: var(--color-accent);
+  --color-accent-text: var(--color-accent-text);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-glow: var(--color-accent-glow);
+  --color-danger-bg: var(--color-danger-bg);
+  --color-danger-bg-hover: var(--color-danger-bg-hover);
+  --color-danger-text: var(--color-danger-text);
+  --color-success: var(--color-success);
+  --color-backdrop: var(--color-backdrop);
+  --color-brand-from: var(--color-brand-from);
+  --color-brand-to: var(--color-brand-to);
+
+  /* Game colors */
+  --color-ammo-light: var(--color-ammo-light);
+  --color-ammo-medium: var(--color-ammo-medium);
+  --color-ammo-heavy: var(--color-ammo-heavy);
+  --color-ammo-shotgun: var(--color-ammo-shotgun);
+  --color-ammo-special: var(--color-ammo-special);
+
+  --color-rarity-common: var(--color-rarity-common);
+  --color-rarity-uncommon: var(--color-rarity-uncommon);
+  --color-rarity-rare: var(--color-rarity-rare);
+  --color-rarity-epic: var(--color-rarity-epic);
+  --color-rarity-legendary: var(--color-rarity-legendary);
+
+  --color-grade-s: var(--color-grade-s);
+  --color-grade-a: var(--color-grade-a);
+  --color-grade-b: var(--color-grade-b);
+  --color-grade-c: var(--color-grade-c);
+  --color-grade-d: var(--color-grade-d);
+  --color-grade-f: var(--color-grade-f);
+
+  --color-class-ar: var(--color-class-ar);
+  --color-class-br: var(--color-class-br);
+  --color-class-smg: var(--color-class-smg);
+  --color-class-sg: var(--color-class-sg);
+  --color-class-pistol: var(--color-class-pistol);
+  --color-class-hc: var(--color-class-hc);
+  --color-class-lmg: var(--color-class-lmg);
+  --color-class-sr: var(--color-class-sr);
+  --color-class-special: var(--color-class-special);
+}

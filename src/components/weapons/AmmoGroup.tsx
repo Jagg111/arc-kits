@@ -22,7 +22,7 @@ export default function AmmoGroup({ ammoType, weapons, onSelect }: AmmoGroupProp
       <h3
         className="text-sm font-semibold px-2 py-1 rounded inline-block"
         style={{
-          backgroundColor: AMMO_COLORS[ammoType] + "22",
+          backgroundColor: `color-mix(in srgb, ${AMMO_COLORS[ammoType]} 13%, transparent)`,
           color: AMMO_COLORS[ammoType],
         }}
       >

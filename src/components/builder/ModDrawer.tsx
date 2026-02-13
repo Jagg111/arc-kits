@@ -68,7 +68,7 @@ export default function ModDrawer({ slot, weaponId, equippedMod, onEquip, onClos
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+        className={`absolute inset-0 bg-backdrop transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={handleClose}
@@ -76,16 +76,16 @@ export default function ModDrawer({ slot, weaponId, equippedMod, onEquip, onClos
 
       {/* Drawer */}
       <div
-        className={`absolute inset-y-0 right-0 w-full lg:w-[440px] bg-gray-900 border-l border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
+        className={`absolute inset-y-0 right-0 w-full lg:w-[440px] bg-surface border-l border-border shadow-2xl flex flex-col transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Sticky header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700 shrink-0">
-          <h3 className="font-bold text-lg text-white">{slot}</h3>
+        <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
+          <h3 className="font-bold text-lg text-text-primary">{slot}</h3>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-lg hover:bg-surface-alt text-text-secondary hover:text-text-primary transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -45,7 +45,7 @@ export default function AttachmentSlot({
 
     return (
       <div
-        className="bg-gray-900 rounded-xl border border-gray-700 p-3 flex items-start gap-3 cursor-pointer hover:border-gray-600 transition-colors"
+        className="bg-surface rounded-xl border border-border p-3 flex items-start gap-3 cursor-pointer hover:border-border-subtle transition-colors"
         onClick={() => onOpenDrawer(slot)}
       >
         {tierData?.img && (
@@ -53,12 +53,12 @@ export default function AttachmentSlot({
             src={tierData.img}
             alt={`${equipped.fam} ${RARITY_LABELS[equipped.tier]}`}
             loading="lazy"
-            className="shrink-0 w-12 h-12 rounded object-contain bg-gray-800"
+            className="shrink-0 w-12 h-12 rounded object-contain bg-surface-alt"
           />
         )}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-white text-sm truncate">{equipped.fam}</span>
+            <span className="font-semibold text-text-primary text-sm truncate">{equipped.fam}</span>
             <span
               className="shrink-0 px-1.5 py-0.5 rounded text-xs font-bold"
               style={{ backgroundColor: color, color: "white" }}
@@ -66,7 +66,7 @@ export default function AttachmentSlot({
               {RARITY_LABELS[equipped.tier]}
             </span>
           </div>
-          <ul className="text-xs text-gray-400 mt-0.5 space-y-0.5">
+          <ul className="text-xs text-text-secondary mt-0.5 space-y-0.5">
             {tierData?.e.map((effect, i) => (
               <li key={i}>{effect}</li>
             )) ?? <li>{slot}</li>}
@@ -78,7 +78,7 @@ export default function AttachmentSlot({
               ))}
             </div>
           ) : (
-            <div className="text-xs text-green-500 mt-1">Free</div>
+            <div className="text-xs text-success mt-1">Free</div>
           )}
         </div>
         <button
@@ -86,7 +86,7 @@ export default function AttachmentSlot({
             e.stopPropagation();
             onRemove(slot);
           }}
-          className="shrink-0 p-1.5 rounded-lg hover:bg-red-900/30 text-red-400 hover:text-red-300 transition-colors"
+          className="shrink-0 p-1.5 rounded-lg hover:bg-danger-bg text-danger-text hover:text-danger-text transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -99,16 +99,16 @@ export default function AttachmentSlot({
   return (
     <button
       onClick={() => onOpenDrawer(slot)}
-      className="w-full bg-gray-900/50 rounded-xl border-2 border-dashed border-gray-700 hover:border-orange-500/50 p-3 flex items-center gap-3 transition-colors text-left group"
+      className="w-full bg-surface/50 rounded-xl border-2 border-dashed border-border hover:border-accent/50 p-3 flex items-center gap-3 transition-colors text-left group"
     >
-      <div className="w-12 h-12 rounded bg-gray-800 flex items-center justify-center shrink-0 group-hover:bg-gray-750">
-        <svg className="w-5 h-5 text-gray-600 group-hover:text-orange-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="w-12 h-12 rounded bg-surface-alt flex items-center justify-center shrink-0 group-hover:bg-surface-hover">
+        <svg className="w-5 h-5 text-text-faint group-hover:text-accent-text transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
       </div>
       <div>
-        <div className="font-semibold text-sm text-gray-400 group-hover:text-gray-300">{slot}</div>
-        <div className="text-xs text-gray-600">Tap to choose</div>
+        <div className="font-semibold text-sm text-text-secondary group-hover:text-text-primary">{slot}</div>
+        <div className="text-xs text-text-faint">Tap to choose</div>
       </div>
     </button>
   );

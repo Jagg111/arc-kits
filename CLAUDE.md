@@ -32,7 +32,7 @@ Auto-deploys on push to `master`. Base path set to `/arc-kits/` in `vite.config.
 src/
   App.tsx                  — Root component, wires hooks to UI
   main.tsx                 — ReactDOM entry point
-  index.css                — Tailwind CSS entry
+  index.css                — Tailwind CSS entry + theme color tokens (dark/light)
 
   types/index.ts           — All TypeScript interfaces and type aliases
 
@@ -47,9 +47,10 @@ src/
     useBuildCost.ts        — Computes total crafting materials from equipped mods, sorted by rarity (rare first) then name
     useCumulativeEffects.ts — Aggregates stat bonuses across equipped mods via regex
     useBuildUrl.ts         — URL query param sync for shareable builds
+    useTheme.ts            — Dark/light mode toggle with OS preference + localStorage persistence
 
   components/              — UI organized by feature domain
-    layout/Header.tsx      — Sticky header with reset button
+    layout/Header.tsx      — Sticky header with reset button and dark/light mode toggle
     weapons/               — Weapon selection screen
       WeaponPicker.tsx     — Groups weapons by ammo type
       AmmoGroup.tsx        — Renders a group of weapon cards
@@ -73,8 +74,8 @@ src/
 - All state lives in `useWeaponBuilder` hook (src/hooks/useWeaponBuilder.ts:6-72), consumed by `App.tsx:8-20`
 - Computed values (`buildCost`, `cumulativeEffects`) are separate hooks with `useMemo`
 - No Context API or global state — prop drilling is sufficient for 15 components
-- Dynamic colors use inline styles with hex color + alpha suffix (e.g., `color + "22"`)
-- All color palettes defined as lookup objects in `src/data/constants.ts`
+- **Theming**: Dark/light mode via CSS custom properties on `data-theme` attribute. **All colors** — both semantic UI colors (surfaces, borders, text, accent) and game-specific colors (ammo, rarity, grade, class) — are defined in `src/index.css` and registered via Tailwind `@theme inline`. UI colors use Tailwind utilities (`bg-surface`, `text-text-primary`). Game colors use CSS vars via inline styles (`var(--color-ammo-light)` etc.), with `color-mix()` for semi-transparent backgrounds.
+- Game color lookup objects in `src/data/constants.ts` reference CSS custom properties (e.g., `"var(--color-rarity-rare)"`) so they automatically adapt per theme
 - URL state sync via `useBuildUrl` hook — builds are shareable via query params (`?w=tempest&m=Muzzle:Compensator:Rare,...`), synced with `history.replaceState`
 
 ## How to Add Game Content
@@ -83,6 +84,8 @@ src/
 - **New goal preset**: Add new key to `GOAL_PRESETS` in `src/data/presets.ts` with icon, name, desc, and per-weapon builds
 - **New stat type for effects**: Add regex pattern to `STAT_PATTERNS` in `src/hooks/useCumulativeEffects.ts:5-16`
 - **New crafting material**: Add entry to `MATERIAL_INFO` in `src/data/constants.ts` with its rarity and wiki thumbnail URL
+- **New game color** (ammo/rarity/grade/class): Add a CSS custom property to both theme blocks in `src/index.css` (dark + light variants), register it in `@theme inline`, then add the `var(--color-...)` reference to the appropriate map in `src/data/constants.ts`. Use `color-mix(in srgb, <color> <percent>%, transparent)` for semi-transparent backgrounds.
+- **New UI color**: Add a CSS custom property to both theme blocks in `src/index.css`, register it in the `@theme inline` block, then use the Tailwind utility (e.g., `bg-[name]`, `text-[name]`)
 
 ## Type System
 All types in `src/types/index.ts`. Key interfaces:

@@ -5,8 +5,8 @@
 //
 // Each tier button shows the tier image, rarity badge, effects list, and crafting cost.
 // Crafting costs are displayed as rarity-colored pills with material icons via CostPill.
-// The background color uses the `color + "18"` hex alpha pattern (~9% opacity) to give
-// each tier a subtle tint matching its rarity color.
+// The background color uses color-mix() to give each tier a subtle tint matching
+// its rarity color. Colors are CSS custom properties that adapt per theme.
 // ============================================================================
 
 import type { ModFamily, Rarity } from "../../types";
@@ -27,13 +27,13 @@ export default function ModFamilySection({
   const tiers = Object.keys(mod.tiers) as Rarity[];
 
   return (
-    <div data-mod-family={mod.fam} className="border border-gray-700 rounded-lg overflow-hidden">
-      <div className="p-3 bg-gray-800">
-        <div className="font-semibold text-white text-sm">{mod.fam}</div>
-        <div className="text-xs text-gray-500 mt-0.5 truncate">{mod.desc}</div>
+    <div data-mod-family={mod.fam} className="border border-border rounded-lg overflow-hidden">
+      <div className="p-3 bg-surface-alt">
+        <div className="font-semibold text-text-primary text-sm">{mod.fam}</div>
+        <div className="text-xs text-text-muted mt-0.5 truncate">{mod.desc}</div>
       </div>
 
-      <div className="p-2 space-y-2 bg-gray-850">
+      <div className="p-2 space-y-2 bg-surface">
         {tiers.map((t) => {
           const tier = mod.tiers[t]!;
           const color = RARITY_COLORS[t];
@@ -43,9 +43,9 @@ export default function ModFamilySection({
               key={t}
               onClick={() => onSelect(mod.fam, t)}
               className={`w-full text-left p-3 rounded-lg hover:brightness-125 transition-all border ${
-                isEquipped ? "border-current ring-1 ring-current" : "border-transparent hover:border-gray-500"
+                isEquipped ? "border-current ring-1 ring-current" : "border-transparent hover:border-text-muted"
               }`}
-              style={{ backgroundColor: color + (isEquipped ? "30" : "18"), color: isEquipped ? color : undefined }}
+              style={{ backgroundColor: `color-mix(in srgb, ${color} ${isEquipped ? "19" : "9"}%, transparent)`, color: isEquipped ? color : undefined }}
             >
               <div className="flex items-start gap-3">
                 {tier.img && (
@@ -53,7 +53,7 @@ export default function ModFamilySection({
                     src={tier.img}
                     alt={`${mod.fam} ${RARITY_LABELS[t]}`}
                     loading="lazy"
-                    className="shrink-0 w-12 h-12 rounded object-contain bg-gray-900"
+                    className="shrink-0 w-12 h-12 rounded object-contain bg-surface"
                   />
                 )}
                 <div className="min-w-0 flex-1">
@@ -68,7 +68,7 @@ export default function ModFamilySection({
                       {t}
                     </span>
                   </div>
-                  <ul className="text-sm text-gray-200 space-y-0.5">
+                  <ul className="text-sm text-text-secondary space-y-0.5">
                     {tier.e.map((effect, i) => (
                       <li key={i}>{effect}</li>
                     ))}
@@ -80,7 +80,7 @@ export default function ModFamilySection({
                       ))}
                     </div>
                   ) : (
-                    <div className="text-xs text-green-500 mt-1">Free</div>
+                    <div className="text-xs text-success mt-1">Free</div>
                   )}
                 </div>
               </div>
