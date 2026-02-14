@@ -8,6 +8,14 @@ description: Generates suggested weapon descriptions and weaknesses to be used f
 ## Goal
 Invoke this skill when writing, rewriting, or reviewing `desc` and `weakness` fields for weapons in `src/data/weapons.ts`. Whenever this is called a specific indiviudal weapon will need to be researched, then it will generate 3 examples of both descriptions and weaknesses for review. Research is to be performed by first finding the weapon on the Arc Raiders wiki (https://arcraiders.wiki/wiki/Weapons) which will serve as a baseline understanding of the weapon. From there it is encouraged to search through other websites, online resources, and discussion boards to gain a more holistic understanding of how the wider player community views the weapon and uses it.
 
+**Always run this skill in plan mode.**
+
+---
+
+## Output Format
+
+All 3 description options and all 3 weakness options must be included in the final plan file for the user to review and select from during plan approval. Do not ask the user to pick options before the plan is finalized — the plan itself is the review step.
+
 ---
 
 ## Description Structure
@@ -63,7 +71,7 @@ These should appear across most descriptions. Include them where relevant:
 - **No hype** — strengths stated matter-of-factly. Never oversell.
   > Good: "Exceptional stability makes it laser-like at mid-range."
   > Bad: "This incredible weapon will dominate every fight!"
-- **Game vocabulary used naturally** — ARC penetration, TTK, DPS, alpha damage, peek-fighting, mag dump, third-partying, choke, bloom, dispersion, recoil. Don't define these terms.
+- **Game vocabulary and abbreviations used naturally** — ARC penetration, TTK, DPS, alpha damage, peek-fighting, mag, mag dump, third-partying, choke, bloom, dispersion, recoil, reload time. Don't define these terms or fully spell them out.
 - **Off limit words** — Never include the name of the weapon or the ammo it uses. If you ever include a mention about an extended magazines never include the ammo type along side it.
   > Good: "Its 12-round capacity is crippling without an extended mag"
   > Bad: "Its 12-round base magazine is crippling without an extended light magazine"

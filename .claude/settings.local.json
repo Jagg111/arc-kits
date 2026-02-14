@@ -5,7 +5,10 @@
       "Bash(npx tsc:*)",
       "WebFetch(domain:arcraiders.wiki)",
       "Bash(npm run dev:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "WebFetch(domain:www.gamesradar.com)",
+      "WebFetch(domain:steamcommunity.com)",
+      "WebFetch(domain:www.dualshockers.com)"
     ]
   }
 }
