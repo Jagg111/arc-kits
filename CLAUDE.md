@@ -98,3 +98,6 @@ All types in `src/types/index.ts`. Key interfaces:
 ## Additional Documentation
 When working on patterns, conventions, or architectural questions, check:
 - `.claude/docs/architectural_patterns.md` — recurring code patterns, state management, styling conventions, data flow
+
+## Session Startup Context
+Before making changes in a new session, read `SESSION_HANDOFF.md` first for current project status, constraints, known issues, and active product direction. Treat it as the cross-session source of truth, then use this file for architecture and workflow details.
