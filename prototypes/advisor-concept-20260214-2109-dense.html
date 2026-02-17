@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weapon Advisor — Variation A: Dense/Compact</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #030712, #111827, #030712);
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      border-bottom: 1px solid #1f2937;
+      background: rgba(17, 24, 39, 0.5);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #fb923c, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      background: #1f2937;
+      border-radius: 0.5rem;
+      padding: 0.2rem;
+    }
+    .tab {
+      padding: 0.4rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      color: #9ca3af;
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: #374151;
+      color: #ffffff;
+    }
+    .theme-btn {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+
+    /* ── Main Content ── */
+    .main {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .page-subtitle {
+      color: #9ca3af;
+      font-size: 0.875rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Form: Dense grid layout ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .form-section {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 0.75rem;
+      padding: 1rem;
+    }
+    .form-section.full-width {
+      grid-column: 1 / -1;
+    }
+    .section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+    .form-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .form-row:last-child { margin-bottom: 0; }
+    .row-label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      min-width: 4.5rem;
+      flex-shrink: 0;
+    }
+    .pill-group {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .pill {
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill.selected {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: #f97316;
+      color: #fb923c;
+    }
+
+    /* ── Budget section (inline checkboxes) ── */
+    .budget-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+    }
+    .budget-arrow {
+      color: #6b7280;
+      font-size: 0.7rem;
+    }
+    .checkbox-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .checkbox-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.375rem;
+      font-size: 0.7rem;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+    .checkbox-pill.checked {
+      border-color: #374151;
+      color: #ffffff;
+      background: #1f2937;
+    }
+    .check-icon {
+      color: #22c55e;
+      font-weight: 700;
+    }
+    .uncheck-icon {
+      color: #4b5563;
+    }
+
+    /* ── CTA Button ── */
+    .cta-row {
+      margin-bottom: 1.5rem;
+    }
+    .cta-btn {
+      width: 100%;
+      padding: 0.7rem 1.5rem;
+      border-radius: 0.75rem;
+      border: none;
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    /* ── Results ── */
+    .results-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      color: #6b7280;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .results-divider::before,
+    .results-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #1f2937;
+    }
+
+    .result-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      position: relative;
+    }
+    .result-rank {
+      position: absolute;
+      top: -0.5rem;
+      left: 1rem;
+      background: #111827;
+      padding: 0 0.5rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fb923c;
+    }
+    .result-rank.alt {
+      color: #6b7280;
+    }
+    .result-weapons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .weapon-slot {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .weapon-slot-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .slot-label {
+      font-size: 0.6rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .weapon-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .weapon-class-badge {
+      font-size: 0.6rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+    }
+    .mod-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .mod-tag {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #9ca3af;
+    }
+    .mod-tag .rarity {
+      font-weight: 600;
+    }
+    .rarity-common { color: #9CA3AF; }
+    .rarity-uncommon { color: #27BC57; }
+    .rarity-rare { color: #3b82f6; }
+
+    .result-reasoning {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      font-style: italic;
+      line-height: 1.5;
+      padding-top: 0.75rem;
+      border-top: 1px solid #1f2937;
+      margin-bottom: 0.75rem;
+    }
+    .result-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .builder-link {
+      font-size: 0.75rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.375rem;
+      border: 1px solid #374151;
+      background: transparent;
+      color: #fb923c;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .builder-link:hover {
+      border-color: #f97316;
+      background: rgba(249, 115, 22, 0.1);
+    }
+
+    .shuffle-btn {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 0.75rem;
+      border: 1px dashed #374151;
+      background: transparent;
+      color: #6b7280;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.15s;
+    }
+    .shuffle-btn:hover {
+      border-color: #4b5563;
+      color: #9ca3af;
+    }
+
+    .grade-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.6rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.25rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .result-weapons { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="logo">ARC RAIDERS Build Tool</div>
+        <div class="tabs">
+          <button class="tab">Weapons</button>
+          <button class="tab active">Advisor</button>
+        </div>
+      </div>
+      <button class="theme-btn">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <h2 class="page-title">Weapon Advisor</h2>
+    <p class="page-subtitle">Answer a few questions and we'll suggest what to bring.</p>
+
+    <!-- Form: 2-column grid -->
+    <div class="form-grid">
+
+      <!-- Left column: Mission -->
+      <div class="form-section">
+        <div class="section-label">Mission</div>
+        <div class="form-row">
+          <span class="row-label">Where?</span>
+          <div class="pill-group">
+            <span class="pill selected">Spaceport</span>
+            <span class="pill">Buried City</span>
+            <span class="pill">Dam</span>
+            <span class="pill">Blue Gate</span>
+            <span class="pill">Stella Montis</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <span class="row-label">Squad?</span>
+          <div class="pill-group">
+            <span class="pill selected">Solo</span>
+            <span class="pill">Squad</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <span class="row-label">Focus?</span>
+          <div class="pill-group">
+            <span class="pill">PVE</span>
+            <span class="pill selected">PVP</span>
+            <span class="pill">Mixed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Playstyle -->
+      <div class="form-section">
+        <div class="section-label">Playstyle</div>
+        <div class="form-row">
+          <span class="row-label">Range?</span>
+          <div class="pill-group">
+            <span class="pill">Close</span>
+            <span class="pill">Mid</span>
+            <span class="pill selected">Long</span>
+            <span class="pill">Any</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <span class="row-label">Damage?</span>
+          <div class="pill-group">
+            <span class="pill selected">Burst</span>
+            <span class="pill">Sustained</span>
+            <span class="pill">No pref</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <span class="row-label">Stealth?</span>
+          <div class="pill-group">
+            <span class="pill">Yes</span>
+            <span class="pill selected">No</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full width: Budget -->
+      <div class="form-section full-width">
+        <div class="budget-header">
+          <span class="budget-arrow">&#9660;</span>
+          <span class="section-label" style="margin-bottom:0;">Budget & Availability</span>
+        </div>
+        <div class="form-row">
+          <span class="row-label">Weapons</span>
+          <div class="checkbox-grid">
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Common</span>
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Uncommon</span>
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Rare</span>
+            <span class="checkbox-pill"><span class="uncheck-icon">&#10007;</span> Epic</span>
+            <span class="checkbox-pill"><span class="uncheck-icon">&#10007;</span> Legendary</span>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:0.5rem;">
+          <span class="row-label">Materials</span>
+          <div class="checkbox-grid">
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Metal Parts</span>
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Plastic Parts</span>
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Rubber Parts</span>
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Wires</span>
+            <span class="checkbox-pill checked"><span class="check-icon">&#10003;</span> Duct Tape</span>
+            <span class="checkbox-pill"><span class="uncheck-icon">&#10007;</span> Steel Spring</span>
+            <span class="checkbox-pill"><span class="uncheck-icon">&#10007;</span> Mech Comp</span>
+            <span class="checkbox-pill"><span class="uncheck-icon">&#10007;</span> Mod Comp</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="cta-btn">Get Recommendations</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results-divider">Results</div>
+
+    <!-- Result #1 -->
+    <div class="result-card">
+      <div class="result-rank">Best Match</div>
+      <div class="result-weapons">
+        <div class="weapon-slot">
+          <div class="slot-label">Primary</div>
+          <div class="weapon-slot-header">
+            <span class="weapon-name">Renegade</span>
+            <span class="weapon-class-badge" style="background: rgba(245,158,11,0.15); color: #f59e0b;">BR</span>
+            <span class="grade-badge" style="background: rgba(74,222,128,0.15); color: #4ade80;">PVP: A</span>
+          </div>
+          <div class="mod-list">
+            <span class="mod-tag">Compensator <span class="rarity rarity-uncommon">(Unc)</span></span>
+            <span class="mod-tag">Vertical Grip <span class="rarity rarity-common">(Com)</span></span>
+            <span class="mod-tag">Ext Med Mag <span class="rarity rarity-uncommon">(Unc)</span></span>
+          </div>
+        </div>
+        <div class="weapon-slot">
+          <div class="slot-label">Secondary</div>
+          <div class="weapon-slot-header">
+            <span class="weapon-name">Stitcher</span>
+            <span class="weapon-class-badge" style="background: rgba(34,197,94,0.15); color: #22c55e;">SMG</span>
+            <span class="grade-badge" style="background: rgba(250,204,21,0.15); color: #facc15;">PVP: B</span>
+          </div>
+          <div class="mod-list">
+            <span class="mod-tag">Ext Light Mag <span class="rarity rarity-common">(Com)</span></span>
+            <span class="mod-tag">Angled Grip <span class="rarity rarity-common">(Com)</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="result-reasoning">
+        "Renegade dominates Spaceport's long sightlines with fast lever-action follow-ups, while Stitcher gives you a panic option for close-quarters ambushes."
+      </div>
+      <div class="result-actions">
+        <button class="builder-link">Open Renegade in Builder &rarr;</button>
+        <button class="builder-link">Open Stitcher in Builder &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Result #2 -->
+    <div class="result-card">
+      <div class="result-rank alt">Alternative</div>
+      <div class="result-weapons">
+        <div class="weapon-slot">
+          <div class="slot-label">Primary</div>
+          <div class="weapon-slot-header">
+            <span class="weapon-name">Rattler</span>
+            <span class="weapon-class-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">AR</span>
+            <span class="grade-badge" style="background: rgba(251,146,60,0.15); color: #fb923c;">PVP: C</span>
+          </div>
+          <div class="mod-list">
+            <span class="mod-tag">Muzzle Brake <span class="rarity rarity-common">(Com)</span></span>
+            <span class="mod-tag">Vertical Grip <span class="rarity rarity-common">(Com)</span></span>
+          </div>
+        </div>
+        <div class="weapon-slot">
+          <div class="slot-label">Secondary</div>
+          <div class="weapon-slot-header">
+            <span class="weapon-name">Venator</span>
+            <span class="weapon-class-badge" style="background: rgba(168,85,247,0.15); color: #a855f7;">Pistol</span>
+            <span class="grade-badge" style="background: rgba(74,222,128,0.15); color: #4ade80;">PVP: A</span>
+          </div>
+          <div class="mod-list">
+            <span class="mod-tag">Compensator <span class="rarity rarity-uncommon">(Unc)</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="result-reasoning">
+        "Rattler gives you budget versatility at range, paired with Venator's devastating burst damage for PVP fights."
+      </div>
+      <div class="result-actions">
+        <button class="builder-link">Open Rattler in Builder &rarr;</button>
+        <button class="builder-link">Open Venator in Builder &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Result #3 -->
+    <div class="result-card">
+      <div class="result-rank alt">Alternative</div>
+      <div class="result-weapons">
+        <div class="weapon-slot">
+          <div class="slot-label">Primary</div>
+          <div class="weapon-slot-header">
+            <span class="weapon-name">Osprey</span>
+            <span class="weapon-class-badge" style="background: rgba(6,182,212,0.15); color: #06b6d4;">SR</span>
+            <span class="grade-badge" style="background: rgba(250,204,21,0.15); color: #facc15;">PVP: B</span>
+          </div>
+          <div class="mod-list">
+            <span class="mod-tag">Stable Stock <span class="rarity rarity-uncommon">(Unc)</span></span>
+          </div>
+        </div>
+        <div class="weapon-slot">
+          <div class="slot-label">Secondary</div>
+          <div class="weapon-slot-header">
+            <span class="weapon-name">Stitcher</span>
+            <span class="weapon-class-badge" style="background: rgba(34,197,94,0.15); color: #22c55e;">SMG</span>
+            <span class="grade-badge" style="background: rgba(250,204,21,0.15); color: #facc15;">PVP: B</span>
+          </div>
+          <div class="mod-list">
+            <span class="mod-tag">Ext Light Mag <span class="rarity rarity-common">(Com)</span></span>
+            <span class="mod-tag">Angled Grip <span class="rarity rarity-common">(Com)</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="result-reasoning">
+        "Osprey is the only scoped weapon in the game — unmatched at extreme range. Stitcher handles everything inside 30m."
+      </div>
+      <div class="result-actions">
+        <button class="builder-link">Open Osprey in Builder &rarr;</button>
+        <button class="builder-link">Open Stitcher in Builder &rarr;</button>
+      </div>
+    </div>
+
+    <button class="shuffle-btn">&#8635; Shuffle &mdash; Show More Options</button>
+  </div>
+
+</body>
+</html>
