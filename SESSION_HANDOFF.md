@@ -62,8 +62,14 @@ Read these first each session:
 - This should be reconciled before relying on that preset behavior.
 
 ## In-Progress Product Direction
-- New feature: Weapon Advisor tab/page (spec + UI prototypes complete, implementation pending).
+- New feature: Weapon Advisor tab/page (engine scaffolding exists; UI integration still pending).
+- Advisor V1 scope has been rebaselined to weapon-only recommendations:
+- No attachment recommendations in V1 output.
+- No material filter in V1 advisor state.
+- Damage Style question removed from advisor contract.
 - Spec: `.claude/docs/weapon_advisor_feature.md`
+- Engine contract: `.claude/docs/weapon_advisor_engine_contract.md`
+- Golden matrix: `.claude/docs/weapon_advisor_golden_matrix.md`
 - Visual prototypes:
 - `prototypes/variation-a-dense.html`
 - `prototypes/variation-b-balanced.html`

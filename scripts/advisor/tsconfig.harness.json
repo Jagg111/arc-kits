@@ -1,0 +1,25 @@
+{
+  // Harness TS config:
+  // - extends app TS rules
+  // - enables emit for temporary compiled CLI output
+  // - includes only advisor engine + scenario sources used by the harness
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": false,
+    "outDir": "../../.tmp/advisor-harness",
+    "rootDir": "../..",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "../../scripts/advisor/cli.ts",
+    "../../src/advisor/**/*.ts",
+    "../../src/data/advisor_*.ts",
+    "../../src/data/mods.ts",
+    "../../src/data/weapons.ts",
+    "../../src/types/index.ts"
+  ]
+}

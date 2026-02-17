@@ -104,3 +104,97 @@ export interface CumulativeEffect {
   total: number;                                          // Sum of all contributing values
   unit: string;                                           // "%" or "" (for flat bonuses like magazine size)
 }
+
+// Advisor questionnaire enums
+export type AdvisorLocationId =
+  | "buried_city"
+  | "spaceport"
+  | "dam"
+  | "blue_gate"
+  | "stella_montis";
+
+export type AdvisorSquadMode = "solo" | "squad";
+export type AdvisorFocus = "pve" | "pvp" | "mixed";
+export type AdvisorPreferredRange = "close" | "mid" | "long" | "any";
+
+export interface AdvisorInputs {
+  location: AdvisorLocationId;
+  squad: AdvisorSquadMode;
+  focus: AdvisorFocus;
+  preferredRange: AdvisorPreferredRange;
+  stealthImportant: boolean;
+  allowedWeaponRarities: Rarity[];
+  debug: boolean;
+}
+
+export interface ShuffleState {
+  bucketIndex: number;
+  seenPairKeys: string[];
+  cycle: number;
+}
+
+export interface AdvisorScoreBreakdown {
+  locationFit: number;
+  focusFit: number;
+  rangeFit: number;
+  soloSquadFit: number;
+  stealthPreferenceFit: number;
+  weightedTotal: number;
+}
+
+export interface AdvisorComplementBreakdown {
+  baseSecondaryFit: number;
+  ammoComplement: number;
+  rangeComplement: number;
+  roleComplement: number;
+  weightedTotal: number;
+}
+
+export interface PairRecommendation {
+  rank: number;
+  pairKey: string;
+  primaryWeaponId: string;
+  secondaryWeaponId: string;
+  primaryScore: number;
+  secondaryScore: number;
+  pairScore: number;
+  tieBucketId: string;
+  reasons: string[];
+  debug?: {
+    primaryBreakdown: AdvisorScoreBreakdown;
+    secondaryBreakdown: AdvisorScoreBreakdown;
+    complementBreakdown: AdvisorComplementBreakdown;
+  };
+}
+
+export interface AdvisorEmptyState {
+  code: "INSUFFICIENT_VALID_WEAPONS" | "NO_VALID_PAIRS";
+  message: string;
+}
+
+export interface AdvisorResult {
+  recommendations: PairRecommendation[];
+  emptyState?: AdvisorEmptyState;
+  shuffleState: ShuffleState;
+}
+
+export interface AdvisorQueryState extends AdvisorInputs {
+  tab: "advisor";
+  shuffle?: {
+    bucket: number;
+    offset: number;
+  };
+}
+
+export interface GoldenScenarioCase {
+  id: string;
+  title: string;
+  inputs: AdvisorInputs;
+  requireDebug: boolean;
+  exactExpectedPairKey?: string;
+  expectedPrimaryPool?: string[];
+  expectedSecondaryPool?: string[];
+  expectEmpty?: boolean;
+  requireTieCycling?: boolean;
+  requireUrlRoundTrip?: boolean;
+}
