@@ -5,10 +5,10 @@
 // - Normalizes raw user inputs
 // - Filters invalid weapon candidates (hard constraints)
 // - Scores weapons and builds primary/secondary pair rankings
-// - Applies tie-bucket-aware shuffle batching
+// - Returns 2-3 deterministic results with tier labels and synergy tags
 // ============================================================================
 
-import type { AdvisorInputs, AdvisorResult, PairRecommendation, ShuffleState } from "../../types";
+import type { AdvisorInputs, AdvisorResult, PairRecommendation } from "../../types";
 import { buildWeaponFeatureMap } from "./feature-map";
 import {
   buildInsufficientWeaponsEmptyState,
@@ -18,13 +18,6 @@ import {
 } from "./filters";
 import { rankPairCandidates, type ScoredWeaponCandidate } from "./pair-ranker";
 import { scorePrimary } from "./primary-score";
-import { getShuffleBatch } from "./shuffle";
-
-export interface RecommendOptions {
-  batchSize?: number;
-  shuffleState?: ShuffleState;
-  forceDebug?: boolean;
-}
 
 export interface RankedRecommendationResult {
   inputs: AdvisorInputs;
@@ -32,17 +25,16 @@ export interface RankedRecommendationResult {
   emptyState?: AdvisorResult["emptyState"];
 }
 
-// Build the full ranked list (not just the visible top 2 cards).
-// This is useful for shuffle behavior and matrix validation.
+// Build the full ranked list (used by matrix validation and the main API).
 export function buildRankedRecommendations(
   rawInputs: Partial<AdvisorInputs>,
-  includeDebugOverride?: boolean,
+  includeDebug = false,
 ): RankedRecommendationResult {
   // 1) Fill in defaults for any missing questionnaire values.
   const inputs = normalizeInputs(rawInputs);
   // 2) Build reusable per-weapon features (range band, stealth eligibility, etc.).
   const featureMap = buildWeaponFeatureMap();
-  // 3) Apply hard constraints (rarity, stealth requirement).
+  // 3) Apply hard constraints (rarity filter).
   const filtered = filterCandidateFeatures(featureMap, inputs);
 
   // Hard-stop when we cannot build a primary + secondary pair.
@@ -64,8 +56,6 @@ export function buildRankedRecommendations(
     };
   });
 
-  // Allow caller to force debug mode even if input.debug is false.
-  const includeDebug = includeDebugOverride ?? inputs.debug;
   const ranked = rankPairCandidates(candidates, inputs, includeDebug);
 
   // Defensive fallback: if pairing logic returns no pairs, return explicit empty state.
@@ -80,29 +70,31 @@ export function buildRankedRecommendations(
   return { inputs, ranked };
 }
 
-// Main API used by future UI/hook integration.
-// Returns only the current visible batch (default 2), plus shuffle state.
-export function recommendLoadouts(rawInputs: Partial<AdvisorInputs>, options: RecommendOptions = {}): AdvisorResult {
-  const includeDebug = options.forceDebug ?? rawInputs.debug ?? false;
+// Main API for UI/hook integration.
+// Returns 2-3 deterministic results with tiers and synergy tags.
+export function recommendLoadouts(
+  rawInputs: Partial<AdvisorInputs>,
+  includeDebug = false,
+): AdvisorResult {
   const { ranked, emptyState } = buildRankedRecommendations(rawInputs, includeDebug);
+
   if (emptyState || ranked.length === 0) {
     return {
+      status: "empty",
       recommendations: [],
       emptyState: emptyState ?? buildNoPairsEmptyState(),
-      shuffleState: options.shuffleState ?? { bucketIndex: 0, seenPairKeys: [], cycle: 0 },
     };
   }
 
-  // Hide debug internals unless debug mode is explicitly enabled.
-  const pool = includeDebug ? ranked : ranked.map(({ debug, ...rest }) => rest);
-  // Pick the next batch using tie-bucket cycle rules.
-  const shuffled = getShuffleBatch(pool, options.shuffleState, options.batchSize ?? 2);
+  // Hide debug internals unless explicitly requested.
+  const recommendations = includeDebug
+    ? ranked
+    : ranked.map(({ debug, ...rest }) => rest);
 
   return {
-    recommendations: shuffled.batch,
-    shuffleState: shuffled.state,
+    status: "results",
+    recommendations,
   };
 }
 
 export { parseAdvisorQuery, serializeAdvisorQuery } from "./url-state";
-export { getShuffleBatch } from "./shuffle";

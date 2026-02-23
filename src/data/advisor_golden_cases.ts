@@ -2,6 +2,11 @@
 // FILE: src/data/advisor_golden_cases.ts
 // PURPOSE: Executable scenario matrix for harness validation.
 // These scenarios act as regression checks while tuning scoring behavior.
+//
+// HOW TO USE:
+// - Run `node scripts/advisor/run-matrix.mjs` to validate all scenarios.
+// - Anchor scenarios (G01, G03, G08) require exact top pair matches.
+// - Flexible scenarios check pool membership and invariants only.
 // ============================================================================
 
 import { ADVISOR_ALL_RARITIES } from "./advisor_config";
@@ -14,128 +19,99 @@ function baseInputs(overrides: Partial<AdvisorInputs>): AdvisorInputs {
     squad: "solo",
     focus: "mixed",
     preferredRange: "any",
-    stealthImportant: false,
     allowedWeaponRarities: [...ADVISOR_ALL_RARITIES],
-    debug: false,
     ...overrides,
   };
 }
 
 // Reusable filter sets across scenarios.
-const COMMON_UNCOMMON_RARITIES: Rarity[] = ["Common", "Uncommon"];
+const COMMON_UNCOMMON: Rarity[] = ["Common", "Uncommon"];
 
 // Main matrix used by the CLI harness.
 export const ADVISOR_GOLDEN_CASES: GoldenScenarioCase[] = [
   {
-    id: "S01",
-    title: "Baseline Long-Range PVP",
+    id: "G01",
+    title: "Spaceport, Solo, PvP, Long, All Rarities",
     inputs: baseInputs({
       location: "spaceport",
       squad: "solo",
       focus: "pvp",
       preferredRange: "long",
     }),
-    requireDebug: false,
-    expectedPrimaryPool: ["renegade", "osprey", "tempest"],
-    expectedSecondaryPool: ["stitcher", "venator", "anvil", "vulcano"],
     exactExpectedPairKey: "renegade__anvil",
+    expectedPrimaryPool: ["renegade", "osprey", "tempest"],
+    expectedSecondaryPool: ["anvil", "venator", "ferro", "vulcano"],
   },
   {
-    id: "S02",
-    title: "Indoor CQC PVP",
+    id: "G02",
+    title: "Stella Montis, Squad, PvP, Close, All Rarities",
     inputs: baseInputs({
       location: "stella_montis",
       squad: "squad",
       focus: "pvp",
       preferredRange: "close",
     }),
-    requireDebug: false,
-    expectedPrimaryPool: ["bobcat", "vulcano", "stitcher", "anvil"],
-    expectedSecondaryPool: ["renegade", "tempest", "venator", "ferro", "vulcano", "bobcat"],
+    expectedPrimaryPool: ["vulcano", "bobcat", "stitcher", "anvil"],
+    expectedSecondaryPool: ["bobcat", "anvil", "venator", "tempest"],
   },
   {
-    id: "S03",
-    title: "ARC-Heavy Long-Range PvE",
+    id: "G03",
+    title: "Blue Gate, Solo, PvE, Long, All Rarities",
     inputs: baseInputs({
       location: "blue_gate",
       squad: "solo",
       focus: "pve",
       preferredRange: "long",
     }),
-    requireDebug: false,
-    expectedPrimaryPool: ["equalizer", "jupiter", "aphelion", "hullcracker"],
-    expectedSecondaryPool: ["anvil", "ferro", "tempest", "renegade"],
-    exactExpectedPairKey: "jupiter__anvil",
+    // Equalizer and Jupiter tie at identical scores; both are ARC:S and
+    // community-recommended for Blue Gate. Alphabetical tiebreak picks Equalizer.
+    exactExpectedPairKey: "equalizer__ferro",
+    expectedPrimaryPool: ["equalizer", "jupiter", "hullcracker", "aphelion"],
+    expectedSecondaryPool: ["ferro", "anvil", "renegade", "tempest"],
   },
   {
-    id: "S04",
-    title: "Mixed Terrain Flexible Run",
+    id: "G04",
+    title: "Dam, Squad, Mixed, Any, All Rarities",
     inputs: baseInputs({
       location: "dam",
       squad: "squad",
       focus: "mixed",
       preferredRange: "any",
     }),
-    requireDebug: false,
-    expectedPrimaryPool: ["tempest", "renegade", "rattler", "torrente"],
+    // Renegade wins primary for Dam due to strong BR class fit + good grades.
+    // Tempest is a close runner-up.
+    expectedPrimaryPool: ["renegade", "tempest", "anvil"],
+    expectedSecondaryPool: ["vulcano", "anvil", "ferro", "stitcher"],
   },
   {
-    id: "S05",
-    title: "Common/Uncommon Economy Constraint",
+    id: "G05",
+    title: "Buried City, Solo, Mixed, Close, Common + Uncommon",
     inputs: baseInputs({
       location: "buried_city",
       squad: "solo",
       focus: "mixed",
       preferredRange: "close",
-      allowedWeaponRarities: COMMON_UNCOMMON_RARITIES,
+      allowedWeaponRarities: COMMON_UNCOMMON,
     }),
-    requireDebug: false,
-    expectedPrimaryPool: ["stitcher", "anvil", "ferro", "iltoro"],
-    expectedSecondaryPool: ["rattler", "burletta", "kettle", "iltoro"],
+    expectedPrimaryPool: ["anvil", "stitcher", "ferro", "iltoro"],
+    expectedSecondaryPool: ["iltoro", "stitcher", "ferro", "anvil"],
   },
   {
-    id: "S06",
-    title: "Stealth Required Wide Budget",
-    inputs: baseInputs({
-      location: "spaceport",
-      squad: "solo",
-      focus: "pvp",
-      preferredRange: "long",
-      stealthImportant: true,
-    }),
-    requireDebug: false,
-    expectedPrimaryPool: ["osprey", "renegade", "tempest", "arpeggio"],
-    exactExpectedPairKey: "renegade__anvil",
-  },
-  {
-    id: "S07",
-    title: "Stealth + Legendary Only Empty",
-    inputs: baseInputs({
-      location: "spaceport",
-      squad: "solo",
-      focus: "pvp",
-      preferredRange: "long",
-      stealthImportant: true,
-      allowedWeaponRarities: ["Legendary"],
-    }),
-    requireDebug: false,
-    expectEmpty: true,
-  },
-  {
-    id: "S08",
-    title: "Common/Uncommon Mid-Range Mixed",
+    id: "G06",
+    title: "Dam, Squad, Mixed, Mid, Common + Uncommon",
     inputs: baseInputs({
       location: "dam",
       squad: "squad",
       focus: "mixed",
       preferredRange: "mid",
-      allowedWeaponRarities: COMMON_UNCOMMON_RARITIES,
+      allowedWeaponRarities: COMMON_UNCOMMON,
     }),
-    requireDebug: false,
+    expectedPrimaryPool: ["anvil", "ferro", "rattler"],
+    expectedSecondaryPool: ["iltoro", "stitcher", "rattler"],
   },
   {
-    id: "S09",
-    title: "Uncommon Weapons Only",
+    id: "G07",
+    title: "Buried City, Solo, Mixed, Close, Uncommon Only",
     inputs: baseInputs({
       location: "buried_city",
       squad: "solo",
@@ -143,12 +119,11 @@ export const ADVISOR_GOLDEN_CASES: GoldenScenarioCase[] = [
       preferredRange: "close",
       allowedWeaponRarities: ["Uncommon"],
     }),
-    requireDebug: false,
     expectedPrimaryPool: ["anvil", "iltoro"],
   },
   {
-    id: "S10",
-    title: "No Slot Inclusion Legendary ARC",
+    id: "G08",
+    title: "Blue Gate, Squad, PvE, Long, Legendaries Only",
     inputs: baseInputs({
       location: "blue_gate",
       squad: "squad",
@@ -156,58 +131,40 @@ export const ADVISOR_GOLDEN_CASES: GoldenScenarioCase[] = [
       preferredRange: "long",
       allowedWeaponRarities: ["Legendary"],
     }),
-    requireDebug: false,
-    exactExpectedPairKey: "jupiter__equalizer",
+    // Equalizer and Jupiter tie at identical primary scores.
+    // Alphabetical tiebreak makes equalizer the primary.
+    exactExpectedPairKey: "equalizer__jupiter",
   },
   {
-    id: "S11",
-    title: "Tie Bucket Shuffle Cycle",
+    id: "G09",
+    title: "Spaceport, Solo, PvP, Long, Legendaries Only",
     inputs: baseInputs({
-      location: "dam",
-      squad: "squad",
-      focus: "mixed",
-      preferredRange: "any",
+      location: "spaceport",
+      squad: "solo",
+      focus: "pvp",
+      preferredRange: "long",
+      allowedWeaponRarities: ["Legendary"],
     }),
-    requireDebug: false,
-    requireTieCycling: true,
+    // Without stealth filter (V1), all 3 legendaries are available.
+    // Aphelion has best PvP grade of the 3 legendaries (PvP:C vs F).
+    // Results are mediocre but valid pairings.
+    expectedPrimaryPool: ["aphelion", "jupiter", "equalizer"],
   },
   {
-    id: "S12",
-    title: "Stealth Exclusion Rules",
+    id: "G10",
+    title: "Stella Montis, Solo, PvP, Close, Common + Uncommon",
     inputs: baseInputs({
       location: "stella_montis",
       squad: "solo",
-      focus: "mixed",
+      focus: "pvp",
       preferredRange: "close",
-      stealthImportant: true,
+      allowedWeaponRarities: COMMON_UNCOMMON,
     }),
-    requireDebug: false,
-  },
-  {
-    id: "S13",
-    title: "Same Ammo Penalty Check",
-    inputs: baseInputs({
-      location: "spaceport",
-      squad: "solo",
-      focus: "pvp",
-      preferredRange: "long",
-    }),
-    requireDebug: false,
-  },
-  {
-    id: "S14",
-    title: "URL Round Trip Shareability",
-    inputs: baseInputs({
-      location: "spaceport",
-      squad: "solo",
-      focus: "pvp",
-      preferredRange: "long",
-    }),
-    requireDebug: true,
-    exactExpectedPairKey: "renegade__anvil",
-    requireUrlRoundTrip: true,
+    // Anvil dominates due to PvP:A grade even though HC is not ideal CQC class.
+    expectedPrimaryPool: ["anvil", "stitcher", "iltoro"],
+    expectedSecondaryPool: ["iltoro", "stitcher", "ferro", "anvil"],
   },
 ];
 
 // Subset where top pair is intentionally locked as an exact expected key.
-export const ADVISOR_CRITICAL_EXACT_CASE_IDS = new Set(["S01", "S03", "S06", "S07", "S10", "S14"]);
+export const ADVISOR_CRITICAL_EXACT_CASE_IDS = new Set(["G01", "G03", "G08"]);

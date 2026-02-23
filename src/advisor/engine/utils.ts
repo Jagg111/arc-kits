@@ -3,8 +3,8 @@
 // PURPOSE: Shared small utility helpers used by multiple engine modules.
 // ============================================================================
 
-import { ADVISOR_GRADE_TO_SCORE, ADVISOR_RANGE_TARGETS, ADVISOR_TIE_PRECISION } from "../../data/advisor_config";
-import type { AdvisorPreferredRange, TierData, Weapon } from "../../types";
+import { ADVISOR_GRADE_TO_SCORE, ADVISOR_RANGE_TARGETS } from "../../data/advisor_config";
+import type { AdvisorPreferredRange, TierData } from "../../types";
 
 export type RangeBand = "close" | "mid" | "long";
 
@@ -15,8 +15,8 @@ export function clamp(value: number, min = 0, max = 1): number {
   return value;
 }
 
-// Round to a deterministic precision (used for tie bucket IDs).
-export function roundTo(value: number, precision = ADVISOR_TIE_PRECISION): number {
+// Round to a deterministic precision.
+export function roundTo(value: number, precision = 4): number {
   const multiplier = 10 ** precision;
   return Math.round(value * multiplier) / multiplier;
 }
@@ -78,11 +78,3 @@ export function pairKey(primaryWeaponId: string, secondaryWeaponId: string): str
   return `${primaryWeaponId}__${secondaryWeaponId}`;
 }
 
-// Simple role diversity signal using range band distance.
-export function roleDistance(a: Weapon, b: Weapon): number {
-  const bandA = pickRangeBand(a.range);
-  const bandB = pickRangeBand(b.range);
-  if (bandA === bandB) return 0.15;
-  if ((bandA === "close" && bandB === "long") || (bandA === "long" && bandB === "close")) return 1;
-  return 0.65;
-}

@@ -2,18 +2,15 @@
 // FILE: scripts/advisor/cli.ts
 // PURPOSE: Command-line matrix runner for advisor engine validation.
 // WHAT IT CHECKS:
-// - Global invariants (2-or-0 results, filter compliance, etc.)
+// - Global invariants (2-3 results or empty, filter compliance, tiers, tags)
 // - Exact critical scenario pair keys
-// - Tie-bucket shuffle progression
-// - URL round-trip state fidelity
+// - Pool membership for flexible scenarios
 // ============================================================================
 
 import { WEAPONS } from "../../src/data/weapons";
 import { ADVISOR_CRITICAL_EXACT_CASE_IDS, ADVISOR_GOLDEN_CASES } from "../../src/data/advisor_golden_cases";
-import { buildWeaponFeatureMap } from "../../src/advisor/engine/feature-map";
-import { buildRankedRecommendations, getShuffleBatch, recommendLoadouts } from "../../src/advisor/engine";
-import { parseAdvisorQuery, serializeAdvisorQuery } from "../../src/advisor/engine/url-state";
-import type { GoldenScenarioCase, ShuffleState } from "../../src/types";
+import { recommendLoadouts } from "../../src/advisor/engine";
+import type { AdvisorResult, GoldenScenarioCase } from "../../src/types";
 
 declare const process: {
   argv: string[];
@@ -25,18 +22,30 @@ interface ScenarioOutcome {
   title: string;
   passed: boolean;
   errors: string[];
+  pairs?: ScenarioPairSummary[];
+  emptyStateCode?: NonNullable<AdvisorResult["emptyState"]>["code"];
 }
 
 interface CliOptions {
   json: boolean;
   scenarioId?: string;
+  showPairs: boolean;
 }
 
-// Minimal arg parser for:
-// --json
-// --scenario Sxx
+interface ScenarioPairSummary {
+  pairKey: string;
+  primaryWeaponId: string;
+  secondaryWeaponId: string;
+  pairScore: number;
+  primaryScore: number;
+  secondaryScore: number;
+  tier: string;
+  synergyTags: string[];
+}
+
+// Minimal arg parser.
 function parseArgs(argv: string[]): CliOptions {
-  const options: CliOptions = { json: false };
+  const options: CliOptions = { json: false, showPairs: false };
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === "--json") {
@@ -46,41 +55,52 @@ function parseArgs(argv: string[]): CliOptions {
     if (token === "--scenario") {
       options.scenarioId = argv[i + 1];
       i += 1;
+      continue;
+    }
+    if (token === "--show-pairs") {
+      options.showPairs = true;
     }
   }
   return options;
 }
 
 // Static maps to avoid rebuilding for each scenario.
-const FEATURE_MAP = buildWeaponFeatureMap();
 const WEAPON_BY_ID = Object.fromEntries(WEAPONS.map((weapon) => [weapon.id, weapon]));
 
-// Invariants that should hold across almost all scenarios.
-function assertGlobalInvariants(scenario: GoldenScenarioCase, errors: string[]): void {
-  const runtimeResult = recommendLoadouts(scenario.inputs, {
-    batchSize: 2,
-    forceDebug: scenario.requireDebug,
-  });
-  const rankedResult = buildRankedRecommendations(scenario.inputs);
-  const recommendations = runtimeResult.recommendations;
+// Invariants that should hold across all scenarios.
+function assertGlobalInvariants(
+  scenario: GoldenScenarioCase,
+  result: AdvisorResult,
+  errors: string[],
+): void {
+  const recommendations = result.recommendations;
 
-  // The product contract is either 2 cards or an explicit empty-state.
-  if (!(recommendations.length === 0 || recommendations.length === 2)) {
-    errors.push(`Expected output length of 0 or 2, received ${recommendations.length}`);
-  }
-
+  // V1 contract: 2-3 results or empty state.
   if (scenario.expectEmpty) {
     if (recommendations.length !== 0) errors.push("Scenario expects empty-state, but recommendations were returned");
-    if (!runtimeResult.emptyState) errors.push("Scenario expects empty-state metadata, but it is missing");
-  } else if (runtimeResult.emptyState) {
-    errors.push(`Unexpected empty state: ${runtimeResult.emptyState.message}`);
+    if (!result.emptyState) errors.push("Scenario expects empty-state metadata, but it is missing");
+    if (result.status !== "empty") errors.push(`Expected status 'empty', got '${result.status}'`);
+  } else {
+    if (result.emptyState) errors.push(`Unexpected empty state: ${result.emptyState.message}`);
+    if (recommendations.length < 2 || recommendations.length > 3) {
+      errors.push(`Expected 2-3 results, received ${recommendations.length}`);
+    }
+    if (result.status !== "results") errors.push(`Expected status 'results', got '${result.status}'`);
+  }
+
+  // Tier invariant: exactly 1 top_pick, rest are strong_option.
+  const topPicks = recommendations.filter((r) => r.tier === "top_pick");
+  if (recommendations.length > 0 && topPicks.length !== 1) {
+    errors.push(`Expected exactly 1 top_pick, found ${topPicks.length}`);
   }
 
   for (const recommendation of recommendations) {
+    // No duplicate weapons in a pair.
     if (recommendation.primaryWeaponId === recommendation.secondaryWeaponId) {
       errors.push(`Duplicate primary/secondary weapon in ${recommendation.pairKey}`);
     }
 
+    // Rarity filter compliance.
     const primary = WEAPON_BY_ID[recommendation.primaryWeaponId];
     const secondary = WEAPON_BY_ID[recommendation.secondaryWeaponId];
 
@@ -91,148 +111,124 @@ function assertGlobalInvariants(scenario: GoldenScenarioCase, errors: string[]):
       errors.push(`Secondary ${secondary.id} violates rarity filter`);
     }
 
-    if (scenario.inputs.stealthImportant) {
-      if (!FEATURE_MAP[primary.id]?.stealthEligible) errors.push(`Primary ${primary.id} violates stealth eligibility`);
-      if (!FEATURE_MAP[secondary.id]?.stealthEligible) errors.push(`Secondary ${secondary.id} violates stealth eligibility`);
+    // Synergy tags must be present.
+    if (!recommendation.synergyTags || recommendation.synergyTags.length === 0) {
+      errors.push(`Pair ${recommendation.pairKey} is missing synergy tags`);
     }
 
-    const hasDebug = Boolean(recommendation.debug);
-    if (scenario.requireDebug && !hasDebug) {
-      errors.push("Debug breakdown is required but missing");
-    }
-    if (!scenario.requireDebug && hasDebug) {
-      errors.push("Debug breakdown should be hidden but is present");
+    // Tier must be valid.
+    if (recommendation.tier !== "top_pick" && recommendation.tier !== "strong_option") {
+      errors.push(`Pair ${recommendation.pairKey} has invalid tier '${recommendation.tier}'`);
     }
   }
 
-  // Pool checks are softer than exact key checks, useful during tuning.
-  if (rankedResult.ranked.length > 0 && scenario.expectedPrimaryPool?.length) {
-    const topPrimary = rankedResult.ranked[0].primaryWeaponId;
+  // Pool checks (softer than exact key checks, useful during tuning).
+  if (recommendations.length > 0 && scenario.expectedPrimaryPool?.length) {
+    const topPrimary = recommendations[0].primaryWeaponId;
     if (!scenario.expectedPrimaryPool.includes(topPrimary)) {
-      errors.push(`Top primary ${topPrimary} is outside expected pool`);
+      errors.push(`Top primary '${topPrimary}' is outside expected pool [${scenario.expectedPrimaryPool.join(", ")}]`);
     }
   }
 
-  if (rankedResult.ranked.length > 0 && scenario.expectedSecondaryPool?.length) {
-    const topSecondary = rankedResult.ranked[0].secondaryWeaponId;
+  if (recommendations.length > 0 && scenario.expectedSecondaryPool?.length) {
+    const topSecondary = recommendations[0].secondaryWeaponId;
     if (!scenario.expectedSecondaryPool.includes(topSecondary)) {
-      errors.push(`Top secondary ${topSecondary} is outside expected pool`);
+      errors.push(`Top secondary '${topSecondary}' is outside expected pool [${scenario.expectedSecondaryPool.join(", ")}]`);
     }
   }
 }
 
-// Exact key checks for critical scenarios only.
-function assertExactCases(scenario: GoldenScenarioCase, errors: string[]): void {
+// Exact key checks for anchor scenarios.
+function assertExactCases(scenario: GoldenScenarioCase, result: AdvisorResult, errors: string[]): void {
   if (!ADVISOR_CRITICAL_EXACT_CASE_IDS.has(scenario.id)) return;
-  const rankedResult = buildRankedRecommendations(scenario.inputs);
 
   if (scenario.expectEmpty) {
-    if (rankedResult.ranked.length !== 0) {
-      errors.push(`Exact-case ${scenario.id} should be empty but returned ranked pairs`);
+    if (result.recommendations.length !== 0) {
+      errors.push(`Anchor scenario ${scenario.id} should be empty but returned results`);
     }
     return;
   }
 
   if (!scenario.exactExpectedPairKey) {
-    errors.push(`Exact-case ${scenario.id} is missing exactExpectedPairKey`);
+    errors.push(`Anchor scenario ${scenario.id} is missing exactExpectedPairKey`);
     return;
   }
 
-  const topPair = rankedResult.ranked[0]?.pairKey;
+  const topPair = result.recommendations[0]?.pairKey;
   if (topPair !== scenario.exactExpectedPairKey) {
-    errors.push(`Exact mismatch: expected ${scenario.exactExpectedPairKey}, got ${topPair ?? "none"}`);
+    errors.push(`Exact mismatch: expected '${scenario.exactExpectedPairKey}', got '${topPair ?? "none"}'`);
   }
 }
 
-// Validate shuffle behavior for tie buckets.
-function assertTieCycling(scenario: GoldenScenarioCase, errors: string[]): void {
-  if (!scenario.requireTieCycling) return;
-  const rankedResult = buildRankedRecommendations(scenario.inputs);
-  const ranked = rankedResult.ranked;
-  if (ranked.length < 3) {
-    errors.push("Tie-cycle scenario requires at least 3 ranked pairs");
+// Determinism check: running the same inputs twice must produce identical output.
+function assertDeterminism(scenario: GoldenScenarioCase, errors: string[]): void {
+  if (scenario.expectEmpty) return;
+  const result1 = recommendLoadouts(scenario.inputs);
+  const result2 = recommendLoadouts(scenario.inputs);
+
+  if (result1.recommendations.length !== result2.recommendations.length) {
+    errors.push("Determinism failure: different result count on re-run");
     return;
   }
 
-  const firstBucket = ranked[0].tieBucketId;
-  const bucketSize = ranked.filter((entry) => entry.tieBucketId === firstBucket).length;
-  if (bucketSize < 1) {
-    errors.push("Tie-cycle scenario requires at least one pair in the top tie bucket");
-    return;
-  }
-
-  const seenFromFirstBucket = new Set<string>();
-  let state: ShuffleState = { bucketIndex: 0, seenPairKeys: [], cycle: 0 };
-  for (let i = 0; i < bucketSize; i += 1) {
-    const step = getShuffleBatch(ranked, state, 1);
-    const rec = step.batch[0];
-    if (!rec) {
-      errors.push("Shuffle produced empty batch unexpectedly while exhausting first bucket");
-      return;
+  for (let i = 0; i < result1.recommendations.length; i++) {
+    if (result1.recommendations[i].pairKey !== result2.recommendations[i].pairKey) {
+      errors.push(`Determinism failure: pair ${i} differs on re-run`);
     }
-    if (rec.tieBucketId !== firstBucket) {
-      errors.push("Shuffle moved to another bucket before exhausting first bucket");
-      return;
-    }
-    if (seenFromFirstBucket.has(rec.pairKey)) {
-      errors.push("Shuffle repeated a pair before exhausting first bucket");
-      return;
-    }
-    seenFromFirstBucket.add(rec.pairKey);
-    state = step.state;
   }
-
-  const next = getShuffleBatch(ranked, state, 1);
-  const nextRec = next.batch[0];
-  if (!nextRec) {
-    errors.push("Shuffle produced empty batch after exhausting first bucket");
-    return;
-  }
-  const hasMultipleBuckets = ranked.some((entry) => entry.tieBucketId !== firstBucket);
-  if (hasMultipleBuckets && nextRec.tieBucketId === firstBucket) {
-    errors.push("Shuffle did not advance to next tie bucket after exhausting first bucket");
-  }
-}
-
-// Parse->serialize->parse consistency check for shareable URLs.
-function assertUrlRoundTrip(scenario: GoldenScenarioCase, errors: string[]): void {
-  if (!scenario.requireUrlRoundTrip) return;
-  const serialized = serializeAdvisorQuery(scenario.inputs, { bucket: 1, offset: 2 });
-  const parsed = parseAdvisorQuery(serialized);
-
-  if (parsed.location !== scenario.inputs.location) errors.push("URL round-trip mismatch: location");
-  if (parsed.squad !== scenario.inputs.squad) errors.push("URL round-trip mismatch: squad");
-  if (parsed.focus !== scenario.inputs.focus) errors.push("URL round-trip mismatch: focus");
-  if (parsed.preferredRange !== scenario.inputs.preferredRange) errors.push("URL round-trip mismatch: preferredRange");
-  if (parsed.stealthImportant !== scenario.inputs.stealthImportant) errors.push("URL round-trip mismatch: stealth");
-  if (parsed.debug !== scenario.inputs.debug) errors.push("URL round-trip mismatch: debug flag");
-  if ((parsed.shuffle?.bucket ?? -1) !== 1) errors.push("URL round-trip mismatch: shuffle bucket");
-  if ((parsed.shuffle?.offset ?? -1) !== 2) errors.push("URL round-trip mismatch: shuffle offset");
 }
 
 // Run all assertion groups for one scenario.
-function runScenario(scenario: GoldenScenarioCase): ScenarioOutcome {
+function runScenario(scenario: GoldenScenarioCase, showPairs: boolean): ScenarioOutcome {
   const errors: string[] = [];
-  assertGlobalInvariants(scenario, errors);
-  assertExactCases(scenario, errors);
-  assertTieCycling(scenario, errors);
-  assertUrlRoundTrip(scenario, errors);
+  const result = recommendLoadouts(scenario.inputs);
+
+  assertGlobalInvariants(scenario, result, errors);
+  assertExactCases(scenario, result, errors);
+  assertDeterminism(scenario, errors);
+
+  const pairs = showPairs
+    ? result.recommendations.map((r) => ({
+        pairKey: r.pairKey,
+        primaryWeaponId: r.primaryWeaponId,
+        secondaryWeaponId: r.secondaryWeaponId,
+        pairScore: r.pairScore,
+        primaryScore: r.primaryScore,
+        secondaryScore: r.secondaryScore,
+        tier: r.tier,
+        synergyTags: r.synergyTags.map((t) => `${t.type === "positive" ? "+" : "!"}${t.label}`),
+      }))
+    : undefined;
 
   return {
     id: scenario.id,
     title: scenario.title,
     passed: errors.length === 0,
     errors,
+    pairs,
+    emptyStateCode: showPairs ? result.emptyState?.code : undefined,
   };
 }
 
 // Pretty text output for terminal use.
-function formatHuman(outcomes: ScenarioOutcome[]): string {
+function formatHuman(outcomes: ScenarioOutcome[], showPairs: boolean): string {
   const lines: string[] = [];
-  const passes = outcomes.filter((outcome) => outcome.passed).length;
+  const passes = outcomes.filter((o) => o.passed).length;
   lines.push(`Advisor matrix: ${passes}/${outcomes.length} passed`);
   for (const outcome of outcomes) {
     lines.push(`${outcome.passed ? "PASS" : "FAIL"} ${outcome.id} - ${outcome.title}`);
+    if (showPairs) {
+      if (outcome.pairs && outcome.pairs.length > 0) {
+        for (const pair of outcome.pairs) {
+          const tags = pair.synergyTags.join(", ");
+          lines.push(
+            `  [${pair.tier}] ${pair.pairKey} (pair=${pair.pairScore.toFixed(4)}, p=${pair.primaryScore.toFixed(4)}, s=${pair.secondaryScore.toFixed(4)}) ${tags}`,
+          );
+        }
+      } else {
+        lines.push(`  pairs: EMPTY (${outcome.emptyStateCode ?? "NO_DATA"})`);
+      }
+    }
     for (const error of outcome.errors) {
       lines.push(`  - ${error}`);
     }
@@ -244,7 +240,7 @@ function formatHuman(outcomes: ScenarioOutcome[]): string {
 function main(): number {
   const options = parseArgs(process.argv.slice(2));
   const selected = options.scenarioId
-    ? ADVISOR_GOLDEN_CASES.filter((scenario) => scenario.id === options.scenarioId)
+    ? ADVISOR_GOLDEN_CASES.filter((s) => s.id === options.scenarioId)
     : ADVISOR_GOLDEN_CASES;
 
   if (selected.length === 0) {
@@ -252,14 +248,14 @@ function main(): number {
     return 2;
   }
 
-  const outcomes = selected.map(runScenario);
+  const outcomes = selected.map((s) => runScenario(s, options.showPairs));
   if (options.json) {
     console.log(JSON.stringify(outcomes, null, 2));
   } else {
-    console.log(formatHuman(outcomes));
+    console.log(formatHuman(outcomes, options.showPairs));
   }
 
-  return outcomes.every((outcome) => outcome.passed) ? 0 : 1;
+  return outcomes.every((o) => o.passed) ? 0 : 1;
 }
 
 process.exit(main());

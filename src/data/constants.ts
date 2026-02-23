@@ -98,6 +98,35 @@ export const MATERIAL_INFO: Record<string, { rarity: Rarity; img: string }> = {
   "Mod Components":        { rarity: "Rare",     img: "https://arcraiders.wiki/w/images/thumb/0/0f/Mod_Components.png/96px-Mod_Components.png.webp" },
 };
 
+// Weapon images — wiki thumbnail URLs keyed by weapon id.
+// Same pattern as MATERIAL_INFO and mod icons in mods.ts.
+const WI = (hash: string, file: string) =>
+  `https://arcraiders.wiki/w/images/thumb/${hash}/${file}/160px-${file}.webp`;
+
+export const WEAPON_IMAGES: Record<string, string> = {
+  hairpin:      WI("6/65", "Hairpin-Level1.png"),
+  burletta:     WI("d/d4", "Burletta-Level1.png"),
+  kettle:       WI("c/c1", "Kettle-Level1.png"),
+  stitcher:     WI("3/3a", "Stitcher-Level1.png"),
+  bobcat:       WI("3/36", "Bobcat-Level1.png"),
+  rattler:      WI("b/be", "Rattler-Level1.png"),
+  arpeggio:     WI("6/6c", "Arpeggio-Level1.png"),
+  renegade:     WI("b/b5", "Renegade-Level1.png"),
+  venator:      WI("b/b4", "Venator-Level1.png"),
+  torrente:     WI("1/1e", "Torrente-Level1.png"),
+  osprey:       WI("a/ae", "Osprey-Level1.png"),
+  tempest:      WI("c/c9", "Tempest-Level1.png"),
+  ferro:        WI("b/b0", "Ferro-Level1.png"),
+  anvil:        WI("0/00", "Anvil-Level1.png"),
+  bettina:      WI("a/ac", "Bettina.png"),
+  iltoro:       WI("5/50", "Il_Toro-Level1.png"),
+  vulcano:      WI("d/da", "Vulcano-Level1.png"),
+  hullcracker:  WI("b/ba", "Hullcracker-Level1.png"),
+  aphelion:     WI("8/88", "Aphelion.png"),
+  jupiter:      WI("6/68", "Jupiter.png"),
+  equalizer:    WI("9/96", "Equalizer.png"),
+};
+
 // Display order for ammo type groups on the weapon picker screen
 export const AMMO_TYPES: AmmoType[] = [
   "Light",

@@ -1,78 +1,48 @@
 // ============================================================================
 // FILE: src/advisor/engine/primary-score.ts
 // PURPOSE: Compute the "standalone" score for a weapon as primary.
-// Each component is a normalized [0..1] score, then weighted into one total.
+// 3 components (mapFit, roleFit, rangeFit), each normalized [0..1], then
+// weighted into one total.
 // ============================================================================
 
 import {
   ADVISOR_FOCUS_BLEND,
-  ADVISOR_LOCATION_PROFILES,
-  ADVISOR_PRIMARY_WEIGHTS,
+  LOCATION_CLASS_TIERS,
+  LOCATION_TIER_SCORES,
+  WEIGHT_MAP_FIT,
+  WEIGHT_ROLE_FIT,
+  WEIGHT_RANGE_FIT,
 } from "../../data/advisor_config";
 import type { AdvisorInputs, AdvisorScoreBreakdown, Weapon } from "../../types";
 import { clamp, gradeToScore, rangeFitFromNumeric } from "./utils";
 
-// How well the weapon fits the chosen map profile.
-function scoreLocationFit(weapon: Weapon, inputs: AdvisorInputs): number {
-  const profile = ADVISOR_LOCATION_PROFILES[inputs.location];
-  const classFit = profile.classWeights[weapon.weaponClass] ?? 0.55;
-  const preferredRangeFit = profile.preferredRanges[inputs.preferredRange] ?? 0.65;
-  const locationThreatBlend =
-    profile.arcBias * gradeToScore(weapon.arc) * 0.55 +
-    profile.pvpBias * gradeToScore(weapon.pvp) * 0.45;
-  return clamp(classFit * 0.5 + preferredRangeFit * 0.15 + locationThreatBlend * 0.35);
+// How well the weapon's class fits the chosen map.
+// Uses 3-tier bucketing: strong/okay/weak per location.
+function scoreMapFit(weapon: Weapon, inputs: AdvisorInputs): number {
+  const tiers = LOCATION_CLASS_TIERS[inputs.location];
+  if (tiers.strong.includes(weapon.weaponClass)) return LOCATION_TIER_SCORES.strong;
+  if (tiers.okay.includes(weapon.weaponClass)) return LOCATION_TIER_SCORES.okay;
+  return LOCATION_TIER_SCORES.weak;
 }
 
 // Blend PVP/ARC grades based on focus (pvp, pve, mixed).
-function scoreFocusFit(weapon: Weapon, inputs: AdvisorInputs): number {
+// Reuses the proven scoreFocusFit logic from the previous engine.
+function scoreRoleFit(weapon: Weapon, inputs: AdvisorInputs): number {
   const blend = ADVISOR_FOCUS_BLEND[inputs.focus];
   return clamp(gradeToScore(weapon.pvp) * blend.pvp + gradeToScore(weapon.arc) * blend.arc);
 }
 
-// Light heuristic for solo vs squad fit.
-function scoreSoloSquadFit(weapon: Weapon, inputs: AdvisorInputs): number {
-  if (inputs.squad === "solo") {
-    if (weapon.weaponClass === "LMG") return 0.45;
-    if (weapon.weaponClass === "Special" && weapon.ammoType === "Special") return 0.5;
-    if (weapon.weaponClass === "SMG" || weapon.weaponClass === "AR" || weapon.weaponClass === "Pistol") return 0.9;
-    return 0.72;
-  }
-
-  if (weapon.weaponClass === "LMG") return 0.88;
-  if (weapon.weaponClass === "Special" && weapon.ammoType === "Special") return 0.8;
-  return 0.74;
-}
-
-// When stealth is a hard filter, this component becomes neutral.
-// Otherwise it slightly favors naturally quiet/stealth-flavored descriptions.
-function scoreStealthPreferenceFit(weapon: Weapon, inputs: AdvisorInputs): number {
-  if (inputs.stealthImportant) return 1;
-  const hasNaturalStealthProfile = /silencer|quiet|stealth/i.test(weapon.desc);
-  return hasNaturalStealthProfile ? 0.78 : 0.55;
-}
-
 // Public scorer used by the pair-ranking stage.
 export function scorePrimary(weapon: Weapon, inputs: AdvisorInputs): AdvisorScoreBreakdown {
-  const locationFit = scoreLocationFit(weapon, inputs);
-  const focusFit = scoreFocusFit(weapon, inputs);
+  const mapFit = scoreMapFit(weapon, inputs);
+  const roleFit = scoreRoleFit(weapon, inputs);
   const rangeFit = rangeFitFromNumeric(weapon.range, inputs.preferredRange);
-  const soloSquadFit = scoreSoloSquadFit(weapon, inputs);
-  const stealthPreferenceFit = scoreStealthPreferenceFit(weapon, inputs);
 
   const weightedTotal = clamp(
-    locationFit * ADVISOR_PRIMARY_WEIGHTS.locationFit +
-      focusFit * ADVISOR_PRIMARY_WEIGHTS.focusFit +
-      rangeFit * ADVISOR_PRIMARY_WEIGHTS.rangeFit +
-      soloSquadFit * ADVISOR_PRIMARY_WEIGHTS.soloSquadFit +
-      stealthPreferenceFit * ADVISOR_PRIMARY_WEIGHTS.stealthPreferenceFit,
+    mapFit * WEIGHT_MAP_FIT +
+    roleFit * WEIGHT_ROLE_FIT +
+    rangeFit * WEIGHT_RANGE_FIT,
   );
 
-  return {
-    locationFit,
-    focusFit,
-    rangeFit,
-    soloSquadFit,
-    stealthPreferenceFit,
-    weightedTotal,
-  };
+  return { mapFit, roleFit, rangeFit, weightedTotal };
 }

@@ -1,14 +1,22 @@
 // ============================================================================
 // FILE: src/advisor/engine/pair-ranker.ts
 // PURPOSE: Turn scored weapon candidates into ranked primary+secondary pairs.
-// Also attaches human-readable reasons and optional debug breakdown details.
+// Assigns tier labels, synergy tags, and handles 2-vs-3 output logic.
 // ============================================================================
 
-import { ADVISOR_PAIR_WEIGHTS, ADVISOR_TOP_PRIMARY_CAP } from "../../data/advisor_config";
+import {
+  ADVISOR_TOP_PRIMARY_CAP,
+  SQUAD_RANGE_BONUS,
+  TOP_GAP,
+  WEIGHT_PAIR_COMPLEMENT,
+  WEIGHT_PAIR_PRIMARY,
+} from "../../data/advisor_config";
 import type {
   AdvisorInputs,
   AdvisorScoreBreakdown,
   PairRecommendation,
+  SynergyTag,
+  TierLabel,
   Weapon,
 } from "../../types";
 import { scoreSecondaryComplement } from "./secondary-score";
@@ -26,36 +34,47 @@ interface WorkingPair {
   secondary: ScoredWeaponCandidate;
   secondaryScore: number;
   pairScore: number;
-  reasons: string[];
   complementBreakdown: ReturnType<typeof scoreSecondaryComplement>;
 }
 
-// Build short explanation text for UI cards.
-function buildReasons(
-  primary: ScoredWeaponCandidate,
-  secondary: ScoredWeaponCandidate,
-  inputs: AdvisorInputs,
-): string[] {
-  const rangeText = inputs.preferredRange === "any" ? "mixed ranges" : `${inputs.preferredRange}-range fights`;
-  const primaryReason = `${primary.weapon.name} is the best primary fit for ${inputs.location.replace("_", " ")} and ${rangeText}.`;
-  const ammoNote =
-    primary.weapon.ammoType === secondary.weapon.ammoType
-      ? "shares ammo reserves with your primary."
-      : "covers you with a different ammo type.";
-  const bandPrimary = pickRangeBand(primary.weapon.range);
-  const bandSecondary = pickRangeBand(secondary.weapon.range);
-  const rangeNote =
-    bandPrimary === bandSecondary
-      ? `${secondary.weapon.name} reinforces the same fight profile and ${ammoNote}`
-      : `${secondary.weapon.name} complements your ${bandPrimary} primary with ${bandSecondary} coverage and ${ammoNote}`;
+// Derive synergy tags from weapon data — no curation, pure logic.
+function deriveSynergyTags(primary: Weapon, secondary: Weapon): SynergyTag[] {
+  const tags: SynergyTag[] = [];
 
-  return [primaryReason, rangeNote];
+  // Ammo diversity
+  if (primary.ammoType !== secondary.ammoType) {
+    tags.push({ type: "positive", label: "Ammo Split" });
+  } else {
+    tags.push({ type: "warning", label: "Same Ammo" });
+  }
+
+  // Range coverage
+  const rangePrimary = pickRangeBand(primary.range);
+  const rangeSecondary = pickRangeBand(secondary.range);
+  if (rangePrimary !== rangeSecondary) {
+    tags.push({ type: "positive", label: "Range Coverage" });
+  } else {
+    tags.push({ type: "warning", label: "Range Overlap" });
+  }
+
+  // Role split: one strong PvP (S/A) and other strong ARC (S/A)
+  const pvpGrades = new Set(["S", "A"]);
+  const arcGrades = new Set(["S", "A"]);
+  const hasPvpStrong = pvpGrades.has(primary.pvp) || pvpGrades.has(secondary.pvp);
+  const hasArcStrong = arcGrades.has(primary.arc) || arcGrades.has(secondary.arc);
+  if (hasPvpStrong && hasArcStrong) {
+    tags.push({ type: "positive", label: "Role Split" });
+  }
+
+  return tags;
 }
 
 // Main pair builder:
 // 1) sort primary candidates
 // 2) expand ordered pairs (primary != secondary)
 // 3) score + sort deterministically
+// 4) assign tiers and synergy tags
+// 5) return top 2-3 results
 export function rankPairCandidates(
   candidates: ScoredWeaponCandidate[],
   inputs: AdvisorInputs,
@@ -70,8 +89,7 @@ export function rankPairCandidates(
   const primaryPool = sortedPrimary.slice(0, Math.min(ADVISOR_TOP_PRIMARY_CAP, sortedPrimary.length));
   const allPairs: WorkingPair[] = [];
 
-  // Ordered pairs are intentional:
-  // A->B is different from B->A because primary role is different.
+  // Ordered pairs: A→B is different from B→A because primary role differs.
   for (const primary of primaryPool) {
     for (const secondary of candidates) {
       if (secondary.weapon.id === primary.weapon.id) continue;
@@ -79,15 +97,22 @@ export function rankPairCandidates(
         primary.weapon,
         secondary.weapon,
         secondary.primaryScore,
-        inputs,
       );
 
       const secondaryScore = complementBreakdown.weightedTotal;
-      // Final pair score prioritizes primary fit over secondary complement.
-      const pairScore = clamp(
-        primary.primaryScore * ADVISOR_PAIR_WEIGHTS.primaryWeight +
-          secondaryScore * ADVISOR_PAIR_WEIGHTS.secondaryWeight,
+      let pairScore = clamp(
+        primary.primaryScore * WEIGHT_PAIR_PRIMARY +
+        secondaryScore * WEIGHT_PAIR_COMPLEMENT,
       );
+
+      // Squad mode bonus: reward pairs that specialize into different range bands.
+      if (inputs.squad === "squad") {
+        const bandPrimary = pickRangeBand(primary.weapon.range);
+        const bandSecondary = pickRangeBand(secondary.weapon.range);
+        if (bandPrimary !== bandSecondary) {
+          pairScore = clamp(pairScore + SQUAD_RANGE_BONUS);
+        }
+      }
 
       allPairs.push({
         pairKey: pairKey(primary.weapon.id, secondary.weapon.id),
@@ -95,14 +120,13 @@ export function rankPairCandidates(
         secondary,
         secondaryScore,
         pairScore,
-        reasons: buildReasons(primary, secondary, inputs),
         complementBreakdown,
       });
     }
   }
 
-  // Deterministic final sort order:
-  // pair score, then primary score, then secondary score, then lexical key.
+  // Deterministic final sort:
+  // pair score → primary score → secondary score → lexical key.
   allPairs.sort((a, b) => {
     if (b.pairScore !== a.pairScore) return b.pairScore - a.pairScore;
     if (b.primary.primaryScore !== a.primary.primaryScore) return b.primary.primaryScore - a.primary.primaryScore;
@@ -110,7 +134,20 @@ export function rankPairCandidates(
     return a.pairKey.localeCompare(b.pairKey);
   });
 
-  return allPairs.map((pair, index) => {
+  // Determine how many results to show (2 or 3).
+  const topScore = allPairs.length > 0 ? allPairs[0].pairScore : 0;
+  let resultCount = Math.min(2, allPairs.length);
+  if (allPairs.length >= 3 && allPairs[2].pairScore >= topScore - TOP_GAP) {
+    resultCount = 3;
+  }
+
+  const topPairs = allPairs.slice(0, resultCount);
+
+  return topPairs.map((pair, index) => {
+    // Tier assignment: first pair = Top Pick, rest = Strong Option.
+    const tier: TierLabel = index === 0 ? "top_pick" : "strong_option";
+    const synergyTags = deriveSynergyTags(pair.primary.weapon, pair.secondary.weapon);
+
     const recommendation: PairRecommendation = {
       rank: index + 1,
       pairKey: pair.pairKey,
@@ -119,11 +156,10 @@ export function rankPairCandidates(
       primaryScore: roundTo(pair.primary.primaryScore, 6),
       secondaryScore: roundTo(pair.secondaryScore, 6),
       pairScore: roundTo(pair.pairScore, 6),
-      tieBucketId: `score_${roundTo(pair.pairScore).toFixed(4)}`,
-      reasons: pair.reasons,
+      tier,
+      synergyTags,
     };
 
-    // Debug payload is intentionally optional so production UI can hide it.
     if (includeDebug) {
       recommendation.debug = {
         primaryBreakdown: pair.primary.primaryBreakdown,

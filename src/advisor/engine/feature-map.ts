@@ -4,7 +4,6 @@
 // This prevents recomputing the same derived properties in multiple modules.
 // ============================================================================
 
-import { ADVISOR_CLASS_ROLE_SCORE } from "../../data/advisor_config";
 import { MOD_FAMILIES } from "../../data/mods";
 import { WEAPONS } from "../../data/weapons";
 import type { Weapon } from "../../types";
@@ -15,18 +14,14 @@ export interface WeaponFeatures {
   rangeBand: RangeBand;
   burstCapable: boolean;
   sustainedCapable: boolean;
-  roleScore: number;
   stealthEligible: boolean;
   noSlots: boolean;
 }
 
-// Intentional exclusions requested for stealth mode.
+// Intentional exclusions for stealth mode (V2 feature, kept for future use).
 const STEALTH_EXCLUSIONS = new Set(["hairpin", "iltoro", "vulcano"]);
 
-// Build stealth-eligible weapon IDs:
-// - Start with explicit "osprey"
-// - Add weapons that can equip regular Muzzle/Silencer
-// - Remove intentional exclusions
+// Build stealth-eligible weapon IDs (kept for V2 re-add).
 export function buildStealthEligibleSet(): Set<string> {
   const result = new Set<string>(["osprey"]);
   const silencer = MOD_FAMILIES.Muzzle.find((family) => family.fam === "Silencer");
@@ -49,7 +44,6 @@ export function buildWeaponFeatureMap(): Record<string, WeaponFeatures> {
       rangeBand: pickRangeBand(weapon.range),
       burstCapable: isBurstFireMode(weapon.fireMode),
       sustainedCapable: isSustainedFireMode(weapon.fireMode),
-      roleScore: ADVISOR_CLASS_ROLE_SCORE[weapon.weaponClass],
       stealthEligible: stealthEligible.has(weapon.id),
       noSlots: weapon.slots.length === 0,
     };

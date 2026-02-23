@@ -16,19 +16,16 @@ export function normalizeInputs(input: Partial<AdvisorInputs>): AdvisorInputs {
     squad: input.squad ?? ADVISOR_DEFAULT_INPUTS.squad,
     focus: input.focus ?? ADVISOR_DEFAULT_INPUTS.focus,
     preferredRange: input.preferredRange ?? ADVISOR_DEFAULT_INPUTS.preferredRange,
-    stealthImportant: input.stealthImportant ?? ADVISOR_DEFAULT_INPUTS.stealthImportant,
     allowedWeaponRarities:
       input.allowedWeaponRarities !== undefined
         ? [...new Set(input.allowedWeaponRarities)]
         : [...ADVISOR_DEFAULT_INPUTS.allowedWeaponRarities],
-    debug: input.debug ?? ADVISOR_DEFAULT_INPUTS.debug,
   };
 }
 
 // Returns true only if weapon satisfies all strict filter rules.
-export function passWeaponHardConstraints(weapon: Weapon, features: WeaponFeatures, inputs: AdvisorInputs): boolean {
+export function passWeaponHardConstraints(weapon: Weapon, _features: WeaponFeatures, inputs: AdvisorInputs): boolean {
   if (!inputs.allowedWeaponRarities.includes(weapon.rarity)) return false;
-  if (inputs.stealthImportant && !features.stealthEligible) return false;
   return true;
 }
 

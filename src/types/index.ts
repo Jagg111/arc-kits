@@ -105,6 +105,9 @@ export interface CumulativeEffect {
   unit: string;                                           // "%" or "" (for flat bonuses like magazine size)
 }
 
+// Top-level app view (which tab/page is active)
+export type AppView = "weapons" | "advisor";
+
 // Advisor questionnaire enums
 export type AdvisorLocationId =
   | "buried_city"
@@ -122,32 +125,28 @@ export interface AdvisorInputs {
   squad: AdvisorSquadMode;
   focus: AdvisorFocus;
   preferredRange: AdvisorPreferredRange;
-  stealthImportant: boolean;
   allowedWeaponRarities: Rarity[];
-  debug: boolean;
-}
-
-export interface ShuffleState {
-  bucketIndex: number;
-  seenPairKeys: string[];
-  cycle: number;
 }
 
 export interface AdvisorScoreBreakdown {
-  locationFit: number;
-  focusFit: number;
+  mapFit: number;
+  roleFit: number;
   rangeFit: number;
-  soloSquadFit: number;
-  stealthPreferenceFit: number;
   weightedTotal: number;
 }
 
 export interface AdvisorComplementBreakdown {
-  baseSecondaryFit: number;
-  ammoComplement: number;
-  rangeComplement: number;
-  roleComplement: number;
+  qualityFloor: number;
+  ammoDiversity: number;
+  rangeDiversity: number;
   weightedTotal: number;
+}
+
+export type TierLabel = "top_pick" | "strong_option";
+
+export interface SynergyTag {
+  type: "positive" | "warning";
+  label: string;
 }
 
 export interface PairRecommendation {
@@ -158,8 +157,8 @@ export interface PairRecommendation {
   primaryScore: number;
   secondaryScore: number;
   pairScore: number;
-  tieBucketId: string;
-  reasons: string[];
+  tier: TierLabel;
+  synergyTags: SynergyTag[];
   debug?: {
     primaryBreakdown: AdvisorScoreBreakdown;
     secondaryBreakdown: AdvisorScoreBreakdown;
@@ -173,28 +172,21 @@ export interface AdvisorEmptyState {
 }
 
 export interface AdvisorResult {
+  status: "idle" | "results" | "empty";
   recommendations: PairRecommendation[];
   emptyState?: AdvisorEmptyState;
-  shuffleState: ShuffleState;
 }
 
 export interface AdvisorQueryState extends AdvisorInputs {
   tab: "advisor";
-  shuffle?: {
-    bucket: number;
-    offset: number;
-  };
 }
 
 export interface GoldenScenarioCase {
   id: string;
   title: string;
   inputs: AdvisorInputs;
-  requireDebug: boolean;
   exactExpectedPairKey?: string;
   expectedPrimaryPool?: string[];
   expectedSecondaryPool?: string[];
   expectEmpty?: boolean;
-  requireTieCycling?: boolean;
-  requireUrlRoundTrip?: boolean;
 }

@@ -14,8 +14,12 @@
 - Live cumulative effects calculation.
 - Live crafting cost totals.
 - URL state sync for shareable builds.
+3. Advisor tab (`AdvisorPage`) with filter-driven weapon pairing recommendations.
+- Filter bar: location, squad mode, focus, range, rarity.
+- Three states: onboarding (no location), results (2-3 pairings), empty (too restrictive).
+- Currently using mock data; engine wiring pending.
 
-Core wiring is in `src/App.tsx`.
+Tab routing via `activeView` state in `src/App.tsx`.
 
 ## Canonical Context Files
 Read these first each session:
@@ -24,7 +28,8 @@ Read these first each session:
 3. `.claude/docs/weapon_advisor_feature.md` (for upcoming advisor work)
 
 ## Architecture Rules (Current)
-- Single source of app state: `src/hooks/useWeaponBuilder.ts`.
+- Builder state: `src/hooks/useWeaponBuilder.ts` (consumed by App).
+- Advisor state: `src/hooks/useAdvisorFilters.ts` (page-owned, consumed by AdvisorPage).
 - Derived logic in dedicated hooks:
 - `src/hooks/useBuildCost.ts`
 - `src/hooks/useCumulativeEffects.ts`
@@ -36,6 +41,8 @@ Read these first each session:
 - `src/data/mods.ts`
 - `src/data/presets.ts`
 - `src/data/constants.ts`
+- `src/data/advisor_config.ts`
+- `src/data/advisor_golden_cases.ts`
 
 ## Theming and Styling
 - Theme system is CSS custom properties on `data-theme` (`dark`/`light`).
@@ -62,18 +69,16 @@ Read these first each session:
 - This should be reconciled before relying on that preset behavior.
 
 ## In-Progress Product Direction
-- New feature: Weapon Advisor tab/page (engine scaffolding exists; UI integration still pending).
-- Advisor V1 scope has been rebaselined to weapon-only recommendations:
-- No attachment recommendations in V1 output.
-- No material filter in V1 advisor state.
-- Damage Style question removed from advisor contract.
+- Weapon Advisor feature status:
+- Engine: complete (`src/advisor/engine/`, public API: `recommendLoadouts()`)
+- UI: complete, using mock data (`src/components/advisor/`, 8 components)
+- **Next step**: Wire `recommendLoadouts()` into `AdvisorPage` to replace `MOCK_ADVISOR_RESULTS`
+- Golden matrix: built (`src/data/advisor_golden_cases.ts`, CLI: `scripts/advisor/cli.ts`)
+- Advisor V1 scope: weapon-only recommendations (no attachments, no material filter).
 - Spec: `.claude/docs/weapon_advisor_feature.md`
 - Engine contract: `.claude/docs/weapon_advisor_engine_contract.md`
-- Golden matrix: `.claude/docs/weapon_advisor_golden_matrix.md`
-- Visual prototypes:
-- `prototypes/variation-a-dense.html`
-- `prototypes/variation-b-balanced.html`
-- `prototypes/variation-c-spacious.html`
+- Golden matrix doc: `.claude/docs/weapon_advisor_golden_matrix.md`
+- UI prototype: `prototypes/advisor-concept-20260222-refined-states.html`
 
 ## Session Kickoff Checklist
 1. Read canonical context files.
@@ -115,5 +120,5 @@ At the end of each session, include:
 1. Pull/rebase latest branch state.
 2. Resolve conflicts with data consistency first (`weapons/mods/presets/constants`).
 3. Run type check/build.
-4. Smoke test core flows (weapon picker, builder, URL sync, theme toggle).
+4. Smoke test core flows (weapon picker, builder, URL sync, theme toggle, advisor tab).
 5. Update this handoff file if architecture or workflow assumptions changed.

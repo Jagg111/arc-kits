@@ -40,6 +40,8 @@
   --color-backdrop:        rgba(0, 0, 0, 0.5);
   --color-brand-from:      #fb923c;  /* orange-400 — header gradient start */
   --color-brand-to:        #ef4444;  /* red-500 — header gradient end */
+  --color-filter-bar-bg:   #0f1a2e;  /* tinted surface for advisor filter bar */
+  --color-warning:         #f59e0b;  /* amber-500 — warning synergy tags */
 
   /* ── Game colors: Ammo types ── */
   --color-ammo-light:      #e6da35;
@@ -99,6 +101,8 @@
   --color-backdrop:        rgba(0, 0, 0, 0.3);
   --color-brand-from:      #c2410c;  /* orange-700 — header gradient start */
   --color-brand-to:        #dc2626;  /* red-600 — header gradient end */
+  --color-filter-bar-bg:   #e0dcd4;  /* warm tinted surface for advisor filter bar */
+  --color-warning:         #d97706;  /* amber-600 — warning synergy tags */
 
   /* ── Game colors: Ammo types (darker for light backgrounds) ── */
   --color-ammo-light:      #a89200;  /* dark gold */
@@ -159,6 +163,8 @@
   --color-backdrop: var(--color-backdrop);
   --color-brand-from: var(--color-brand-from);
   --color-brand-to: var(--color-brand-to);
+  --color-filter-bar-bg: var(--color-filter-bar-bg);
+  --color-warning: var(--color-warning);
 
   /* Game colors */
   --color-ammo-light: var(--color-ammo-light);

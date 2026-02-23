@@ -12,6 +12,8 @@ Computed values are separate hooks consumed in App:
 
 This keeps App as a thin wiring layer with no business logic of its own.
 
+**Page-owned state hooks**: The advisor introduces a different pattern — `useAdvisorFilters` (src/hooks/useAdvisorFilters.ts) is consumed by `AdvisorPage` directly, not lifted to App. This is the pattern for feature-page-scoped state where no other component outside the page tree needs access.
+
 ## Unidirectional Data Flow (Props Down, Callbacks Up)
 
 No Context API, Redux, or any global state. Data flows strictly parent-to-child via props, and user actions flow child-to-parent via callback props.
@@ -117,13 +119,18 @@ Game data uses human-readable strings for effects and costs. Two hooks parse the
 ##  Feature-Based Component Organization
 
 Components are grouped by feature domain, not by component type:
-- `components/layout/` — app chrome (Header)
+- `components/layout/` — app chrome (Header with tab navigation)
 - `components/weapons/` — weapon selection flow (WeaponPicker → AmmoGroup → WeaponCard)
 - `components/builder/` — mod builder flow (WeaponBuilder → AttachmentSlot → ModFamilySection)
+- `components/advisor/` — weapon advisor flow (AdvisorPage → AdvisorFilterBar + AdvisorResults → PairingCard)
 - `components/goals/` — goal/preset display (WeaponHeader, GoalCard)
 - `components/shared/` — reusable leaf components (Badge)
 
 Each folder contains related components that form a feature-specific subtree.
+
+## Pure Function Engine Modules
+
+The advisor engine (`src/advisor/engine/`) is a non-React TypeScript module: pure functions grouped by responsibility, no hooks or components. Each file exports stateless scoring/filtering functions. The entry point (`index.ts`) composes them into the full recommendation pipeline. This pattern keeps game logic testable without React and importable from both UI components and CLI scripts (`scripts/advisor/cli.ts`).
 
 ## Conditional Rendering Patterns
 
