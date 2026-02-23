@@ -5,6 +5,7 @@
 // USED BY: App.tsx
 // ============================================================================
 
+import { useMemo } from "react";
 import { useAdvisorFilters } from "../../hooks/useAdvisorFilters";
 import {
   ADVISOR_LOCATION_LABELS,
@@ -12,7 +13,7 @@ import {
   ADVISOR_FOCUS_LABELS,
   ADVISOR_RANGE_LABELS,
 } from "../../data/advisor_config";
-import { MOCK_ADVISOR_RESULTS } from "../../data/advisor_mock";
+import { recommendLoadouts } from "../../advisor/engine";
 import AdvisorFilterBar from "./AdvisorFilterBar";
 import AdvisorOnboarding from "./AdvisorOnboarding";
 import AdvisorResults from "./AdvisorResults";
@@ -34,10 +35,22 @@ export default function AdvisorPage() {
         .join(" \u00b7 ")
     : "";
 
-  // Derive view state (mock logic — replaced with engine call later)
+  // Run engine when location is selected; idle otherwise
   const isIdle = filters.location === null;
-  const isEmpty = !isIdle && filters.allowedWeaponRarities.length <= 1;
-  const hasResults = !isIdle && !isEmpty;
+
+  const result = useMemo(() => {
+    if (isIdle) return null;
+    return recommendLoadouts({
+      location: filters.location!,
+      squad: filters.squad,
+      focus: filters.focus,
+      preferredRange: filters.preferredRange,
+      allowedWeaponRarities: filters.allowedWeaponRarities,
+    });
+  }, [isIdle, filters.location, filters.squad, filters.focus, filters.preferredRange, filters.allowedWeaponRarities]);
+
+  const hasResults = result?.status === "results";
+  const isEmpty = result?.status === "empty";
 
   return (
     <>
@@ -53,7 +66,7 @@ export default function AdvisorPage() {
       <div className="max-w-[80rem] mx-auto px-5 py-4 pb-8">
         {isIdle && <AdvisorOnboarding />}
         {hasResults && (
-          <AdvisorResults recommendations={MOCK_ADVISOR_RESULTS} contextLine={contextLine} />
+          <AdvisorResults recommendations={result!.recommendations} contextLine={contextLine} />
         )}
         {isEmpty && (
           <>
@@ -63,7 +76,7 @@ export default function AdvisorPage() {
               </span>
               <span className="text-xs text-text-faint">&mdash; {contextLine}</span>
             </div>
-            <AdvisorEmptyState />
+            <AdvisorEmptyState message={result!.emptyState?.message} />
           </>
         )}
       </div>

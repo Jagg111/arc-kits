@@ -1,7 +1,7 @@
 # Weapon Advisor Golden Scenario Matrix (V1)
 
 Status: Active calibration matrix
-As of: February 22, 2026
+As of: February 23, 2026
 
 Purpose:
 

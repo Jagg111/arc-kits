@@ -4,7 +4,7 @@
 // USED BY: AdvisorPage.tsx
 // ============================================================================
 
-export default function AdvisorEmptyState() {
+export default function AdvisorEmptyState({ message }: { message?: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <div className="text-4xl mb-4 opacity-50" style={{ color: "var(--color-warning)" }}>
@@ -14,8 +14,7 @@ export default function AdvisorEmptyState() {
         No pairings match these filters
       </div>
       <div className="text-sm text-text-muted max-w-md leading-relaxed">
-        The current combination is too restrictive to produce a solid recommendation. Try broadening
-        your search.
+        {message ?? "The current combination is too restrictive to produce a solid recommendation. Try broadening your search."}
       </div>
       <div
         className="mt-5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-dashed text-xs text-text-muted"

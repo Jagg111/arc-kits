@@ -1,6 +1,6 @@
 # Weapon Advisor Engine Contract (V1)
 
-Status: Implemented
+Status: V1 shipped
 As of: February 22, 2026
 
 ## 1. Locked Product Decisions

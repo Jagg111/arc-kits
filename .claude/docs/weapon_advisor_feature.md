@@ -1,6 +1,6 @@
 # Weapon Advisor Feature (V1)
 
-Status: UI complete, engine complete, live wiring pending
+Status: V1 shipped
 As of: February 23, 2026
 
 ## 1. Feature Vision

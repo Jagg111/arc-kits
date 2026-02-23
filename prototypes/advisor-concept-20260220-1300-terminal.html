@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weapon Advisor — Tactical Terminal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #0c1220;
+      --surf-1:    #111928;
+      --surf-2:    #172032;
+      --surf-3:    #1e2d42;
+      --border:    #263550;
+      --border-2:  #1a2840;
+      --text-1:    #c8d8e8;
+      --text-2:    #6a8aaa;
+      --text-3:    #3a5068;
+      --orange:    #f97316;
+      --orange-dim: rgba(249,115,22,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ─── Top Navigation ─── */
+    .top-bar {
+      background: #080e1a;
+      border-bottom: 1px solid var(--border-2);
+      height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .tb-logo-section {
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      border-right: 1px solid var(--border-2);
+      height: 100%;
+      gap: 0.75rem;
+    }
+    .tb-logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 6px var(--orange);
+    }
+    .tb-logo-text {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-1);
+    }
+    .tb-tabs {
+      display: flex;
+      height: 100%;
+    }
+    .tb-tab {
+      display: flex;
+      align-items: center;
+      padding: 0 1.1rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-2);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      border-right: 1px solid var(--border-2);
+    }
+    .tb-tab:hover { color: var(--text-1); background: var(--surf-1); }
+    .tb-tab.active {
+      color: var(--text-1);
+      border-bottom-color: var(--orange);
+      background: var(--orange-dim);
+    }
+    .tb-right {
+      margin-left: auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.68rem;
+      color: var(--text-2);
+    }
+    .tb-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #27BC57;
+    }
+
+    /* ─── Main Layout: 4 panels ─── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ─── FAR LEFT: Icon navigation strip ─── */
+    .icon-strip {
+      width: 48px;
+      flex-shrink: 0;
+      background: #080e1a;
+      border-right: 1px solid var(--border-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.75rem 0;
+      gap: 0.25rem;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-3);
+      transition: all 0.15s;
+    }
+    .icon-btn:hover { background: var(--surf-1); color: var(--text-2); }
+    .icon-btn.active {
+      background: var(--orange-dim);
+      color: var(--orange);
+      border: 1px solid rgba(249,115,22,0.3);
+    }
+    .icon-separator {
+      width: 24px;
+      height: 1px;
+      background: var(--border-2);
+      margin: 0.25rem 0;
+    }
+
+    /* ─── LEFT: Preferences Panel ("STASH" equivalent) ─── */
+    .prefs-panel {
+      width: 252px;
+      flex-shrink: 0;
+      background: var(--surf-1);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .prefs-header {
+      padding: 0.75rem 0.875rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .prefs-header-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-1);
+    }
+    .prefs-header-count {
+      font-size: 0.62rem;
+      color: var(--text-2);
+    }
+    .prefs-body {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .prefs-body::-webkit-scrollbar { width: 3px; }
+    .prefs-body::-webkit-scrollbar-track { background: transparent; }
+    .prefs-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Filter section headers (like CATEGORY) */
+    .filter-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.875rem 0.35rem;
+      border-bottom: 1px solid var(--border-2);
+      margin-top: 0.25rem;
+    }
+    .fsh-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .fsh-label::before {
+      content: '=';
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    /* Filter row within a section */
+    .filter-row {
+      padding: 0.45rem 0.875rem;
+      border-bottom: 1px solid var(--border-2);
+    }
+    .filter-row-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-2);
+      margin-bottom: 0.3rem;
+    }
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+    .fpill {
+      padding: 0.25rem 0.55rem;
+      border-radius: 2px;
+      font-size: 0.68rem;
+      font-weight: 500;
+      background: var(--surf-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .fpill:hover { border-color: var(--text-3); color: var(--text-1); }
+    .fpill.sel {
+      background: var(--orange-dim);
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+    /* Rarity-colored pill selections */
+    .fpill.sel-c { background: rgba(156,163,175,0.12); border-color: #9ca3af; color: #9ca3af; }
+    .fpill.sel-u { background: rgba(39,188,87,0.12); border-color: #27BC57; color: #27BC57; }
+    .fpill.sel-r { background: rgba(59,130,246,0.12); border-color: #3b82f6; color: #3b82f6; }
+    .fpill.sel-e { background: rgba(217,70,239,0.12); border-color: #d946ef; color: #d946ef; }
+    .fpill.sel-l { background: rgba(245,158,11,0.12); border-color: #f59e0b; color: #f59e0b; }
+
+    .prefs-cta {
+      padding: 0.75rem 0.875rem;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .analyze-btn {
+      width: 100%;
+      padding: 0.65rem;
+      background: var(--orange);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: background 0.15s;
+    }
+    .analyze-btn:hover { background: #fb923c; }
+    .abtn-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+
+    /* ─── MAIN: Loadout Results Panel ─── */
+    .main-panel {
+      flex: 1;
+      background: var(--surf-1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+    .main-header {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+    .main-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--orange-dim);
+      border: 1px solid rgba(249,115,22,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .main-header-info { flex: 1; }
+    .main-header-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-1);
+    }
+    .main-header-stats {
+      font-size: 0.62rem;
+      color: var(--text-2);
+      margin-top: 0.1rem;
+    }
+    .main-header-stats span { color: var(--orange); }
+
+    .main-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem;
+    }
+    .main-body::-webkit-scrollbar { width: 4px; }
+    .main-body::-webkit-scrollbar-track { background: transparent; }
+    .main-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Loadout result card */
+    .loadout-card {
+      background: var(--surf-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+    .lc-header {
+      padding: 0.55rem 0.875rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .lc-rank-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .lcr-gold { background: rgba(249,115,22,0.15); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+    .lcr-silver { background: rgba(106,138,170,0.12); color: var(--text-2); border: 1px solid var(--border); }
+    .lcr-bronze { background: rgba(58,80,104,0.15); color: var(--text-3); border: 1px solid var(--border-2); }
+    .lc-rank-info { flex: 1; }
+    .lc-rank-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .lcrl-gold { color: var(--orange); }
+    .lcrl-silver { color: var(--text-2); }
+    .lcrl-bronze { color: var(--text-3); }
+    .lc-score {
+      font-size: 0.6rem;
+      color: var(--text-2);
+      margin-top: 0.05rem;
+    }
+    .lc-body { padding: 0.75rem; }
+
+    /* Weapon Equipment Slots — styled like in-game loadout slots */
+    .weapon-slots {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 0.65rem;
+    }
+    .weapon-slot {
+      background: var(--surf-1);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    /* Rarity top stripe — mimics in-game colored item borders */
+    .ws-stripe {
+      height: 3px;
+      width: 100%;
+    }
+    .stripe-common { background: #9ca3af; }
+    .stripe-uncommon { background: #27BC57; }
+    .stripe-rare { background: #3b82f6; }
+    .stripe-epic { background: #d946ef; }
+    .stripe-legendary { background: #f59e0b; }
+
+    .ws-inner {
+      padding: 0.6rem 0.7rem 0.5rem;
+    }
+    .ws-role {
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+      margin-bottom: 0.25rem;
+    }
+    .ws-badges {
+      display: flex;
+      gap: 0.2rem;
+      margin-bottom: 0.3rem;
+    }
+    .wsbadge {
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+    }
+    .wsb-class { background: rgba(200,216,232,0.08); border: 1px solid var(--border); color: var(--text-2); }
+    .wsb-common { background: rgba(156,163,175,0.15); color: #9ca3af; border: 1px solid rgba(156,163,175,0.3); }
+    .wsb-uncommon { background: rgba(39,188,87,0.12); color: #27BC57; border: 1px solid rgba(39,188,87,0.3); }
+    .wsb-rare { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+    .wsb-epic { background: rgba(217,70,239,0.12); color: #d946ef; border: 1px solid rgba(217,70,239,0.3); }
+    .wsb-legendary { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+
+    .ws-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-1);
+      margin-bottom: 0.4rem;
+    }
+    /* Ammo type row (like in-game ≡ symbol + ammo type) */
+    .ws-ammo {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.62rem;
+      color: var(--text-2);
+      margin-bottom: 0.4rem;
+    }
+    .ammo-sym {
+      font-size: 0.7rem;
+      color: var(--text-3);
+    }
+    /* Mod slots row — small squares like in-game */
+    .ws-modslots {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .mod-slot-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      background: var(--surf-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mod-slot-icon.filled {
+      background: rgba(249,115,22,0.08);
+      border-color: rgba(249,115,22,0.3);
+    }
+    /* Durability/capacity bar at bottom of slot */
+    .ws-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+      padding-top: 0.4rem;
+      border-top: 1px solid var(--border-2);
+    }
+    .ws-bar-track {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+    }
+    .ws-bar-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 1px;
+    }
+    .ws-bar-label {
+      font-size: 0.55rem;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    /* Reasoning block */
+    .lc-reasoning {
+      padding: 0.55rem 0.7rem;
+      background: rgba(19,29,44,0.6);
+      border: 1px solid var(--border-2);
+      border-radius: 3px;
+      margin-bottom: 0.6rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    .reasoning-icon { color: var(--text-3); flex-shrink: 0; margin-top: 0.1rem; }
+    .reasoning-text { font-size: 0.72rem; color: var(--text-2); line-height: 1.55; }
+
+    /* Action buttons row */
+    .lc-actions { display: flex; gap: 0.4rem; }
+    .lc-btn {
+      flex: 1;
+      padding: 0.5rem 0.6rem;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .lc-btn-primary {
+      background: var(--orange-dim);
+      border: 1px solid rgba(249,115,22,0.4);
+      color: var(--orange);
+    }
+    .lc-btn-primary:hover { background: rgba(249,115,22,0.2); }
+    .lc-btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    .lc-btn-secondary:hover { border-color: var(--text-3); color: var(--text-1); }
+
+    /* ─── RIGHT: Active Filters Panel ("QUICK USE" equivalent) ─── */
+    .filters-panel {
+      width: 178px;
+      flex-shrink: 0;
+      background: var(--surf-1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .fp-header {
+      padding: 0.75rem 0.875rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .fp-header-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-1);
+    }
+    .fp-header-sub {
+      font-size: 0.6rem;
+      color: var(--text-2);
+      margin-top: 0.1rem;
+    }
+    .fp-body {
+      flex: 1;
+      padding: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .fp-filter-tag {
+      padding: 0.4rem 0.6rem;
+      background: var(--surf-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      border-radius: 2px;
+    }
+    .fp-filter-tag.active { border-left-color: var(--orange); }
+    .fpt-label {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 0.1rem;
+    }
+    .fpt-value {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+    .fp-rarity-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+      padding: 0.4rem 0.6rem;
+      background: var(--surf-2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .fp-rarity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .fp-section-label {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 0.3rem;
+      padding: 0.4rem 0.6rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <div class="top-bar">
+    <div class="tb-logo-section">
+      <div class="tb-logo-dot"></div>
+      <span class="tb-logo-text">ARC Raiders</span>
+    </div>
+    <div class="tb-tabs">
+      <div class="tb-tab">Inventory</div>
+      <div class="tb-tab active">Advisor</div>
+      <div class="tb-tab">Builder</div>
+      <div class="tb-tab">System</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-status-dot"></div>
+      Online · p3518
+    </div>
+  </div>
+
+  <!-- 4-panel Layout -->
+  <div class="layout">
+
+    <!-- FAR LEFT: Icon Strip -->
+    <div class="icon-strip">
+      <div class="icon-btn active" title="Mission">
+        <!-- Target/crosshair icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>
+          <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+        </svg>
+      </div>
+      <div class="icon-btn" title="Playstyle">
+        <!-- Person icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="7" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/>
+        </svg>
+      </div>
+      <div class="icon-btn" title="Availability">
+        <!-- Shield icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2l8 4v6c0 5-4 9-8 10C8 21 4 17 4 12V6l8-4z"/>
+        </svg>
+      </div>
+      <div class="icon-separator"></div>
+      <div class="icon-btn" title="Results">
+        <!-- List icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+          <circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- LEFT: Preferences Panel -->
+    <div class="prefs-panel">
+      <div class="prefs-header">
+        <span class="prefs-header-title">Preferences</span>
+        <span class="prefs-header-count">5 / 5</span>
+      </div>
+      <div class="prefs-body">
+
+        <div class="filter-section-header">
+          <span class="fsh-label">Mission</span>
+        </div>
+        <div class="filter-row">
+          <div class="filter-row-label">Where?</div>
+          <div class="filter-pills">
+            <div class="fpill sel">Spaceport</div>
+            <div class="fpill">Buried City</div>
+            <div class="fpill">Dam</div>
+            <div class="fpill">Blue Gate</div>
+            <div class="fpill">Stella Montis</div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-row-label">Squad?</div>
+          <div class="filter-pills">
+            <div class="fpill sel">Solo</div>
+            <div class="fpill">Squad</div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-row-label">Focus?</div>
+          <div class="filter-pills">
+            <div class="fpill">PVE</div>
+            <div class="fpill sel">PVP</div>
+            <div class="fpill">Mixed</div>
+          </div>
+        </div>
+
+        <div class="filter-section-header">
+          <span class="fsh-label">Playstyle</span>
+        </div>
+        <div class="filter-row">
+          <div class="filter-row-label">Range?</div>
+          <div class="filter-pills">
+            <div class="fpill">Close</div>
+            <div class="fpill">Mid</div>
+            <div class="fpill sel">Long</div>
+            <div class="fpill">Any</div>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-row-label">Stealth?</div>
+          <div class="filter-pills">
+            <div class="fpill">Yes</div>
+            <div class="fpill sel">No</div>
+          </div>
+        </div>
+
+        <div class="filter-section-header">
+          <span class="fsh-label">Availability</span>
+        </div>
+        <div class="filter-row">
+          <div class="filter-row-label">Weapon Rarity?</div>
+          <div class="filter-pills">
+            <div class="fpill sel-c">Common</div>
+            <div class="fpill sel-u">Uncommon</div>
+            <div class="fpill sel-r">Rare</div>
+            <div class="fpill sel-e" style="opacity:0.4;">Epic</div>
+            <div class="fpill sel-l" style="opacity:0.4;">Legendary</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="prefs-cta">
+        <button class="analyze-btn">
+          <span class="abtn-key">E</span>
+          Analyze
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN: Recommended Loadout Panel -->
+    <div class="main-panel">
+      <div class="main-header">
+        <div class="main-header-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div class="main-header-info">
+          <div class="main-header-title">Recommended Loadout</div>
+          <div class="main-header-stats"><span>3 pairs</span> · Spaceport · Solo · PVP · Long Range</div>
+        </div>
+      </div>
+      <div class="main-body">
+
+        <!-- ── Loadout #1: Best Match ── -->
+        <div class="loadout-card">
+          <div class="lc-header">
+            <div class="lc-rank-badge lcr-gold">1</div>
+            <div class="lc-rank-info">
+              <div class="lc-rank-label lcrl-gold">Best Match</div>
+              <div class="lc-score">Fit Score 0.91 · Best available within your rarity filter</div>
+            </div>
+          </div>
+          <div class="lc-body">
+            <div class="weapon-slots">
+              <!-- Primary slot -->
+              <div class="weapon-slot">
+                <div class="ws-stripe stripe-rare"></div>
+                <div class="ws-inner">
+                  <div class="ws-role">Primary</div>
+                  <div class="ws-badges">
+                    <span class="wsbadge wsb-class">Battle Rifle</span>
+                    <span class="wsbadge wsb-rare">Rare</span>
+                  </div>
+                  <div class="ws-name">Renegade</div>
+                  <div class="ws-ammo">
+                    <span class="ammo-sym">≡</span> Medium Ammo
+                  </div>
+                  <div class="ws-modslots">
+                    <div class="mod-slot-icon filled">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg>
+                    </div>
+                    <div class="mod-slot-icon filled">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg>
+                    </div>
+                    <div class="mod-slot-icon filled">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg>
+                    </div>
+                    <div class="mod-slot-icon"></div>
+                  </div>
+                  <div class="ws-bar-row">
+                    <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%;"></div></div>
+                    <span class="ws-bar-label">100/100</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Secondary slot -->
+              <div class="weapon-slot">
+                <div class="ws-stripe stripe-common"></div>
+                <div class="ws-inner">
+                  <div class="ws-role">Secondary</div>
+                  <div class="ws-badges">
+                    <span class="wsbadge wsb-class">SMG</span>
+                    <span class="wsbadge wsb-common">Common</span>
+                  </div>
+                  <div class="ws-name">Stitcher</div>
+                  <div class="ws-ammo">
+                    <span class="ammo-sym">≡</span> Light Ammo
+                  </div>
+                  <div class="ws-modslots">
+                    <div class="mod-slot-icon filled">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg>
+                    </div>
+                    <div class="mod-slot-icon filled">
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg>
+                    </div>
+                    <div class="mod-slot-icon"></div>
+                  </div>
+                  <div class="ws-bar-row">
+                    <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%;"></div></div>
+                    <span class="ws-bar-label">100/100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="lc-reasoning">
+              <span class="reasoning-icon">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </span>
+              <span class="reasoning-text">Renegade dominates Spaceport's vast open sightlines with lever-action precision. Stitcher on light ammo gives a panic spray option without competing for medium ammo.</span>
+            </div>
+            <div class="lc-actions">
+              <button class="lc-btn lc-btn-primary">Open Renegade →</button>
+              <button class="lc-btn lc-btn-secondary">Open Stitcher →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Loadout #2: Alternative ── -->
+        <div class="loadout-card">
+          <div class="lc-header">
+            <div class="lc-rank-badge lcr-silver">2</div>
+            <div class="lc-rank-info">
+              <div class="lc-rank-label lcrl-silver">Alternative</div>
+              <div class="lc-score">Fit Score 0.78 · Budget-friendly option</div>
+            </div>
+          </div>
+          <div class="lc-body">
+            <div class="weapon-slots">
+              <div class="weapon-slot">
+                <div class="ws-stripe stripe-common"></div>
+                <div class="ws-inner">
+                  <div class="ws-role">Primary</div>
+                  <div class="ws-badges">
+                    <span class="wsbadge wsb-class">Assault Rifle</span>
+                    <span class="wsbadge wsb-common">Common</span>
+                  </div>
+                  <div class="ws-name">Rattler</div>
+                  <div class="ws-ammo"><span class="ammo-sym">≡</span> Medium Ammo</div>
+                  <div class="ws-modslots">
+                    <div class="mod-slot-icon filled"><svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg></div>
+                    <div class="mod-slot-icon filled"><svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg></div>
+                    <div class="mod-slot-icon"></div>
+                  </div>
+                  <div class="ws-bar-row">
+                    <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%;"></div></div>
+                    <span class="ws-bar-label">100/100</span>
+                  </div>
+                </div>
+              </div>
+              <div class="weapon-slot">
+                <div class="ws-stripe stripe-rare"></div>
+                <div class="ws-inner">
+                  <div class="ws-role">Secondary</div>
+                  <div class="ws-badges">
+                    <span class="wsbadge wsb-class">Pistol</span>
+                    <span class="wsbadge wsb-rare">Rare</span>
+                  </div>
+                  <div class="ws-name">Venator</div>
+                  <div class="ws-ammo"><span class="ammo-sym">≡</span> Medium Ammo</div>
+                  <div class="ws-modslots">
+                    <div class="mod-slot-icon filled"><svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg></div>
+                    <div class="mod-slot-icon"></div>
+                  </div>
+                  <div class="ws-bar-row">
+                    <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%;"></div></div>
+                    <span class="ws-bar-label">100/100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="lc-reasoning">
+              <span class="reasoning-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+              <span class="reasoning-text">Rattler gives budget versatility at range, paired with Venator's devastating burst damage for PVP. Both use medium ammo — watch your reserves.</span>
+            </div>
+            <div class="lc-actions">
+              <button class="lc-btn lc-btn-primary">Open Rattler →</button>
+              <button class="lc-btn lc-btn-secondary">Open Venator →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Loadout #3: Alternative ── -->
+        <div class="loadout-card">
+          <div class="lc-header">
+            <div class="lc-rank-badge lcr-bronze">3</div>
+            <div class="lc-rank-info">
+              <div class="lc-rank-label lcrl-bronze">Alternative</div>
+              <div class="lc-score">Fit Score 0.71 · Extreme range specialization</div>
+            </div>
+          </div>
+          <div class="lc-body">
+            <div class="weapon-slots">
+              <div class="weapon-slot">
+                <div class="ws-stripe stripe-rare"></div>
+                <div class="ws-inner">
+                  <div class="ws-role">Primary</div>
+                  <div class="ws-badges">
+                    <span class="wsbadge wsb-class">Sniper Rifle</span>
+                    <span class="wsbadge wsb-rare">Rare</span>
+                  </div>
+                  <div class="ws-name">Osprey</div>
+                  <div class="ws-ammo"><span class="ammo-sym">≡</span> Heavy Ammo</div>
+                  <div class="ws-modslots">
+                    <div class="mod-slot-icon filled"><svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg></div>
+                    <div class="mod-slot-icon"></div>
+                  </div>
+                  <div class="ws-bar-row">
+                    <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%;"></div></div>
+                    <span class="ws-bar-label">100/100</span>
+                  </div>
+                </div>
+              </div>
+              <div class="weapon-slot">
+                <div class="ws-stripe stripe-common"></div>
+                <div class="ws-inner">
+                  <div class="ws-role">Secondary</div>
+                  <div class="ws-badges">
+                    <span class="wsbadge wsb-class">SMG</span>
+                    <span class="wsbadge wsb-common">Common</span>
+                  </div>
+                  <div class="ws-name">Stitcher</div>
+                  <div class="ws-ammo"><span class="ammo-sym">≡</span> Light Ammo</div>
+                  <div class="ws-modslots">
+                    <div class="mod-slot-icon filled"><svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg></div>
+                    <div class="mod-slot-icon filled"><svg width="8" height="8" viewBox="0 0 8 8" fill="rgba(249,115,22,0.6)"><rect width="8" height="8" rx="1"/></svg></div>
+                    <div class="mod-slot-icon"></div>
+                  </div>
+                  <div class="ws-bar-row">
+                    <div class="ws-bar-track"><div class="ws-bar-fill" style="width:100%;"></div></div>
+                    <span class="ws-bar-label">100/100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="lc-reasoning">
+              <span class="reasoning-icon"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+              <span class="reasoning-text">Osprey is the only scoped weapon in the game — unmatched at extreme range. Stitcher handles everything inside 30m on light ammo.</span>
+            </div>
+            <div class="lc-actions">
+              <button class="lc-btn lc-btn-primary">Open Osprey →</button>
+              <button class="lc-btn lc-btn-secondary">Open Stitcher →</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: Active Filters Summary Panel -->
+    <div class="filters-panel">
+      <div class="fp-header">
+        <div class="fp-header-title">Active Filters</div>
+        <div class="fp-header-sub">5 / 5 set</div>
+      </div>
+      <div class="fp-body">
+        <div class="fp-filter-tag active">
+          <div class="fpt-label">Location</div>
+          <div class="fpt-value">Spaceport</div>
+        </div>
+        <div class="fp-filter-tag active">
+          <div class="fpt-label">Squad</div>
+          <div class="fpt-value">Solo</div>
+        </div>
+        <div class="fp-filter-tag active">
+          <div class="fpt-label">Focus</div>
+          <div class="fpt-value">PVP</div>
+        </div>
+        <div class="fp-filter-tag active">
+          <div class="fpt-label">Range</div>
+          <div class="fpt-value">Long</div>
+        </div>
+        <div class="fp-filter-tag active">
+          <div class="fpt-label">Stealth</div>
+          <div class="fpt-value">No</div>
+        </div>
+        <div class="fp-section-label">Rarity</div>
+        <div class="fp-rarity-row">
+          <div class="fp-rarity-dot" style="background:#9ca3af;" title="Common"></div>
+          <div class="fp-rarity-dot" style="background:#27BC57;" title="Uncommon"></div>
+          <div class="fp-rarity-dot" style="background:#3b82f6;" title="Rare"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

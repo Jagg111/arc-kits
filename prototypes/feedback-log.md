@@ -82,3 +82,63 @@ Changes from hybrid v1:
 - Added 20px wiki-hosted mod icons inline with each mod tag in result cards (sourced from arcraiders.wiki, same as existing builder)
 - Added 16px wiki-hosted material icons next to each material checkbox pill in Budget section
 - No weapon images available (wiki has none in codebase data)
+
+## Round 3 — 2026-02-19
+
+Reviewed Files
+- prototypes/advisor-concept-20260216-1530-hybrid-v2.html
+
+### Hybrid v3 (advisor-concept-20260219-1000-hybrid-v3.html)
+Changes from hybrid v2:
+- Removed 'Damage?' row from Playstyle section — Playstyle now has only Range? and Stealth?
+- Added clarifying hint text under Budget & Availability header: "Available materials determine which attachments we can recommend for your weapons."
+- Compressed vertical spacing throughout to get first loadout card above the fold at 1920x1080:
+  - Main top padding: 1.5rem → 1rem
+  - Page subtitle margin-bottom: 1.25rem → 0.75rem
+  - Form grid gap: 1rem → 0.75rem; margin-bottom: 1.25rem → 0.75rem
+  - CTA section padding: 1rem 0 2rem → 0.5rem 0 0.5rem (biggest offender)
+  - Results section margin-top: 1rem → 0
+  - Loadout body padding: 1.5rem → 1rem
+  - Weapon row margin-bottom: 1.25rem → 0.75rem
+  - Loadout header padding: 1rem 1.5rem → 0.75rem 1.5rem
+
+## Round 4 — 2026-02-20
+
+Reviewed Files
+- prototypes/advisor-concept-20260220-1200-gunsmith.html
+- prototypes/advisor-concept-20260220-1300-terminal.html
+- prototypes/advisor-concept-20260220-1400-dossier.html
+
+### Gunsmith (advisor-concept-20260220-1200-gunsmith.html)
+Inspiration: Gunsmith/Blueprints screen (screenshots 131–134)
+3-column fixed layout: dark form panel left | weapon silhouette center | cream blueprint paper panel right.
+Features: game-style [CLASS][RARITY] badge pairs, 6-stat bars (Damage/FireRate/Range/Stability/Agility/Stealth),
+yellow [E] ANALYZE CTA button, warm brownish-black workshop palette, all-caps weapon names.
+Like
+-
+Dislike
+-
+
+### Tactical Terminal (advisor-concept-20260220-1300-terminal.html)
+Inspiration: Inventory/Loadout screen (screenshots 129–130)
+4-panel layout: icon strip | PREFERENCES panel | RECOMMENDED LOADOUT main | ACTIVE FILTERS right.
+Features: rarity-colored top stripe on weapon equipment slots, ammo type + mod slot icons per weapon,
+blue-grey dark palette, orange accent, compact filter summary on right.
+Like
+-
+Dislike
+-
+
+### Field Dossier (advisor-concept-20260220-1400-dossier.html)
+Inspiration: Tooltip/hover cards (screenshots 130, 132–134)
+Single-column centered layout. Scanline CSS overlay texture. Monospace Courier labels.
+Features: orange left-border accent on question cards, yellow [E] full-width ANALYZE button,
+dossier rank cards (01/02/03) with gold/silver/bronze gradient stripes, colored stat bars per stat type,
+FIELD ASSESSMENT reasoning block, ⟳ REQUEST ADDITIONAL OPTIONS shuffle button.
+Like
+-
+Dislike
+-
+
+Feedback for Next Round
+-

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weapon Advisor — Field Dossier</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #06080c;
+      --surf:      #0c1018;
+      --surf-2:    #101520;
+      --surf-3:    #151d28;
+      --border:    #1a2535;
+      --border-2:  #0f1828;
+      --text-1:    #ccd8e8;
+      --text-2:    #5a7898;
+      --text-3:    #2a3e58;
+      --orange:    #f97316;
+      --orange-dim: rgba(249,115,22,0.08);
+      --gold:      #d4a017;
+      --gold-dim:  rgba(212,160,23,0.1);
+      --green:     #27BC57;
+      --blue:      #3b82f6;
+      --pink:      #d946ef;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+    }
+
+    /* Scanline overlay texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.04) 3px,
+        rgba(0, 0, 0, 0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── Page shell ─── */
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 1.25rem 3rem;
+    }
+
+    /* ─── Terminal Header ─── */
+    .terminal-header {
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+    /* Full-width orange accent stripe */
+    .accent-stripe {
+      height: 3px;
+      background: linear-gradient(to right, var(--orange), rgba(249,115,22,0.3), transparent);
+      margin-bottom: 0;
+    }
+    .header-bar {
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 0.875rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .header-label {
+      font-family: 'Courier New', 'Courier', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .header-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-1);
+    }
+    .header-title span {
+      color: var(--text-2);
+      font-weight: 400;
+    }
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.2rem;
+    }
+    .header-session {
+      font-family: 'Courier New', monospace;
+      font-size: 0.58rem;
+      color: var(--text-2);
+      letter-spacing: 0.08em;
+    }
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.58rem;
+      color: var(--green);
+      letter-spacing: 0.06em;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 5px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ─── Section Headers ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+      margin-top: 1.25rem;
+    }
+    .section-header:first-of-type { margin-top: 0; }
+    .sh-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-2);
+    }
+    .sh-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .sh-step {
+      font-family: 'Courier New', monospace;
+      font-size: 0.58rem;
+      color: var(--text-3);
+    }
+
+    /* ─── Intel Question Cards ─── */
+    .intel-card {
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 0.4rem;
+      transition: border-left-color 0.15s;
+    }
+    .intel-card.active { border-left-color: var(--orange); }
+    .ic-label-cell {
+      padding: 0.6rem 0.875rem;
+      border-right: 1px solid var(--border);
+      width: 110px;
+      flex-shrink: 0;
+    }
+    .ic-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-2);
+    }
+    .ic-options {
+      padding: 0.45rem 0.875rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+      flex: 1;
+    }
+    .ic-pill {
+      padding: 0.25rem 0.6rem;
+      border-radius: 2px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      background: var(--surf-2);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ic-pill:hover { color: var(--text-1); border-color: var(--text-3); }
+    .ic-pill.sel {
+      background: rgba(249,115,22,0.1);
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+    .ic-pill.sel-c { background: rgba(156,163,175,0.1); border-color: #9ca3af; color: #9ca3af; }
+    .ic-pill.sel-u { background: rgba(39,188,87,0.1); border-color: #27BC57; color: #27BC57; }
+    .ic-pill.sel-r { background: rgba(59,130,246,0.1); border-color: #3b82f6; color: #3b82f6; }
+    .ic-pill.sel-e { background: rgba(217,70,239,0.1); border-color: #d946ef; color: #d946ef; opacity: 0.5; }
+    .ic-pill.sel-l { background: rgba(245,158,11,0.1); border-color: #f59e0b; color: #f59e0b; opacity: 0.5; }
+
+    /* ─── CTA / Analyze Button ─── */
+    .cta-block {
+      margin: 1.25rem 0;
+    }
+    .analyze-btn {
+      width: 100%;
+      padding: 1rem;
+      background: #f5c014;
+      color: #06080c;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      transition: background 0.15s;
+    }
+    .analyze-btn:hover { background: #ffd020; }
+    .abtn-key-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: rgba(6,8,12,0.5);
+    }
+    .abtn-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: rgba(6,8,12,0.2);
+      border-bottom: 2px solid rgba(6,8,12,0.3);
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: rgba(6,8,12,0.7);
+    }
+
+    /* ─── Dossier Result Cards ─── */
+    .dossier-card {
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      background: var(--surf);
+      overflow: hidden;
+    }
+    /* Rank accent stripe at top of each dossier card */
+    .dc-stripe {
+      height: 3px;
+    }
+    .dc-stripe-gold { background: linear-gradient(to right, #d4a017, rgba(212,160,23,0.3), transparent); }
+    .dc-stripe-silver { background: linear-gradient(to right, #5a7898, rgba(90,120,152,0.3), transparent); }
+    .dc-stripe-bronze { background: linear-gradient(to right, #7a4a20, rgba(122,74,32,0.3), transparent); }
+
+    .dc-header {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--surf-2);
+    }
+    .dc-rank-num {
+      font-family: 'Courier New', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+    .dc-rank-num.gold { color: var(--gold); }
+    .dc-rank-num.silver { color: var(--text-2); }
+    .dc-rank-num.bronze { color: #6a4a30; }
+    .dc-rank-info { flex: 1; }
+    .dc-rank-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .drl-gold { color: var(--gold); }
+    .drl-silver { color: var(--text-2); }
+    .drl-bronze { color: #7a5a38; }
+    .dc-rank-sub {
+      font-family: 'Courier New', monospace;
+      font-size: 0.58rem;
+      color: var(--text-3);
+      margin-top: 0.08rem;
+      letter-spacing: 0.06em;
+    }
+    .dc-score-block {
+      text-align: right;
+    }
+    .dc-score-value {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .dc-score-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.55rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Weapon pair inside dossier card */
+    .dc-pair {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0;
+    }
+    .dc-pair-divider {
+      background: var(--border);
+      width: 1px;
+    }
+    .dc-weapon {
+      padding: 0.875rem 1rem;
+    }
+    .dc-weapon-role {
+      font-family: 'Courier New', monospace;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-3);
+      margin-bottom: 0.35rem;
+    }
+    /* Game-style badge pair — same as in-game tooltip (e.g. [BATTLE RIFLE] [RARE]) */
+    .dc-badges {
+      display: flex;
+      gap: 0.2rem;
+      margin-bottom: 0.35rem;
+      flex-wrap: wrap;
+    }
+    .dcbadge {
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.15rem 0.4rem;
+      border-radius: 1px;
+    }
+    /* Class badge styling (mimics game's colored class badges exactly) */
+    .dcb-br { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+    .dcb-ar { background: rgba(59,130,246,0.15); color: #6ba3f8; border: 1px solid rgba(59,130,246,0.3); }
+    .dcb-smg { background: rgba(39,188,87,0.15); color: #27BC57; border: 1px solid rgba(39,188,87,0.3); }
+    .dcb-sr { background: rgba(6,182,212,0.15); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3); }
+    .dcb-pistol { background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
+    /* Rarity badge styling */
+    .dcb-common { background: rgba(156,163,175,0.15); color: #9ca3af; border: 1px solid rgba(156,163,175,0.3); }
+    .dcb-uncommon { background: rgba(39,188,87,0.2); color: #27BC57; border: 1px solid rgba(39,188,87,0.4); }
+    .dcb-rare { background: rgba(59,130,246,0.2); color: #3b82f6; border: 1px solid rgba(59,130,246,0.4); }
+    .dcb-epic { background: rgba(217,70,239,0.2); color: #d946ef; border: 1px solid rgba(217,70,239,0.4); }
+    .dcb-legendary { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.4); }
+
+    .dc-weapon-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-1);
+      margin-bottom: 0.55rem;
+    }
+
+    /* 6-stat bars in 2-column grid */
+    .dc-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.2rem 0.6rem;
+    }
+    .dc-stat-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .dc-stat-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.56rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-2);
+      width: 46px;
+      flex-shrink: 0;
+    }
+    .dc-stat-track {
+      flex: 1;
+      height: 3px;
+      background: var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .dc-stat-fill {
+      height: 100%;
+      border-radius: 1px;
+    }
+    /* Stat bar colors matching game's visual language */
+    .dc-fill-damage { background: #ef4444; }
+    .dc-fill-firerate { background: #f97316; }
+    .dc-fill-range { background: #3b82f6; }
+    .dc-fill-stability { background: #22c55e; }
+    .dc-fill-agility { background: #a78bfa; }
+    .dc-fill-stealth { background: #6b7280; }
+
+    /* Field Assessment / Reasoning block */
+    .dc-assessment {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+      background: var(--surf-2);
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .da-label-col {
+      flex-shrink: 0;
+    }
+    .da-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--orange);
+      white-space: nowrap;
+    }
+    .da-text {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* Action buttons */
+    .dc-actions {
+      padding: 0.65rem 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+    }
+    .dc-btn {
+      flex: 1;
+      padding: 0.55rem 0.75rem;
+      border-radius: 2px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      transition: all 0.15s;
+      font-family: 'Courier New', monospace;
+    }
+    .dc-btn-primary {
+      background: rgba(249,115,22,0.08);
+      border: 1px solid rgba(249,115,22,0.4);
+      color: var(--orange);
+    }
+    .dc-btn-primary:hover { background: rgba(249,115,22,0.15); }
+    .dc-btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    .dc-btn-secondary:hover { border-color: var(--text-3); color: var(--text-1); }
+
+    /* Shuffle button */
+    .shuffle-row {
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+    .shuffle-btn {
+      padding: 0.65rem 2.5rem;
+      border: 1px dashed var(--border);
+      background: transparent;
+      color: var(--text-3);
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .shuffle-btn:hover { border-color: var(--text-3); color: var(--text-2); }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- ─── Terminal Header ─── -->
+    <div class="terminal-header">
+      <div class="accent-stripe"></div>
+      <div class="header-bar">
+        <div class="header-left">
+          <div class="header-label">ARC Raiders Build Tool // Field Intel</div>
+          <div class="header-title">Weapon Advisor <span>— Loadout Analysis</span></div>
+        </div>
+        <div class="header-right">
+          <div class="header-session">SESSION: 0x0F34 · v1.0</div>
+          <div class="header-status">
+            <div class="status-dot"></div>
+            SIGNAL: STRONG
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Form: Intel Questions ─── -->
+    <div class="section-header">
+      <span class="sh-label">Mission Parameters</span>
+      <div class="sh-line"></div>
+      <span class="sh-step">1 / 2</span>
+    </div>
+
+    <div class="intel-card active">
+      <div class="ic-label-cell"><div class="ic-label">Location</div></div>
+      <div class="ic-options">
+        <span class="ic-pill sel">Spaceport</span>
+        <span class="ic-pill">Buried City</span>
+        <span class="ic-pill">Dam</span>
+        <span class="ic-pill">Blue Gate</span>
+        <span class="ic-pill">Stella Montis</span>
+      </div>
+    </div>
+
+    <div class="intel-card active">
+      <div class="ic-label-cell"><div class="ic-label">Squad</div></div>
+      <div class="ic-options">
+        <span class="ic-pill sel">Solo</span>
+        <span class="ic-pill">Squad</span>
+      </div>
+    </div>
+
+    <div class="intel-card active">
+      <div class="ic-label-cell"><div class="ic-label">Focus</div></div>
+      <div class="ic-options">
+        <span class="ic-pill">PVE</span>
+        <span class="ic-pill sel">PVP</span>
+        <span class="ic-pill">Mixed</span>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="sh-label">Playstyle</span>
+      <div class="sh-line"></div>
+      <span class="sh-step">2 / 2</span>
+    </div>
+
+    <div class="intel-card active">
+      <div class="ic-label-cell"><div class="ic-label">Range</div></div>
+      <div class="ic-options">
+        <span class="ic-pill">Close</span>
+        <span class="ic-pill">Mid</span>
+        <span class="ic-pill sel">Long</span>
+        <span class="ic-pill">Any</span>
+      </div>
+    </div>
+
+    <div class="intel-card active">
+      <div class="ic-label-cell"><div class="ic-label">Stealth</div></div>
+      <div class="ic-options">
+        <span class="ic-pill">Yes</span>
+        <span class="ic-pill sel">No</span>
+      </div>
+    </div>
+
+    <div class="intel-card active">
+      <div class="ic-label-cell"><div class="ic-label">Rarity</div></div>
+      <div class="ic-options">
+        <span class="ic-pill sel-c">Common</span>
+        <span class="ic-pill sel-u">Uncommon</span>
+        <span class="ic-pill sel-r">Rare</span>
+        <span class="ic-pill sel-e">Epic</span>
+        <span class="ic-pill sel-l">Legendary</span>
+      </div>
+    </div>
+
+    <!-- ─── CTA ─── -->
+    <div class="cta-block">
+      <button class="analyze-btn">
+        <div class="abtn-key-wrap">
+          <span class="abtn-key">E</span>
+          ANALYZE
+        </div>
+        Identify Optimal Loadout
+      </button>
+    </div>
+
+    <!-- ─── Results: Dossier Entries ─── -->
+    <div class="section-header">
+      <span class="sh-label">Intel Output — 3 Pairs Ranked</span>
+      <div class="sh-line"></div>
+      <span class="sh-step" style="color:var(--orange);">SPACEPORT · SOLO · PVP · LONG</span>
+    </div>
+
+    <!-- ── Dossier #1: Best Match ── -->
+    <div class="dossier-card">
+      <div class="dc-stripe dc-stripe-gold"></div>
+      <div class="dc-header">
+        <div class="dc-rank-num gold">01</div>
+        <div class="dc-rank-info">
+          <div class="dc-rank-label drl-gold">Best Match</div>
+          <div class="dc-rank-sub">HIGHEST FIT SCORE WITHIN FILTER CRITERIA</div>
+        </div>
+        <div class="dc-score-block">
+          <div class="dc-score-value">0.91</div>
+          <div class="dc-score-label">Fit Score</div>
+        </div>
+      </div>
+
+      <div class="dc-pair">
+        <!-- Primary -->
+        <div class="dc-weapon">
+          <div class="dc-weapon-role">/// Primary</div>
+          <div class="dc-badges">
+            <span class="dcbadge dcb-br">Battle Rifle</span>
+            <span class="dcbadge dcb-rare">Rare</span>
+          </div>
+          <div class="dc-weapon-name">Renegade</div>
+          <div class="dc-stats">
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Damage</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-damage" style="width:85%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Fire Rate</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-firerate" style="width:35%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Range</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-range" style="width:90%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Stability</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stability" style="width:55%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Agility</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-agility" style="width:40%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Stealth</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stealth" style="width:45%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="dc-pair-divider"></div>
+        <!-- Secondary -->
+        <div class="dc-weapon">
+          <div class="dc-weapon-role">/// Secondary</div>
+          <div class="dc-badges">
+            <span class="dcbadge dcb-smg">SMG</span>
+            <span class="dcbadge dcb-common">Common</span>
+          </div>
+          <div class="dc-weapon-name">Stitcher</div>
+          <div class="dc-stats">
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Damage</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-damage" style="width:45%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Fire Rate</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-firerate" style="width:75%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Range</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-range" style="width:35%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Stability</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stability" style="width:40%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Agility</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-agility" style="width:75%"></div></div>
+            </div>
+            <div class="dc-stat-row">
+              <span class="dc-stat-label">Stealth</span>
+              <div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stealth" style="width:55%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dc-assessment">
+        <div class="da-label-col"><div class="da-label">Field<br>Assessment</div></div>
+        <div class="da-text">Renegade dominates Spaceport's vast open sightlines with lever-action precision and fast follow-up shots. Stitcher on light ammo gives a panic spray option for close encounters without competing for medium ammo.</div>
+      </div>
+      <div class="dc-actions">
+        <button class="dc-btn dc-btn-primary">Open Renegade in Builder →</button>
+        <button class="dc-btn dc-btn-secondary">Open Stitcher in Builder →</button>
+      </div>
+    </div>
+
+    <!-- ── Dossier #2: Alternative ── -->
+    <div class="dossier-card">
+      <div class="dc-stripe dc-stripe-silver"></div>
+      <div class="dc-header">
+        <div class="dc-rank-num silver">02</div>
+        <div class="dc-rank-info">
+          <div class="dc-rank-label drl-silver">Alternative</div>
+          <div class="dc-rank-sub">BUDGET-ACCESSIBLE — NO RARE WEAPONS REQUIRED</div>
+        </div>
+        <div class="dc-score-block">
+          <div class="dc-score-value">0.78</div>
+          <div class="dc-score-label">Fit Score</div>
+        </div>
+      </div>
+
+      <div class="dc-pair">
+        <div class="dc-weapon">
+          <div class="dc-weapon-role">/// Primary</div>
+          <div class="dc-badges">
+            <span class="dcbadge dcb-ar">Assault Rifle</span>
+            <span class="dcbadge dcb-common">Common</span>
+          </div>
+          <div class="dc-weapon-name">Rattler</div>
+          <div class="dc-stats">
+            <div class="dc-stat-row"><span class="dc-stat-label">Damage</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-damage" style="width:60%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Fire Rate</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-firerate" style="width:65%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Range</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-range" style="width:60%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stability</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stability" style="width:55%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Agility</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-agility" style="width:60%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stealth</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stealth" style="width:50%"></div></div></div>
+          </div>
+        </div>
+        <div class="dc-pair-divider"></div>
+        <div class="dc-weapon">
+          <div class="dc-weapon-role">/// Secondary</div>
+          <div class="dc-badges">
+            <span class="dcbadge dcb-pistol">Pistol</span>
+            <span class="dcbadge dcb-rare">Rare</span>
+          </div>
+          <div class="dc-weapon-name">Venator</div>
+          <div class="dc-stats">
+            <div class="dc-stat-row"><span class="dc-stat-label">Damage</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-damage" style="width:75%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Fire Rate</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-firerate" style="width:50%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Range</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-range" style="width:55%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stability</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stability" style="width:45%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Agility</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-agility" style="width:85%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stealth</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stealth" style="width:50%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dc-assessment">
+        <div class="da-label-col"><div class="da-label">Field<br>Assessment</div></div>
+        <div class="da-text">Rattler gives budget versatility at range, paired with Venator's devastating burst damage for PVP fights. Both weapons draw from medium ammo — monitor your reserves during extended engagements.</div>
+      </div>
+      <div class="dc-actions">
+        <button class="dc-btn dc-btn-primary">Open Rattler in Builder →</button>
+        <button class="dc-btn dc-btn-secondary">Open Venator in Builder →</button>
+      </div>
+    </div>
+
+    <!-- ── Dossier #3: Alternative ── -->
+    <div class="dossier-card">
+      <div class="dc-stripe dc-stripe-bronze"></div>
+      <div class="dc-header">
+        <div class="dc-rank-num bronze">03</div>
+        <div class="dc-rank-info">
+          <div class="dc-rank-label drl-bronze">Alternative</div>
+          <div class="dc-rank-sub">EXTREME RANGE SPECIALIZATION — HIGH SKILL CEILING</div>
+        </div>
+        <div class="dc-score-block">
+          <div class="dc-score-value">0.71</div>
+          <div class="dc-score-label">Fit Score</div>
+        </div>
+      </div>
+
+      <div class="dc-pair">
+        <div class="dc-weapon">
+          <div class="dc-weapon-role">/// Primary</div>
+          <div class="dc-badges">
+            <span class="dcbadge dcb-sr">Sniper Rifle</span>
+            <span class="dcbadge dcb-rare">Rare</span>
+          </div>
+          <div class="dc-weapon-name">Osprey</div>
+          <div class="dc-stats">
+            <div class="dc-stat-row"><span class="dc-stat-label">Damage</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-damage" style="width:95%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Fire Rate</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-firerate" style="width:15%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Range</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-range" style="width:100%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stability</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stability" style="width:70%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Agility</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-agility" style="width:25%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stealth</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stealth" style="width:65%"></div></div></div>
+          </div>
+        </div>
+        <div class="dc-pair-divider"></div>
+        <div class="dc-weapon">
+          <div class="dc-weapon-role">/// Secondary</div>
+          <div class="dc-badges">
+            <span class="dcbadge dcb-smg">SMG</span>
+            <span class="dcbadge dcb-common">Common</span>
+          </div>
+          <div class="dc-weapon-name">Stitcher</div>
+          <div class="dc-stats">
+            <div class="dc-stat-row"><span class="dc-stat-label">Damage</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-damage" style="width:45%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Fire Rate</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-firerate" style="width:75%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Range</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-range" style="width:35%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stability</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stability" style="width:40%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Agility</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-agility" style="width:75%"></div></div></div>
+            <div class="dc-stat-row"><span class="dc-stat-label">Stealth</span><div class="dc-stat-track"><div class="dc-stat-fill dc-fill-stealth" style="width:55%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dc-assessment">
+        <div class="da-label-col"><div class="da-label">Field<br>Assessment</div></div>
+        <div class="da-text">Osprey is the only scoped weapon in the game — unmatched at extreme range. Stitcher handles everything inside 30m on light ammo, keeping your heavy reserves available for the Osprey.</div>
+      </div>
+      <div class="dc-actions">
+        <button class="dc-btn dc-btn-primary">Open Osprey in Builder →</button>
+        <button class="dc-btn dc-btn-secondary">Open Stitcher in Builder →</button>
+      </div>
+    </div>
+
+    <div class="shuffle-row">
+      <button class="shuffle-btn">⟳ REQUEST ADDITIONAL OPTIONS</button>
+    </div>
+
+  </div><!-- /page -->
+
+</body>
+</html>

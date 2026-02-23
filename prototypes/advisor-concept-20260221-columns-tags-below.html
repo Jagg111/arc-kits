@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weapon Advisor — Columns: Tags Below Weapons</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #030712, #111827, #030712);
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      border-bottom: 1px solid #1f2937;
+      background: rgba(17, 24, 39, 0.5);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .header-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 0.5rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #fb923c, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+    }
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      background: #1f2937;
+      border-radius: 0.5rem;
+      padding: 0.2rem;
+    }
+    .tab {
+      padding: 0.4rem 0.9rem;
+      border-radius: 0.375rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      color: #9ca3af;
+      background: transparent;
+    }
+    .tab.active { background: #374151; color: #ffffff; }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      position: sticky;
+      top: 41px;
+      z-index: 15;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1f2937;
+      padding: 0.6rem 1.25rem;
+    }
+    .filter-bar-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .filter-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-right: 0.15rem;
+      white-space: nowrap;
+    }
+    .filter-sep {
+      width: 1px;
+      height: 20px;
+      background: #374151;
+      flex-shrink: 0;
+    }
+    .pill {
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .pill:hover { border-color: #4b5563; color: #d1d5db; }
+    .pill.selected {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: #f97316;
+      color: #fb923c;
+    }
+    .pill-check {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.3rem;
+      font-size: 0.68rem;
+      font-weight: 500;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #9ca3af;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .pill-check.checked { color: #d1d5db; }
+    .pill-check .tick { color: #22c55e; font-weight: 700; font-size: 0.7rem; }
+    .pill-check .cross { color: #4b5563; font-size: 0.65rem; }
+
+    /* ── Results ── */
+    .results {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 2rem;
+    }
+    .results-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.25rem 0;
+      margin-bottom: 0.65rem;
+    }
+    .results-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+    }
+    .results-context {
+      font-size: 0.75rem;
+      color: #4b5563;
+    }
+
+    .columns-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+
+    /* ── Column Card ── */
+    .column-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .column-card.best {
+      border-top: 2px solid #f97316;
+      background: linear-gradient(180deg, rgba(249, 115, 22, 0.04) 0%, #111827 40%);
+    }
+    .column-card.alt {
+      border-top: 2px solid #1f2937;
+    }
+
+    /* Clean header — rank only, no synergy tags here */
+    .col-header {
+      display: flex;
+      align-items: center;
+      padding: 0.45rem 0.7rem;
+      border-bottom: 1px solid #1f2937;
+    }
+    .rank-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .rank-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 0.35rem;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .rank-badge.best { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+    .rank-badge.alt { background: rgba(107, 114, 128, 0.08); color: #6b7280; }
+    .rank-text { font-size: 0.7rem; font-weight: 600; }
+    .rank-text.best { color: #fb923c; }
+    .rank-text.alt { color: #6b7280; }
+
+    .col-body {
+      padding: 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      flex: 1;
+    }
+
+    /* Weapon Block */
+    .weapon-block {
+      background: #1f2937;
+      border-radius: 0.5rem;
+      padding: 0.55rem 0.65rem;
+      padding-bottom: 0.85rem;
+      position: relative;
+    }
+    .weapon-role {
+      position: absolute;
+      top: -0.35rem;
+      left: 0.55rem;
+      font-size: 0.52rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      background: #1f2937;
+      padding: 0 0.2rem;
+    }
+    .weapon-img-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .weapon-img {
+      height: 52px;
+      width: auto;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .weapon-info { flex: 1; min-width: 0; }
+    .weapon-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .weapon-badges {
+      display: flex;
+      gap: 0.2rem;
+    }
+    .wb-badge {
+      font-size: 0.55rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.2rem;
+      font-weight: 600;
+    }
+
+    /* Synergy tags — dedicated row below both weapons */
+    .synergy-row {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+      padding: 0.15rem 0.1rem;
+    }
+    .synergy-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.58rem;
+      font-weight: 500;
+    }
+    .synergy-tag.good { color: #22c55e; background: rgba(34, 197, 94, 0.08); }
+    .synergy-tag.warn { color: #f59e0b; background: rgba(245, 158, 11, 0.08); }
+    .synergy-icon { font-size: 0.62rem; }
+
+    /* Reasoning */
+    .reasoning {
+      padding: 0.35rem 0.5rem;
+      background: rgba(31, 41, 55, 0.2);
+      border-radius: 0.35rem;
+      margin-top: auto;
+    }
+    .reasoning-text {
+      font-size: 0.72rem;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+
+    /* ── More ── */
+    .more-row {
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+    .more-btn {
+      padding: 0.5rem 1.75rem;
+      border-radius: 999px;
+      border: 1px dashed #374151;
+      background: transparent;
+      color: #6b7280;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .more-btn:hover { border-color: #4b5563; color: #9ca3af; }
+
+    .concept-label {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid #374151;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.7rem;
+      color: #6b7280;
+      z-index: 50;
+    }
+    .concept-label strong { color: #fb923c; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">ARC RAIDERS Build Tool</div>
+      <div class="tabs">
+        <button class="tab">Weapons</button>
+        <button class="tab active">Advisor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="filter-bar-inner">
+      <div class="filter-group">
+        <span class="filter-label">Where</span>
+        <span class="pill selected">Spaceport</span>
+        <span class="pill">Buried City</span>
+        <span class="pill">Dam</span>
+        <span class="pill">Blue Gate</span>
+        <span class="pill">Stella M.</span>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Squad</span>
+        <span class="pill selected">Solo</span>
+        <span class="pill">Squad</span>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Focus</span>
+        <span class="pill">PVE</span>
+        <span class="pill selected">PVP</span>
+        <span class="pill">Mixed</span>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Range</span>
+        <span class="pill">Close</span>
+        <span class="pill">Mid</span>
+        <span class="pill selected">Long</span>
+        <span class="pill">Any</span>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Rarity</span>
+        <span class="pill-check checked"><span class="tick">&#10003;</span> C</span>
+        <span class="pill-check checked"><span class="tick">&#10003;</span> U</span>
+        <span class="pill-check checked"><span class="tick">&#10003;</span> R</span>
+        <span class="pill-check"><span class="cross">&#10007;</span> E</span>
+        <span class="pill-check"><span class="cross">&#10007;</span> L</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results">
+    <div class="results-header">
+      <span class="results-title">Recommendations</span>
+      <span class="results-context">&mdash; Spaceport &middot; Solo &middot; PVP &middot; Long range</span>
+    </div>
+
+    <div class="columns-grid">
+
+      <!-- #1 Best Match -->
+      <div class="column-card best">
+        <div class="col-header">
+          <div class="rank-group">
+            <div class="rank-badge best">1</div>
+            <span class="rank-text best">Best Match</span>
+          </div>
+        </div>
+        <div class="col-body">
+          <div class="weapon-block">
+            <div class="weapon-role">Primary</div>
+            <div class="weapon-img-row">
+              <img class="weapon-img" src="images/weapons/renegade.webp" alt="Renegade">
+              <div class="weapon-info">
+                <div class="weapon-name">Renegade</div>
+                <div class="weapon-badges">
+                  <span class="wb-badge" style="background: rgba(245,158,11,0.15); color: #f59e0b;">Battle Rifle</span>
+                  <span class="wb-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">Rare</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="weapon-block">
+            <div class="weapon-role">Secondary</div>
+            <div class="weapon-img-row">
+              <img class="weapon-img" src="images/weapons/stitcher.webp" alt="Stitcher">
+              <div class="weapon-info">
+                <div class="weapon-name">Stitcher</div>
+                <div class="weapon-badges">
+                  <span class="wb-badge" style="background: rgba(34,197,94,0.15); color: #22c55e;">SMG</span>
+                  <span class="wb-badge" style="background: rgba(156,163,175,0.15); color: #9CA3AF;">Common</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="synergy-row">
+            <span class="synergy-tag good"><span class="synergy-icon">&#10003;</span> Ammo Split</span>
+            <span class="synergy-tag good"><span class="synergy-icon">&#10003;</span> Range Coverage</span>
+            <span class="synergy-tag good"><span class="synergy-icon">&#10003;</span> Budget Friendly</span>
+          </div>
+
+          <div class="reasoning">
+            <span class="reasoning-text">Renegade dominates Spaceport's open sightlines with lever-action precision. Stitcher on light ammo covers close encounters without competing for medium ammo.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- #2 Alternative -->
+      <div class="column-card alt">
+        <div class="col-header">
+          <div class="rank-group">
+            <div class="rank-badge alt">2</div>
+            <span class="rank-text alt">Alternative</span>
+          </div>
+        </div>
+        <div class="col-body">
+          <div class="weapon-block">
+            <div class="weapon-role">Primary</div>
+            <div class="weapon-img-row">
+              <img class="weapon-img" src="images/weapons/rattler.webp" alt="Rattler">
+              <div class="weapon-info">
+                <div class="weapon-name">Rattler</div>
+                <div class="weapon-badges">
+                  <span class="wb-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">Assault Rifle</span>
+                  <span class="wb-badge" style="background: rgba(156,163,175,0.15); color: #9CA3AF;">Common</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="weapon-block">
+            <div class="weapon-role">Secondary</div>
+            <div class="weapon-img-row">
+              <img class="weapon-img" src="images/weapons/venator.webp" alt="Venator">
+              <div class="weapon-info">
+                <div class="weapon-name">Venator</div>
+                <div class="weapon-badges">
+                  <span class="wb-badge" style="background: rgba(168,85,247,0.15); color: #a855f7;">Pistol</span>
+                  <span class="wb-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">Rare</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="synergy-row">
+            <span class="synergy-tag warn"><span class="synergy-icon">!</span> Same Ammo</span>
+            <span class="synergy-tag good"><span class="synergy-icon">&#10003;</span> Range Coverage</span>
+          </div>
+
+          <div class="reasoning">
+            <span class="reasoning-text">Rattler gives budget versatility at range. Venator's burst damage dominates PVP. Both use medium ammo — watch your reserves.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- #3 Alternative -->
+      <div class="column-card alt">
+        <div class="col-header">
+          <div class="rank-group">
+            <div class="rank-badge alt">3</div>
+            <span class="rank-text alt">Alternative</span>
+          </div>
+        </div>
+        <div class="col-body">
+          <div class="weapon-block">
+            <div class="weapon-role">Primary</div>
+            <div class="weapon-img-row">
+              <img class="weapon-img" src="images/weapons/osprey.webp" alt="Osprey">
+              <div class="weapon-info">
+                <div class="weapon-name">Osprey</div>
+                <div class="weapon-badges">
+                  <span class="wb-badge" style="background: rgba(6,182,212,0.15); color: #06b6d4;">Sniper Rifle</span>
+                  <span class="wb-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">Rare</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="weapon-block">
+            <div class="weapon-role">Secondary</div>
+            <div class="weapon-img-row">
+              <img class="weapon-img" src="images/weapons/stitcher.webp" alt="Stitcher">
+              <div class="weapon-info">
+                <div class="weapon-name">Stitcher</div>
+                <div class="weapon-badges">
+                  <span class="wb-badge" style="background: rgba(34,197,94,0.15); color: #22c55e;">SMG</span>
+                  <span class="wb-badge" style="background: rgba(156,163,175,0.15); color: #9CA3AF;">Common</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="synergy-row">
+            <span class="synergy-tag good"><span class="synergy-icon">&#10003;</span> Ammo Split</span>
+            <span class="synergy-tag good"><span class="synergy-icon">&#10003;</span> Extreme Range</span>
+          </div>
+
+          <div class="reasoning">
+            <span class="reasoning-text">Osprey is the only scoped weapon — unmatched at extreme range. Stitcher covers everything inside 30m on separate ammo.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="more-row">
+      <button class="more-btn">&#8635; Shuffle — Show More Options</button>
+    </div>
+  </div>
+
+  <div class="concept-label">
+    Concept H: <strong>Tags Below Weapons</strong> — Synergy tags as dedicated row below both weapon blocks
+  </div>
+
+</body>
+</html>

@@ -17,7 +17,7 @@
 3. Advisor tab (`AdvisorPage`) with filter-driven weapon pairing recommendations.
 - Filter bar: location, squad mode, focus, range, rarity.
 - Three states: onboarding (no location), results (2-3 pairings), empty (too restrictive).
-- Currently using mock data; engine wiring pending.
+- Live engine: `recommendLoadouts()` called via `useMemo` in `AdvisorPage`.
 
 Tab routing via `activeView` state in `src/App.tsx`.
 
@@ -68,17 +68,14 @@ Read these first each session:
 - `src/data/mods.ts` defines `Horizontal Grip` as Legendary-only.
 - This should be reconciled before relying on that preset behavior.
 
-## In-Progress Product Direction
-- Weapon Advisor feature status:
-- Engine: complete (`src/advisor/engine/`, public API: `recommendLoadouts()`)
-- UI: complete, using mock data (`src/components/advisor/`, 8 components)
-- **Next step**: Wire `recommendLoadouts()` into `AdvisorPage` to replace `MOCK_ADVISOR_RESULTS`
-- Golden matrix: built (`src/data/advisor_golden_cases.ts`, CLI: `scripts/advisor/cli.ts`)
-- Advisor V1 scope: weapon-only recommendations (no attachments, no material filter).
+## Advisor V1 — Shipped
+- Engine (`src/advisor/engine/`) wired to UI (`src/components/advisor/`) — fully live.
+- Golden matrix: 10/10 passing (`src/data/advisor_golden_cases.ts`, CLI: `scripts/advisor/cli.ts`).
+- V1 scope: weapon-only pairing recommendations (no attachments, no material filter).
 - Spec: `.claude/docs/weapon_advisor_feature.md`
 - Engine contract: `.claude/docs/weapon_advisor_engine_contract.md`
 - Golden matrix doc: `.claude/docs/weapon_advisor_golden_matrix.md`
-- UI prototype: `prototypes/advisor-concept-20260222-refined-states.html`
+- Phase 2 roadmap: see feature doc §9 (stealth filter, builder links, URL sharing, economy ranking).
 
 ## Session Kickoff Checklist
 1. Read canonical context files.
