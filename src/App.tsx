@@ -86,7 +86,12 @@ export default function App() {
         </div>
       )}
 
-      {activeView === "advisor" && <AdvisorPage />}
+      {activeView === "advisor" && (
+        <AdvisorPage
+          onSelectWeapon={selectWeapon}
+          onNavigateToBuilder={() => setActiveView("weapons")}
+        />
+      )}
     </div>
   );
 }

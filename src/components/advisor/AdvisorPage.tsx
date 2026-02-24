@@ -5,7 +5,7 @@
 // USED BY: App.tsx
 // ============================================================================
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useAdvisorFilters } from "../../hooks/useAdvisorFilters";
 import {
   ADVISOR_LOCATION_LABELS,
@@ -19,9 +19,19 @@ import AdvisorOnboarding from "./AdvisorOnboarding";
 import AdvisorResults from "./AdvisorResults";
 import AdvisorEmptyState from "./AdvisorEmptyState";
 
-export default function AdvisorPage() {
+interface AdvisorPageProps {
+  onSelectWeapon: (id: string) => void;
+  onNavigateToBuilder: () => void;
+}
+
+export default function AdvisorPage({ onSelectWeapon, onNavigateToBuilder }: AdvisorPageProps) {
   const { filters, setLocation, setSquad, setFocus, setRange, toggleRarity } =
     useAdvisorFilters();
+
+  const handleOpenBuilder = useCallback((weaponId: string) => {
+    onSelectWeapon(weaponId);
+    onNavigateToBuilder();
+  }, [onSelectWeapon, onNavigateToBuilder]);
 
   // Build context echo line from active filters
   const contextLine = filters.location
@@ -66,7 +76,7 @@ export default function AdvisorPage() {
       <div className="max-w-[80rem] mx-auto px-5 py-4 pb-8">
         {isIdle && <AdvisorOnboarding />}
         {hasResults && (
-          <AdvisorResults recommendations={result!.recommendations} contextLine={contextLine} />
+          <AdvisorResults recommendations={result!.recommendations} contextLine={contextLine} onOpenBuilder={handleOpenBuilder} />
         )}
         {isEmpty && (
           <>

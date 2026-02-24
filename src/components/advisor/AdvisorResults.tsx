@@ -10,9 +10,10 @@ import PairingCard from "./PairingCard";
 interface AdvisorResultsProps {
   recommendations: PairRecommendation[];
   contextLine: string;
+  onOpenBuilder?: (weaponId: string) => void;
 }
 
-export default function AdvisorResults({ recommendations, contextLine }: AdvisorResultsProps) {
+export default function AdvisorResults({ recommendations, contextLine, onOpenBuilder }: AdvisorResultsProps) {
   return (
     <div>
       {/* Results header with context echo */}
@@ -26,7 +27,7 @@ export default function AdvisorResults({ recommendations, contextLine }: Advisor
       {/* 3-column grid on desktop, single column on mobile */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:max-w-none max-w-md mx-auto md:mx-0">
         {recommendations.map((rec) => (
-          <PairingCard key={rec.pairKey} recommendation={rec} />
+          <PairingCard key={rec.pairKey} recommendation={rec} onOpenBuilder={onOpenBuilder} />
         ))}
       </div>
     </div>

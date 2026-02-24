@@ -1,6 +1,6 @@
 # Weapon Advisor Feature (V1)
 
-Status: V1 shipped
+Status: V1 shipped + Phase 2 in progress
 As of: February 23, 2026
 
 ## 1. Feature Vision
@@ -157,7 +157,7 @@ These outcomes would kill user trust and adoption:
 Recommended sequence after V1 weapon-pairing quality is stable:
 
 1. Add stealth preference filter
-2. Add open-in-builder links for recommended weapons
+2. ~~Add open-in-builder links for recommended weapons~~ **Shipped** — "Build →" button on each WeaponBlock in pairing cards. Clicking navigates to the Weapons tab with that weapon's builder loaded.
 3. Add shareable URL state for advisor inputs
 4. Introduce economy-aware ranking (prefer cheaper weapons for high-risk runs)
 5. Introduce material availability filtering

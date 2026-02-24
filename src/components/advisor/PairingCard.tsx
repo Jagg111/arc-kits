@@ -10,9 +10,10 @@ import SynergyTagList from "./SynergyTagList";
 
 interface PairingCardProps {
   recommendation: PairRecommendation;
+  onOpenBuilder?: (weaponId: string) => void;
 }
 
-export default function PairingCard({ recommendation }: PairingCardProps) {
+export default function PairingCard({ recommendation, onOpenBuilder }: PairingCardProps) {
   const isTopPick = recommendation.tier === "top_pick";
 
   return (
@@ -45,8 +46,8 @@ export default function PairingCard({ recommendation }: PairingCardProps) {
 
       {/* Weapon blocks + synergy */}
       <div className="p-2.5 flex flex-col gap-2 flex-1">
-        <WeaponBlock weaponId={recommendation.primaryWeaponId} role="Primary" />
-        <WeaponBlock weaponId={recommendation.secondaryWeaponId} role="Secondary" />
+        <WeaponBlock weaponId={recommendation.primaryWeaponId} role="Primary" onOpenBuilder={onOpenBuilder} />
+        <WeaponBlock weaponId={recommendation.secondaryWeaponId} role="Secondary" onOpenBuilder={onOpenBuilder} />
         <SynergyTagList tags={recommendation.synergyTags} />
       </div>
     </div>

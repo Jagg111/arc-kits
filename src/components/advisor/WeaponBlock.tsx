@@ -11,9 +11,10 @@ import Badge from "../shared/Badge";
 interface WeaponBlockProps {
   weaponId: string;
   role: "Primary" | "Secondary";
+  onOpenBuilder?: (weaponId: string) => void;
 }
 
-export default function WeaponBlock({ weaponId, role }: WeaponBlockProps) {
+export default function WeaponBlock({ weaponId, role, onOpenBuilder }: WeaponBlockProps) {
   const weapon = WEAPONS.find((w) => w.id === weaponId);
   if (!weapon) return null;
 
@@ -45,8 +46,25 @@ export default function WeaponBlock({ weaponId, role }: WeaponBlockProps) {
         )}
         <div className="flex-1 min-w-0">
           <div className="text-base font-bold text-text-primary mb-0.5">{weapon.name}</div>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
             <Badge label={weapon.rarity} color={RARITY_COLORS[weapon.rarity]} />
+            {onOpenBuilder && (
+              <button
+                onClick={() => onOpenBuilder(weaponId)}
+                className="ml-auto px-1.5 py-0.5 rounded text-[0.6rem] font-semibold uppercase tracking-wide text-text-muted hover:text-accent-text cursor-pointer transition-colors"
+                style={{
+                  backgroundColor: "color-mix(in srgb, var(--color-text-muted) 8%, transparent)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "color-mix(in srgb, var(--color-accent) 15%, transparent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "color-mix(in srgb, var(--color-text-muted) 8%, transparent)";
+                }}
+              >
+                Build &rarr;
+              </button>
+            )}
           </div>
         </div>
       </div>
