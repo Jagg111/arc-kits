@@ -164,6 +164,21 @@ export const ADVISOR_GOLDEN_CASES: GoldenScenarioCase[] = [
     expectedPrimaryPool: ["anvil", "stitcher", "iltoro"],
     expectedSecondaryPool: ["iltoro", "stitcher", "ferro", "anvil"],
   },
+  {
+    id: "G11",
+    title: "Blue Gate, Solo, PvP, Close, Uncommon + Rare (Mitch)",
+    // Authored by Mitch — close-range CQC weapons should surface when
+    // "Close" is selected, even on a map that favors long-range play.
+    inputs: baseInputs({
+      location: "blue_gate",
+      squad: "solo",
+      focus: "pvp",
+      preferredRange: "close",
+      allowedWeaponRarities: ["Uncommon", "Rare"],
+    }),
+    expectedPrimaryPool: ["renegade", "anvil", "venator"],
+    expectedSecondaryPool: ["renegade", "iltoro", "anvil", "venator"],
+  },
 ];
 
 // Subset where top pair is intentionally locked as an exact expected key.

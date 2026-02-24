@@ -134,14 +134,25 @@ export function rankPairCandidates(
     return a.pairKey.localeCompare(b.pairKey);
   });
 
+  // Deduplicate mirror pairs: A→B and B→A are the same loadout.
+  // Keep whichever orientation scored higher (already sorted by score).
+  const seen = new Set<string>();
+  const deduped = allPairs.filter((pair) => {
+    const ids = [pair.primary.weapon.id, pair.secondary.weapon.id].sort();
+    const unorderedKey = ids.join("__");
+    if (seen.has(unorderedKey)) return false;
+    seen.add(unorderedKey);
+    return true;
+  });
+
   // Determine how many results to show (2 or 3).
-  const topScore = allPairs.length > 0 ? allPairs[0].pairScore : 0;
-  let resultCount = Math.min(2, allPairs.length);
-  if (allPairs.length >= 3 && allPairs[2].pairScore >= topScore - TOP_GAP) {
+  const topScore = deduped.length > 0 ? deduped[0].pairScore : 0;
+  let resultCount = Math.min(2, deduped.length);
+  if (deduped.length >= 3 && deduped[2].pairScore >= topScore - TOP_GAP) {
     resultCount = 3;
   }
 
-  const topPairs = allPairs.slice(0, resultCount);
+  const topPairs = deduped.slice(0, resultCount);
 
   return topPairs.map((pair, index) => {
     // Tier assignment: first pair = Top Pick, rest = Strong Option.

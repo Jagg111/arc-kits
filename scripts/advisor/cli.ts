@@ -82,8 +82,8 @@ function assertGlobalInvariants(
     if (result.status !== "empty") errors.push(`Expected status 'empty', got '${result.status}'`);
   } else {
     if (result.emptyState) errors.push(`Unexpected empty state: ${result.emptyState.message}`);
-    if (recommendations.length < 2 || recommendations.length > 3) {
-      errors.push(`Expected 2-3 results, received ${recommendations.length}`);
+    if (recommendations.length < 1 || recommendations.length > 3) {
+      errors.push(`Expected 1-3 results, received ${recommendations.length}`);
     }
     if (result.status !== "results") errors.push(`Expected status 'results', got '${result.status}'`);
   }

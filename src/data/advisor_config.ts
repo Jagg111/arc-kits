@@ -94,13 +94,13 @@ export const WEIGHT_MAP_FIT = 0.30;
 // Higher = PvE and PvP give very different results.
 // Lower = focus selection has subtle effect.
 // Safe range: 0.35 – 0.55
-export const WEIGHT_ROLE_FIT = 0.45;
+export const WEIGHT_ROLE_FIT = 0.40;
 
 // How much range preference matters.
 // Higher = "close" and "long" give dramatically different results.
 // Lower = range is a light nudge.
 // Safe range: 0.15 – 0.30
-export const WEIGHT_RANGE_FIT = 0.25;
+export const WEIGHT_RANGE_FIT = 0.30;
 
 
 // ── Pair Scoring Weights ──
