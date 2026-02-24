@@ -27,7 +27,7 @@ const INITIAL_STATE: AdvisorFilterState = {
   squad: "solo",
   focus: "mixed",
   preferredRange: "any",
-  allowedWeaponRarities: [...ADVISOR_ALL_RARITIES],
+  allowedWeaponRarities: ADVISOR_ALL_RARITIES.filter((r) => r !== "Legendary"),
 };
 
 export function useAdvisorFilters() {

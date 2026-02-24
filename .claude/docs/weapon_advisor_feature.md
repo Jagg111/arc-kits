@@ -92,7 +92,7 @@ If all 2-3 pairings score within a narrow band, all may share the "Top Pick" tie
 
 The advisor has three distinct states:
 
-1. **Initial load** — All rarity checkboxes pre-checked (most permissive). Location, squad, focus, and range are unselected. The results area shows an onboarding prompt directing the player to select a location. No weapon cards are visible. This ensures the page always starts fresh (no remembered filters across sessions) while keeping friction low — one click on a location pill is enough to generate results.
+1. **Initial load** — All rarity checkboxes pre-checked except Legendary (which starts unchecked). Location, squad, focus, and range are unselected. The results area shows an onboarding prompt directing the player to select a location. No weapon cards are visible. This ensures the page always starts fresh (no remembered filters across sessions) while keeping friction low — one click on a location pill is enough to generate results.
 
 2. **Results** — 2-3 pairings displayed in a 3-column grid (desktop) or single-column stack (mobile). Each column card shows the primary and secondary weapon with type/rarity badges and synergy tags. A context echo line below the filter bar confirms the active filters (e.g., "Spaceport · Solo · PVP · Long range").
 

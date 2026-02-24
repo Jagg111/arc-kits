@@ -18,9 +18,9 @@ import {
   ADVISOR_SQUAD_LABELS,
   ADVISOR_FOCUS_LABELS,
   ADVISOR_RANGE_LABELS,
-  ADVISOR_RARITY_SHORT,
   ADVISOR_ALL_RARITIES,
 } from "../../data/advisor_config";
+import { RARITY_COLORS } from "../../data/constants";
 
 interface AdvisorFilterBarProps {
   filters: AdvisorFilterState;
@@ -140,19 +140,32 @@ export default function AdvisorFilterBar({
           <FilterLabel>Rarity</FilterLabel>
           {ADVISOR_ALL_RARITIES.map((rarity) => {
             const checked = filters.allowedWeaponRarities.includes(rarity);
+            const rarityColor = RARITY_COLORS[rarity];
             return (
               <button
                 key={rarity}
-                className={`${basePill} border-border bg-surface-alt inline-flex items-center gap-1`}
-                style={checked ? { color: "var(--color-text-primary)" } : { color: "var(--color-text-muted)" }}
+                className={`${basePill} inline-flex items-center gap-1`}
+                style={
+                  checked
+                    ? {
+                        backgroundColor: `color-mix(in srgb, ${rarityColor} 15%, transparent)`,
+                        borderColor: rarityColor,
+                        color: rarityColor,
+                      }
+                    : {
+                        borderColor: "var(--color-border)",
+                        backgroundColor: "var(--color-surface-alt)",
+                        color: "var(--color-text-muted)",
+                      }
+                }
                 onClick={() => onToggleRarity(rarity)}
               >
                 {checked ? (
-                  <span className="font-bold text-[0.7rem]" style={{ color: "var(--color-success)" }}>&#10003;</span>
+                  <span className="font-bold text-[0.7rem]">&#10003;</span>
                 ) : (
-                  <span className="text-[0.65rem] text-text-faint">&#10007;</span>
+                  <span className="text-[0.65rem]">&#10007;</span>
                 )}
-                {ADVISOR_RARITY_SHORT[rarity]}
+                {rarity}
               </button>
             );
           })}
