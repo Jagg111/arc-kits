@@ -14,7 +14,7 @@
 // toggle button. The active theme is applied via a data-theme attribute on <html>.
 // ============================================================================
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWeaponBuilder } from "./hooks/useWeaponBuilder";
 import { useBuildCost } from "./hooks/useBuildCost";
 import { useCumulativeEffects } from "./hooks/useCumulativeEffects";
@@ -53,6 +53,11 @@ export default function App() {
 
   // Sync build state with URL params so builds are shareable via link
   useBuildUrl(gun, equipped, selectWeapon, equipMod);
+
+  // Scroll to top when switching tabs or navigating within the Weapons view
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeView, gun]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-bg-base via-bg-mid to-bg-base text-text-primary">
