@@ -80,7 +80,7 @@ src/
       AdvisorFilterBar.tsx — Sticky pill-toggle filter bar
       AdvisorResults.tsx   — Results header + 3-column pairing grid
       PairingCard.tsx      — Single pairing card with tier badge + synergy tags
-      WeaponBlock.tsx      — Weapon image + name + class/rarity badges
+      WeaponBlock.tsx      — Weapon image + name + rarity badge
       SynergyTagList.tsx   — Synergy tag pills (positive/warning)
       AdvisorOnboarding.tsx — Idle state before location selected
       AdvisorEmptyState.tsx — Empty state when no pairings match

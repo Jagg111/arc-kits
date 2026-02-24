@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { WEAPONS } from "../../data/weapons";
-import { CLASS_LABELS, CLASS_COLORS, RARITY_COLORS, WEAPON_IMAGES } from "../../data/constants";
+import { RARITY_COLORS, WEAPON_IMAGES } from "../../data/constants";
 import Badge from "../shared/Badge";
 
 interface WeaponBlockProps {
@@ -46,7 +46,6 @@ export default function WeaponBlock({ weaponId, role }: WeaponBlockProps) {
         <div className="flex-1 min-w-0">
           <div className="text-base font-bold text-text-primary mb-0.5">{weapon.name}</div>
           <div className="flex gap-1">
-            <Badge label={CLASS_LABELS[weapon.weaponClass]} color={CLASS_COLORS[weapon.weaponClass]} />
             <Badge label={weapon.rarity} color={RARITY_COLORS[weapon.rarity]} />
           </div>
         </div>
