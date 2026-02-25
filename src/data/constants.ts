@@ -79,11 +79,6 @@ export const GRADE_COLORS: Record<string, string> = {
   F: "var(--color-grade-f)",
 };
 
-// Numeric ordering for sorting weapons by grade (lower = better grade)
-export const GRADE_ORDER: Record<string, number> = {
-  S: 1, A: 2, B: 3, C: 4, D: 5, F: 6,
-};
-
 // Crafting material metadata — maps material names to their rarity tier and wiki thumbnail icon.
 // Used by cost display components to color-code materials and show icons.
 // Image URLs follow the same wiki thumbnail pattern as mod icons in mods.ts.
