@@ -1,7 +1,8 @@
 // ============================================================================
 // FILE: components/layout/Header.tsx
-// PURPOSE: Sticky top bar with app title, Weapons/Advisor tabs, weapon name,
-//          "Change Weapon" button, and dark/light mode toggle
+// PURPOSE: Sticky top bar with app title, Weapons/Advisor tabs, and theme toggle.
+//          When a weapon is selected, the Weapons tab transforms into a back-nav
+//          link (‹ Weapons) that returns to the weapon picker.
 // USED BY: App.tsx
 // ============================================================================
 
@@ -11,7 +12,6 @@ interface HeaderProps {
   activeView: AppView;
   onChangeView: (view: AppView) => void;
   hasWeapon: boolean;
-  weaponName?: string;
   onReset: () => void;
   theme: "light" | "dark";
   toggleTheme: () => void;
@@ -26,12 +26,11 @@ export default function Header({
   activeView,
   onChangeView,
   hasWeapon,
-  weaponName,
   onReset,
   theme,
   toggleTheme,
 }: HeaderProps) {
-  const showWeaponControls = activeView === "weapons";
+  const isWeaponBuilder = activeView === "weapons" && hasWeapon;
 
   const themeButton = (
     <button
@@ -53,64 +52,54 @@ export default function Header({
 
   const tabs = (
     <div className="flex bg-surface-alt rounded-lg p-0.5">
-      <button className={tabClass(activeView === "weapons")} onClick={() => onChangeView("weapons")}>
-        Weapons
-      </button>
+      {isWeaponBuilder ? (
+        <button
+          onClick={onReset}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium bg-border text-accent-text transition-colors cursor-pointer"
+        >
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Weapons
+        </button>
+      ) : (
+        <button className={tabClass(activeView === "weapons")} onClick={() => onChangeView("weapons")}>
+          Weapons
+        </button>
+      )}
       <button className={tabClass(activeView === "advisor")} onClick={() => onChangeView("advisor")}>
         Advisor
       </button>
     </div>
   );
 
-  const changeWeaponButton = showWeaponControls && hasWeapon && (
-    <button
-      onClick={onReset}
-      className="text-sm text-text-secondary hover:text-text-primary transition-colors whitespace-nowrap"
-    >
-      ← Change Weapon
-    </button>
-  );
-
   return (
-    <div className="border-b border-border-subtle bg-surface/50 backdrop-blur-sm sticky top-0 z-20">
-      {/* ── Desktop: single row ── */}
-      <div className="hidden sm:flex max-w-[80rem] mx-auto px-4 py-2.5 items-center gap-4">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-transparent shrink-0">
-          ARC RAIDERS Build Tool
-        </h1>
-        {tabs}
-        {showWeaponControls && hasWeapon && weaponName && (
-          <span className="text-sm text-text-secondary font-medium truncate">
-            {weaponName}
-          </span>
-        )}
-        <div className="ml-auto flex items-center gap-2 shrink-0">
-          {themeButton}
-          {changeWeaponButton}
+    <header className="sticky top-0 z-30 w-full border-b border-border-subtle bg-surface/80 backdrop-blur-md">
+      {/* ── Desktop View ── */}
+      <div className="hidden sm:block max-w-[80rem] mx-auto">
+        <div className="flex px-4 h-14 items-center gap-6">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-transparent shrink-0">
+            ARC RAIDERS
+          </h1>
+          {tabs}
+          <div className="ml-auto flex items-center gap-2">
+            {themeButton}
+          </div>
         </div>
       </div>
 
-      {/* ── Mobile: two stable rows ── */}
-      <div className="sm:hidden max-w-[80rem] mx-auto px-4 py-2.5 space-y-2">
-        {/* Row 1: title + theme toggle */}
-        <div className="flex items-center justify-between">
+      {/* ── Mobile View ── */}
+      <div className="sm:hidden flex flex-col">
+        <div className="flex items-center justify-between px-4 h-12 border-b border-border-subtle/30">
           <h1 className="text-lg font-bold bg-gradient-to-r from-brand-from to-brand-to bg-clip-text text-transparent">
-            ARC RAIDERS Build Tool
+            ARC RAIDERS
           </h1>
           {themeButton}
         </div>
-        {/* Row 2: tabs + change weapon */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center px-4 h-11 bg-surface-alt/10">
           {tabs}
-          {changeWeaponButton}
         </div>
-        {/* Row 3: weapon name (builder only) */}
-        {showWeaponControls && hasWeapon && weaponName && (
-          <span className="text-sm text-text-secondary font-medium block -mt-1">
-            {weaponName}
-          </span>
-        )}
       </div>
-    </div>
+    </header>
   );
 }

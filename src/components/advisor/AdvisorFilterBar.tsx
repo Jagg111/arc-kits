@@ -65,7 +65,7 @@ export default function AdvisorFilterBar({
   onToggleRarity,
 }: AdvisorFilterBarProps) {
   return (
-    <div className="bg-filter-bar-bg border-b border-border-subtle py-2.5 px-5 sticky top-[52px] z-10">
+    <div className="bg-filter-bar-bg border-b border-border-subtle py-2.5 px-5 sticky top-[92px] sm:top-14 z-10">
       <div className="max-w-[80rem] mx-auto flex items-center gap-3 sm:gap-5 flex-wrap">
         {/* Location */}
         <div className="flex items-center gap-1.5">

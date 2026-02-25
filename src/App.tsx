@@ -65,7 +65,6 @@ export default function App() {
         activeView={activeView}
         onChangeView={setActiveView}
         hasWeapon={!!gun}
-        weaponName={gunObj?.name}
         onReset={resetSelection}
         theme={theme}
         toggleTheme={toggleTheme}

@@ -122,7 +122,7 @@ export default function WeaponBuilder({
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Sidebar - hidden on mobile, shown on desktop */}
-          <div className="hidden lg:block lg:col-span-1 space-y-4 lg:sticky lg:top-16 lg:self-start">
+          <div className="hidden lg:block lg:col-span-1 space-y-4 lg:sticky lg:top-28 lg:self-start">
             {/* Goal Picker */}
             <div className="bg-surface rounded-xl border border-border-subtle p-4">
               {selectedGoal && !goalExpanded ? (
