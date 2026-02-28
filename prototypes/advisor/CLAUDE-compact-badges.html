@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advisor Prototype 2 — Compact Badges — ArcKits</title>
+  <style>
+    /* ================================================================
+       TOKENS — exact match of src/index.css dark theme
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg-base:         #030712;
+      --color-bg-mid:          #111827;
+      --color-surface:         #111827;
+      --color-surface-alt:     #1f2937;
+      --color-surface-hover:   #1f2937;
+      --color-border:          #374151;
+      --color-border-subtle:   #1f2937;
+      --color-text-primary:    #ffffff;
+      --color-text-secondary:  #9ca3af;
+      --color-text-muted:      #6b7280;
+      --color-text-faint:      #4b5563;
+      --color-accent:          #f97316;
+      --color-accent-text:     #fb923c;
+      --color-accent-hover:    #fdba74;
+      --color-success:         #22c55e;
+      --color-warning:         #f59e0b;
+      --color-danger-text:     #f87171;
+      --color-brand-from:      #fb923c;
+      --color-brand-to:        #ef4444;
+      --color-filter-bar-bg:   #0f1a2e;
+
+      --color-rarity-common:    #9CA3AF;
+      --color-rarity-uncommon:  #27BC57;
+      --color-rarity-rare:      #3b82f6;
+      --color-rarity-epic:      #CB3098;
+      --color-rarity-legendary: #FFC301;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--color-bg-base);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    /* ── Prototype chrome ─────────────────────────────────── */
+    .proto-section { padding: 32px; padding-top: 16px; }
+    .proto-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .proto-subtitle { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 32px; line-height: 1.6; }
+    .viewport-label {
+      font-size: 11px; color: var(--color-text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 8px; margin-top: 24px;
+    }
+    .design-note {
+      font-size: 12px; color: var(--color-text-muted); margin-top: 16px; padding: 10px 14px;
+      background: var(--color-surface); border-left: 3px solid var(--color-accent);
+      border-radius: 6px; line-height: 1.6;
+    }
+    .design-note strong { color: var(--color-accent-text); }
+
+    /* ── Frame containers ─────────────────────────────────── */
+    .frame {
+      border: 1px solid var(--color-border); border-radius: 12px;
+      overflow: hidden; background: var(--color-bg-base);
+    }
+    .frame-desktop { max-width: 1080px; }
+    .frame-mobile  { max-width: 390px; }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .app-header {
+      position: sticky; top: 0; z-index: 30; width: 100%;
+      border-bottom: 1px solid var(--color-border-subtle);
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+    }
+    .app-header-inner {
+      max-width: 80rem; margin: 0 auto; display: flex;
+      padding: 0 16px; height: 56px; align-items: center; gap: 24px;
+    }
+    .app-title {
+      font-size: 18px; font-weight: 700;
+      background: linear-gradient(to right, var(--color-brand-from), var(--color-brand-to));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; flex-shrink: 0;
+    }
+    .tab-group { display: flex; background: var(--color-surface-alt); border-radius: 8px; padding: 2px; }
+    .tab-btn {
+      padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 500;
+      border: none; cursor: pointer; background: none; color: var(--color-text-secondary);
+    }
+    .tab-active { background: var(--color-border); color: var(--color-accent-text); }
+
+    /* ── Main filter bar ──────────────────────────────────── */
+    .filter-bar {
+      background: var(--color-filter-bar-bg);
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 10px 20px;
+    }
+    .filter-bar-inner {
+      max-width: 80rem; margin: 0 auto;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .filter-label {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--color-text-muted); margin-right: 2px;
+    }
+    .filter-sep { width: 1px; height: 20px; background: var(--color-border); flex-shrink: 0; }
+    .pill {
+      padding: 4px 10px; border-radius: 4px; font-size: 11.5px; font-weight: 500;
+      border: 1px solid var(--color-border); background: var(--color-surface-alt);
+      color: var(--color-text-secondary); cursor: pointer; white-space: nowrap;
+    }
+    .pill-active {
+      background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+      border-color: var(--color-accent); color: var(--color-accent-text);
+    }
+    .pill-rarity-on {
+      border-color: var(--rarity-c); color: var(--rarity-c);
+      background: color-mix(in srgb, var(--rarity-c) 15%, transparent);
+    }
+    .pill-rarity-off {
+      border-color: var(--color-border); color: var(--color-text-faint);
+      background: var(--color-surface-alt); opacity: 0.6;
+    }
+
+    /* ── Crafting sub-bar (separate row) ──────────────────── */
+    .craft-bar {
+      background: color-mix(in srgb, var(--color-filter-bar-bg) 80%, var(--color-bg-base));
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 6px 20px;
+    }
+    .craft-bar-inner {
+      max-width: 80rem; margin: 0 auto;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .craft-bar-label {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--color-text-muted);
+    }
+    .craft-toggle {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+      cursor: pointer; border: 1px solid transparent;
+    }
+    .craft-toggle-on {
+      background: color-mix(in srgb, var(--color-success) 10%, transparent);
+      border-color: color-mix(in srgb, var(--color-success) 30%, transparent);
+      color: var(--color-success);
+    }
+    .craft-toggle-off {
+      background: transparent; color: var(--color-text-faint);
+      border-color: var(--color-border-subtle);
+    }
+    .craft-toggle-forced {
+      background: color-mix(in srgb, var(--color-success) 10%, transparent);
+      border-color: color-mix(in srgb, var(--color-success) 20%, transparent);
+      color: color-mix(in srgb, var(--color-success) 60%, var(--color-text-faint));
+      cursor: default;
+    }
+    .craft-checkbox {
+      width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid currentColor;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 8px; line-height: 1;
+    }
+    .craft-checkbox-checked { background: currentColor; }
+    .craft-checkbox-checked::after {
+      content: "✓"; color: var(--color-bg-base); font-weight: 700;
+    }
+    .craft-forced-hint {
+      font-size: 9px; color: var(--color-text-faint); font-style: italic; margin-left: -4px;
+    }
+
+    /* ── Content ──────────────────────────────────────────── */
+    .content { max-width: 80rem; margin: 0 auto; padding: 16px 20px 32px; }
+    .results-header {
+      display: flex; align-items: baseline; gap: 8px; padding: 4px 0; margin-bottom: 10px;
+    }
+    .results-label {
+      font-size: 11.5px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--color-text-muted);
+    }
+    .results-context { font-size: 12px; color: var(--color-text-faint); }
+
+    /* ── Card grid ────────────────────────────────────────── */
+    .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card-grid-mobile { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 400px; }
+
+    /* ── Pairing card ─────────────────────────────────────── */
+    .pairing-card {
+      background: var(--color-surface); border: 1px solid var(--color-border-subtle);
+      border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+      border-top: 2px solid var(--color-border-subtle);
+    }
+    .pairing-card-top {
+      border-top-color: var(--color-accent);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 4%, transparent) 0%, var(--color-surface) 40%);
+    }
+    .card-tier-header {
+      display: flex; align-items: center; padding: 8px 12px;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .tier-badge {
+      display: inline-flex; align-items: center; padding: 2px 8px;
+      border-radius: 4px; font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .tier-top {
+      background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+      color: var(--color-accent-text);
+    }
+    .tier-strong {
+      background: color-mix(in srgb, var(--color-text-muted) 8%, transparent);
+      color: var(--color-text-muted);
+    }
+    .card-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+    /* ── Weapon block ─────────────────────────────────────── */
+    .weapon-block {
+      background: var(--color-surface-alt); border-radius: 8px;
+      padding: 10px 10px 10px; position: relative;
+    }
+    .weapon-role {
+      position: absolute; top: -6px; left: 10px;
+      font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--color-text-muted); background: var(--color-surface-alt); padding: 0 4px;
+    }
+    .weapon-main {
+      display: flex; align-items: center; gap: 10px; margin-top: 2px;
+    }
+    .weapon-img {
+      width: 52px; height: 52px; border-radius: 6px; flex-shrink: 0;
+      background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; opacity: 0.4; color: var(--color-accent-text);
+    }
+    .weapon-info { flex: 1; min-width: 0; }
+    .weapon-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+    .weapon-meta { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .rarity-common    { background: color-mix(in srgb, var(--color-rarity-common) 13%, transparent); color: var(--color-rarity-common); }
+    .rarity-uncommon  { background: color-mix(in srgb, var(--color-rarity-uncommon) 13%, transparent); color: var(--color-rarity-uncommon); }
+    .rarity-rare      { background: color-mix(in srgb, var(--color-rarity-rare) 13%, transparent); color: var(--color-rarity-rare); }
+    .rarity-epic      { background: color-mix(in srgb, var(--color-rarity-epic) 13%, transparent); color: var(--color-rarity-epic); }
+    .rarity-legendary { background: color-mix(in srgb, var(--color-rarity-legendary) 13%, transparent); color: var(--color-rarity-legendary); }
+
+    .build-tag {
+      font-size: 9.5px; font-weight: 500; color: var(--color-text-muted);
+      padding: 1px 6px; border-radius: 3px;
+      background: color-mix(in srgb, var(--color-text-muted) 8%, transparent);
+      white-space: nowrap;
+    }
+    .btn-build {
+      margin-left: auto; padding: 2px 6px; border-radius: 4px;
+      font-size: 9.5px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--color-text-muted); cursor: pointer;
+      background: color-mix(in srgb, var(--color-text-muted) 8%, transparent);
+      border: none;
+    }
+    .btn-build:hover { background: color-mix(in srgb, var(--color-accent) 15%, transparent); color: var(--color-accent-text); }
+
+    /* ── COMPACT MOD BADGES (the new part) ────────────────── */
+    .mod-badges {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
+    }
+    .mod-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 6px; border-radius: 3px; font-size: 9.5px; font-weight: 500;
+      white-space: nowrap;
+    }
+    .mod-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .mod-badge-empty {
+      color: var(--color-text-faint); font-style: italic;
+    }
+
+    /* ── Synergy tags ─────────────────────────────────────── */
+    .synergy-tags { display: flex; gap: 4px; flex-wrap: wrap; padding: 2px; }
+    .synergy-tag {
+      display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px;
+      border-radius: 4px; font-size: 9.5px; font-weight: 500;
+    }
+    .synergy-pos {
+      color: var(--color-success);
+      background: color-mix(in srgb, var(--color-success) 8%, transparent);
+    }
+    .synergy-warn {
+      color: var(--color-warning);
+      background: color-mix(in srgb, var(--color-warning) 8%, transparent);
+    }
+    .synergy-icon { font-size: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="proto-section">
+  <div class="proto-title">Prototype 2 — Compact Badges</div>
+  <div class="proto-subtitle">
+    Crafting filters in a dedicated sub-bar below the main filter bar (checkbox-style toggles).<br>
+    Mods shown as tiny rarity-colored dot + abbreviated name badges under each weapon.<br>
+    Cards stay compact — build name appears as a subtle tag next to the weapon rarity badge.
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       DESKTOP
+       ════════════════════════════════════════════════════════ -->
+  <div class="viewport-label">Desktop (1080 px)</div>
+  <div class="frame frame-desktop">
+
+    <div class="app-header">
+      <div class="app-header-inner">
+        <div class="app-title">ArcKits</div>
+        <div class="tab-group">
+          <button class="tab-btn">Weapons</button>
+          <button class="tab-btn tab-active">Advisor</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main filter bar (unchanged from today) -->
+    <div class="filter-bar">
+      <div class="filter-bar-inner">
+        <span class="filter-label">Where</span>
+        <span class="pill pill-active">Cortex</span>
+        <span class="pill">Silo</span>
+        <span class="pill">Grid</span>
+
+        <span class="filter-sep"></span>
+        <span class="filter-label">Squad</span>
+        <span class="pill pill-active">Duo</span>
+        <span class="pill">Trio</span>
+
+        <span class="filter-sep"></span>
+        <span class="filter-label">Focus</span>
+        <span class="pill pill-active">Balanced</span>
+        <span class="pill">Ranged</span>
+
+        <span class="filter-sep"></span>
+        <span class="filter-label">Range</span>
+        <span class="pill pill-active">Any</span>
+        <span class="pill">Close</span>
+        <span class="pill">Mid</span>
+        <span class="pill">Long</span>
+
+        <span class="filter-sep"></span>
+        <span class="filter-label">Rarity</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-common);">✓ C</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-uncommon);">✓ U</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-rare);">✓ R</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-epic);">✓ E</span>
+        <span class="pill pill-rarity-off" style="--rarity-c: var(--color-rarity-legendary);">✕ L</span>
+      </div>
+    </div>
+
+    <!-- Crafting sub-bar (NEW) -->
+    <div class="craft-bar">
+      <div class="craft-bar-inner">
+        <span class="craft-bar-label">Crafting</span>
+
+        <span class="craft-toggle craft-toggle-on">
+          <span class="craft-checkbox craft-checkbox-checked"></span>
+          Mechanical Components
+        </span>
+
+        <span class="craft-toggle craft-toggle-on">
+          <span class="craft-checkbox craft-checkbox-checked"></span>
+          Mod Components
+        </span>
+
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          Kinetic Converter
+        </span>
+
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          Horizontal Grip
+        </span>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="content">
+      <div class="results-header">
+        <span class="results-label">Recommendations</span>
+        <span class="results-context">&mdash; Cortex &middot; Duo &middot; Balanced</span>
+      </div>
+
+      <div class="card-grid">
+
+        <!-- Card 1: Top Pick -->
+        <div class="pairing-card pairing-card-top">
+          <div class="card-tier-header">
+            <span class="tier-badge tier-top">Top Pick</span>
+          </div>
+          <div class="card-body">
+            <div class="weapon-block">
+              <span class="weapon-role">Primary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">T</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Tempest</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-common">Common</span>
+                    <span class="build-tag">Long Range</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  Comp III
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  Angled III
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Med Mag II
+                </span>
+              </div>
+            </div>
+
+            <div class="weapon-block">
+              <span class="weapon-role">Secondary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">R</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Renegade</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-uncommon">Uncommon</span>
+                    <span class="build-tag">Mid Range</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  MB III
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Med Mag II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  Stable III
+                </span>
+              </div>
+            </div>
+
+            <div class="synergy-tags">
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Ammo Diversity</span>
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Range Synergy</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Strong Option -->
+        <div class="pairing-card">
+          <div class="card-tier-header">
+            <span class="tier-badge tier-strong">Strong Option</span>
+          </div>
+          <div class="card-body">
+            <div class="weapon-block">
+              <span class="weapon-role">Primary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">O</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Osprey</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-rare">Rare</span>
+                    <span class="build-tag">Long Range</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Comp II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-common) 10%, transparent); color: var(--color-rarity-common);">
+                  <span class="mod-dot" style="background: var(--color-rarity-common);"></span>
+                  Vert I
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-common) 10%, transparent); color: var(--color-rarity-common);">
+                  <span class="mod-dot" style="background: var(--color-rarity-common);"></span>
+                  Med Mag I
+                </span>
+                <span class="mod-badge mod-badge-empty">
+                  Stock: —
+                </span>
+              </div>
+            </div>
+
+            <div class="weapon-block">
+              <span class="weapon-role">Secondary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">S</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Stitcher</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-common">Common</span>
+                    <span class="build-tag">Close</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Comp II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Vert II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-common) 10%, transparent); color: var(--color-rarity-common);">
+                  <span class="mod-dot" style="background: var(--color-rarity-common);"></span>
+                  Lt Mag I
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-common) 10%, transparent); color: var(--color-rarity-common);">
+                  <span class="mod-dot" style="background: var(--color-rarity-common);"></span>
+                  Stable I
+                </span>
+              </div>
+            </div>
+
+            <div class="synergy-tags">
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Ammo Diversity</span>
+              <span class="synergy-tag synergy-warn"><span class="synergy-icon">!</span> Both Mid-Range</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Strong Option -->
+        <div class="pairing-card">
+          <div class="card-tier-header">
+            <span class="tier-badge tier-strong">Strong Option</span>
+          </div>
+          <div class="card-body">
+            <div class="weapon-block">
+              <span class="weapon-role">Primary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">F</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Ferro</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-uncommon">Uncommon</span>
+                    <span class="build-tag">Mid Range</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  MB II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Angled II
+                </span>
+                <span class="mod-badge mod-badge-empty">
+                  Stock: —
+                </span>
+              </div>
+            </div>
+
+            <div class="weapon-block">
+              <span class="weapon-role">Secondary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">B</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Burletta</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-common">Common</span>
+                    <span class="build-tag">Close</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Comp II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-common) 10%, transparent); color: var(--color-rarity-common);">
+                  <span class="mod-dot" style="background: var(--color-rarity-common);"></span>
+                  Lt Mag I
+                </span>
+              </div>
+            </div>
+
+            <div class="synergy-tags">
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Ammo Diversity</span>
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Range Cover</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       DESKTOP — AUTO-ENABLE STATE
+       ════════════════════════════════════════════════════════ -->
+  <div class="viewport-label">Desktop — Auto-enable state (Mod Components forces Mech on)</div>
+  <div class="frame frame-desktop">
+    <div class="craft-bar">
+      <div class="craft-bar-inner">
+        <span class="craft-bar-label">Crafting</span>
+
+        <span class="craft-toggle craft-toggle-forced">
+          <span class="craft-checkbox craft-checkbox-checked"></span>
+          Mechanical Components
+        </span>
+        <span class="craft-forced-hint">(required by Mod Components)</span>
+
+        <span class="craft-toggle craft-toggle-on">
+          <span class="craft-checkbox craft-checkbox-checked"></span>
+          Mod Components
+        </span>
+
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          Kinetic Converter
+        </span>
+
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          Horizontal Grip
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       MOBILE
+       ════════════════════════════════════════════════════════ -->
+  <div class="viewport-label">Mobile (390 px)</div>
+  <div class="frame frame-mobile">
+    <div class="app-header">
+      <div class="app-header-inner">
+        <div class="app-title">ArcKits</div>
+        <div class="tab-group">
+          <button class="tab-btn">Weapons</button>
+          <button class="tab-btn tab-active">Advisor</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-bar-inner">
+        <span class="filter-label">Where</span>
+        <span class="pill pill-active">Cortex</span>
+        <span class="pill">Silo</span>
+
+        <span class="filter-label">Squad</span>
+        <span class="pill pill-active">Duo</span>
+        <span class="pill">Trio</span>
+
+        <span class="filter-label">Focus</span>
+        <span class="pill pill-active">Balanced</span>
+
+        <span class="filter-label">Rarity</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-common);">✓ C</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-uncommon);">✓ U</span>
+        <span class="pill pill-rarity-on" style="--rarity-c: var(--color-rarity-rare);">✓ R</span>
+      </div>
+    </div>
+
+    <div class="craft-bar">
+      <div class="craft-bar-inner">
+        <span class="craft-bar-label">Crafting</span>
+        <span class="craft-toggle craft-toggle-on">
+          <span class="craft-checkbox craft-checkbox-checked"></span>
+          Mech
+        </span>
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          Mod
+        </span>
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          KC
+        </span>
+        <span class="craft-toggle craft-toggle-off">
+          <span class="craft-checkbox"></span>
+          HG
+        </span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="results-header">
+        <span class="results-label">Recommendations</span>
+      </div>
+
+      <div class="card-grid-mobile">
+        <div class="pairing-card pairing-card-top">
+          <div class="card-tier-header">
+            <span class="tier-badge tier-top">Top Pick</span>
+          </div>
+          <div class="card-body">
+            <div class="weapon-block">
+              <span class="weapon-role">Primary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">T</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Tempest</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-common">Common</span>
+                    <span class="build-tag">Long Range</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  Comp III
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  Angled III
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Med Mag II
+                </span>
+              </div>
+            </div>
+
+            <div class="weapon-block">
+              <span class="weapon-role">Secondary</span>
+              <div class="weapon-main">
+                <div class="weapon-img">R</div>
+                <div class="weapon-info">
+                  <div class="weapon-name">Renegade</div>
+                  <div class="weapon-meta">
+                    <span class="badge rarity-uncommon">Uncommon</span>
+                    <span class="build-tag">Mid</span>
+                    <button class="btn-build">Build &rarr;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mod-badges">
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  MB III
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-uncommon) 10%, transparent); color: var(--color-rarity-uncommon);">
+                  <span class="mod-dot" style="background: var(--color-rarity-uncommon);"></span>
+                  Med Mag II
+                </span>
+                <span class="mod-badge" style="background: color-mix(in srgb, var(--color-rarity-rare) 10%, transparent); color: var(--color-rarity-rare);">
+                  <span class="mod-dot" style="background: var(--color-rarity-rare);"></span>
+                  Stable III
+                </span>
+              </div>
+            </div>
+
+            <div class="synergy-tags">
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Ammo Diversity</span>
+              <span class="synergy-tag synergy-pos"><span class="synergy-icon">✓</span> Range Synergy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-note">
+    <strong>Design notes:</strong>
+    Crafting filters get their own dedicated sub-bar below the main filters — visually distinct with checkbox styling instead of pills.
+    This keeps the main filter bar unchanged while giving crafting its own clear space.
+    The auto-enable state (Mod Components forcing Mech on) is shown with a dimmed/forced visual + hint text.
+    Mods render as ultra-compact rarity-colored dot badges — takes minimal vertical space.
+    Build name appears inline as a tag in the weapon meta row (next to rarity badge).
+    Empty slots shown as dim "Slot: —" text. Mobile uses abbreviated labels (Mech, Mod, KC, HG).
+  </div>
+</div>
+
+</body>
+</html>

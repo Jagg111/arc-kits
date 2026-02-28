@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Builder Build List — 3 Variations — ArcKits Prototype</title>
+  <style>
+    /* ================================================================
+       BASE RESET + TOKENS
+       Pulled directly from src/index.css (dark theme)
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Surfaces & backgrounds */
+      --color-bg-base:         #030712;
+      --color-surface:         #111827;
+      --color-surface-alt:     #1f2937;
+      --color-surface-hover:   #1f2937;
+      --color-border:          #374151;
+      --color-border-subtle:   #1f2937;
+
+      /* Text hierarchy */
+      --color-text-primary:    #ffffff;
+      --color-text-secondary:  #9ca3af;
+      --color-text-muted:      #6b7280;
+      --color-text-faint:      #4b5563;
+
+      /* Accent */
+      --color-accent:          #f97316;
+      --color-accent-text:     #fb923c;
+      --color-accent-hover:    #fdba74;
+
+      /* Semantic */
+      --color-danger-text:     #f87171;
+      --color-success:         #22c55e;
+      --color-warning:         #f59e0b;
+
+      /* Rarity */
+      --color-rarity-common:    #9CA3AF;
+      --color-rarity-uncommon:  #27BC57;
+      --color-rarity-rare:      #3b82f6;
+      --color-rarity-epic:      #CB3098;
+      --color-rarity-legendary: #FFC301;
+
+      /* Range bands (prototype-specific) */
+      --color-range-close:  #fb923c;
+      --color-range-mid:    #3b82f6;
+      --color-range-long:   #06b6d4;
+
+      /* Class color for SMG */
+      --color-class-smg:    #22c55e;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--color-bg-base);
+      color: var(--color-text-primary);
+      padding: 32px;
+      line-height: 1.5;
+    }
+
+    /* ── Prototype chrome ─────────────────────────────────────────── */
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin-bottom: 40px;
+    }
+
+    .variation-label {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent-text);
+      margin-bottom: 4px;
+      padding-top: 48px;
+    }
+    .variation-label:first-of-type { padding-top: 0; }
+
+    .variation-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .viewport-label {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      margin-top: 24px;
+    }
+
+    .frame {
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--color-bg-base);
+    }
+    .frame-desktop { max-width: 900px; }
+    .frame-mobile  { max-width: 375px; }
+
+    .frame-inner {
+      padding: 20px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--color-border);
+      margin: 60px 0 20px;
+    }
+
+    /* ── Shared component patterns ────────────────────────────────── */
+
+    /* Weapon header (simplified, shared across variations) */
+    .weapon-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .weapon-header .weapon-img {
+      width: 72px;
+      height: 48px;
+      border-radius: 8px;
+      background: var(--color-surface-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--color-text-muted);
+    }
+    .weapon-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .weapon-header .weapon-meta {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    /* Badge (matches Badge.tsx) */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* Range pills */
+    .range-pill {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .range-close {
+      background: color-mix(in srgb, var(--color-range-close) 15%, transparent);
+      color: var(--color-range-close);
+    }
+    .range-mid {
+      background: color-mix(in srgb, var(--color-range-mid) 15%, transparent);
+      color: var(--color-range-mid);
+    }
+    .range-long {
+      background: color-mix(in srgb, var(--color-range-long) 15%, transparent);
+      color: var(--color-range-long);
+    }
+
+    /* Rarity badges (color-mix tinted backgrounds like the app) */
+    .rarity-common    { background: color-mix(in srgb, var(--color-rarity-common) 13%, transparent);    color: var(--color-rarity-common); }
+    .rarity-uncommon  { background: color-mix(in srgb, var(--color-rarity-uncommon) 13%, transparent);  color: var(--color-rarity-uncommon); }
+    .rarity-rare      { background: color-mix(in srgb, var(--color-rarity-rare) 13%, transparent);      color: var(--color-rarity-rare); }
+    .rarity-epic      { background: color-mix(in srgb, var(--color-rarity-epic) 13%, transparent);      color: var(--color-rarity-epic); }
+    .rarity-legendary { background: color-mix(in srgb, var(--color-rarity-legendary) 13%, transparent); color: var(--color-rarity-legendary); }
+
+    /* Callout panels (tips / avoids / conditionals) */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+    }
+    .callout-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .callout-tip      { border-left: 3px solid var(--color-accent); }
+    .callout-tip .callout-title { color: var(--color-accent-text); }
+
+    .callout-avoid     { border-left: 3px solid var(--color-danger-text); }
+    .callout-avoid .callout-title { color: var(--color-danger-text); }
+
+    .callout-conditional { border-left: 3px solid var(--color-warning); }
+    .callout-conditional .callout-title { color: var(--color-warning); }
+
+    .callout p, .callout li {
+      color: var(--color-text-secondary);
+    }
+    .callout ul {
+      padding-left: 16px;
+      margin-top: 4px;
+    }
+    .callout li { margin-bottom: 3px; }
+    .callout li strong { color: var(--color-text-primary); font-weight: 600; }
+
+    /* Mod slot mini display */
+    .mod-slot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mod-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--color-surface-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+    .mod-name {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .mod-name .mod-tier {
+      font-weight: 600;
+    }
+
+    /* Build number tag */
+    .build-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--color-surface-alt);
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+
+
+    /* ================================================================
+       VARIATION A: Compact List
+       ================================================================ */
+    .va-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .va-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .va-row:hover {
+      border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+    }
+    .va-row-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .va-row-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .va-row-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      white-space: nowrap;
+    }
+    .va-row-mods {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .va-row-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .va-manual {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px dashed var(--color-border);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+    .va-manual:hover {
+      border-color: var(--color-text-muted);
+    }
+    .va-manual-text {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    .va-manual-text span {
+      margin-right: 6px;
+    }
+
+    /* Callout stack for variation A */
+    .va-callouts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+
+    /* ================================================================
+       VARIATION B: Card Stack
+       ================================================================ */
+    .vb-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .vb-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .vb-card:hover {
+      border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+    }
+    .vb-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 10px;
+      flex-wrap: wrap;
+    }
+    .vb-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .vb-card-slots {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 0 16px 14px;
+    }
+    .vb-slot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      background: var(--color-surface-alt);
+    }
+    .vb-slot-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-faint);
+      margin-bottom: 1px;
+    }
+    .vb-slot-mod {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .vb-slot-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Manual build card */
+    .vb-manual {
+      background: transparent;
+      border: 2px dashed var(--color-border);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+    .vb-manual:hover {
+      border-color: var(--color-text-muted);
+    }
+    .vb-manual-icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+    .vb-manual-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+    .vb-manual-desc {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    /* Info panels for Variation B */
+    .vb-panels {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+
+    /* ================================================================
+       VARIATION C: Sidebar + Clean List
+       ================================================================ */
+    .vc-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+      align-items: start;
+    }
+    .vc-sidebar {
+      position: sticky;
+      top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .vc-sidebar-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* Build cards for Variation C (medium density) */
+    .vc-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .vc-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .vc-card:hover {
+      border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+    }
+    .vc-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .vc-card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .vc-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .vc-card-mods {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Manual build tile for Variation C */
+    .vc-manual {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px dashed var(--color-border);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .vc-manual:hover {
+      border-color: var(--color-text-muted);
+    }
+    .vc-manual-icon {
+      font-size: 20px;
+      color: var(--color-text-muted);
+    }
+    .vc-manual-text {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    /* Mobile collapse for sidebar */
+    .vc-mobile-intel {
+      margin-bottom: 16px;
+    }
+    .vc-mobile-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+    .vc-mobile-toggle .chevron {
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+    .vc-mobile-content {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-title">Builder Build List — 3 Variations</div>
+<div class="page-subtitle">Stitcher (SMG, 4 slots, 6 builds) — stress testing layout density, info placement, and tips/avoids</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     VARIATION A: "Compact List" — Minimal, scannable rows
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="variation-label">Variation A — "Compact List"</div>
+<div class="variation-desc">
+  Each build is a single horizontal row. Max density, minimal chrome. Tips/avoids sit in a
+  compact callout strip above the list. "Build Manually" is a subtle link at the bottom.
+  Good for experienced users who know what they want.
+</div>
+
+<div class="viewport-label">Desktop (900px)</div>
+<div class="frame frame-desktop">
+  <div class="frame-inner">
+
+    <!-- Weapon header -->
+    <div class="weapon-header">
+      <div class="weapon-img">S</div>
+      <div>
+        <h2>Stitcher</h2>
+        <div class="weapon-meta">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-class-smg) 13%, transparent); color: var(--color-class-smg);">SMG</span>
+          <span class="badge rarity-common">Common</span>
+          <span style="color: var(--color-text-faint); font-size: 11px;">4 slots</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips + Avoids (compact strip) -->
+    <div class="va-callouts">
+      <div class="callout callout-tip">
+        <div class="callout-title">Tips</div>
+        <p>Muzzle Brakes can feel great for no-recoil in the first 1-2 mags, but mid/long range shots become ineffective due to bloom. Learn to shoot with Compensators and avoid Muzzle Brakes.</p>
+      </div>
+      <div class="callout callout-avoid">
+        <div class="callout-title">Avoid</div>
+        <ul>
+          <li><strong>Muzzle Brakes</strong> — bloom kills mid-range accuracy</li>
+          <li><strong>Extended Barrel</strong> — pointless on SMG</li>
+          <li><strong>Vertical Grips</strong> — horizontal recoil is the issue, not vertical</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Build list -->
+    <div class="va-list">
+      <!-- Build 1 -->
+      <div class="va-row">
+        <div class="build-num">1</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+          </div>
+          <div class="va-row-mods">Compensator 3 &middot; Horizontal Grip &middot; Light Mag 3 &middot; Kinetic Converter</div>
+        </div>
+        <div class="va-row-right">
+          <span class="badge rarity-legendary" style="font-size: 10px;">Legendary</span>
+        </div>
+      </div>
+
+      <!-- Build 2 -->
+      <div class="va-row">
+        <div class="build-num">2</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name">Medium - Long</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="range-pill range-long">Long</span>
+          </div>
+          <div class="va-row-mods">Compensator 3 &middot; Angled Grip 3 &middot; Light Mag 3 &middot; Padded Stock</div>
+        </div>
+        <div class="va-row-right">
+          <span class="badge rarity-epic" style="font-size: 10px;">Epic</span>
+        </div>
+      </div>
+
+      <!-- Build 3 -->
+      <div class="va-row">
+        <div class="build-num">3</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name">Medium - Long</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="range-pill range-long">Long</span>
+          </div>
+          <div class="va-row-mods">Compensator 3 &middot; Angled Grip 2 &middot; Light Mag 2 &middot; Stable Stock 1</div>
+        </div>
+        <div class="va-row-right">
+          <span class="badge rarity-rare" style="font-size: 10px;">Rare</span>
+        </div>
+      </div>
+
+      <!-- Build 4 -->
+      <div class="va-row">
+        <div class="build-num">4</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+          </div>
+          <div class="va-row-mods">Compensator 2 &middot; Angled Grip 2 &middot; Light Mag 1 &middot; Stable Stock 1</div>
+        </div>
+        <div class="va-row-right">
+          <span class="badge rarity-uncommon" style="font-size: 10px;">Uncommon</span>
+        </div>
+      </div>
+
+      <!-- Build 5 -->
+      <div class="va-row">
+        <div class="build-num">5</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+          </div>
+          <div class="va-row-mods">Compensator 1 &middot; Angled Grip 1 &middot; Light Mag 1 &middot; Stable Stock 1</div>
+        </div>
+        <div class="va-row-right">
+          <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+        </div>
+      </div>
+
+      <!-- Build 6 -->
+      <div class="va-row">
+        <div class="build-num">6</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name">Short</span>
+            <span class="range-pill range-close">Close</span>
+          </div>
+          <div class="va-row-mods">Compensator 1 &middot; Angled Grip 1 &middot; Light Mag 1 &middot; Stable Stock 1</div>
+        </div>
+        <div class="va-row-right">
+          <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+        </div>
+      </div>
+
+      <!-- Build Manually -->
+      <div class="va-manual">
+        <div class="va-manual-text"><span>&#128295;</span> Build Manually — pick your own attachments slot by slot</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Mobile -->
+<div class="viewport-label">Mobile (375px)</div>
+<div class="frame frame-mobile">
+  <div class="frame-inner" style="padding: 14px;">
+
+    <div class="weapon-header" style="gap: 10px;">
+      <div class="weapon-img" style="width: 56px; height: 38px; font-size: 18px;">S</div>
+      <div>
+        <h2 style="font-size: 18px;">Stitcher</h2>
+        <div class="weapon-meta">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-class-smg) 13%, transparent); color: var(--color-class-smg); font-size: 10px;">SMG</span>
+          <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="va-callouts">
+      <div class="callout callout-tip">
+        <div class="callout-title">Tips</div>
+        <p>Learn to shoot with Compensators and avoid Muzzle Brakes — bloom kills mid-range accuracy.</p>
+      </div>
+      <div class="callout callout-avoid">
+        <div class="callout-title">Avoid</div>
+        <ul>
+          <li><strong>Muzzle Brakes</strong> — bloom</li>
+          <li><strong>Extended Barrel</strong> — pointless</li>
+          <li><strong>Vertical Grips</strong> — wrong recoil axis</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="va-list">
+      <div class="va-row" style="padding: 8px 10px;">
+        <div class="build-num">1</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name" style="font-size: 13px;">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="badge rarity-legendary" style="font-size: 9px;">Legendary</span>
+          </div>
+          <div class="va-row-mods">Comp 3 &middot; Horiz. Grip &middot; Mag 3 &middot; KC</div>
+        </div>
+      </div>
+      <div class="va-row" style="padding: 8px 10px;">
+        <div class="build-num">2</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name" style="font-size: 13px;">Medium - Long</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="range-pill range-long">Long</span>
+            <span class="badge rarity-epic" style="font-size: 9px;">Epic</span>
+          </div>
+          <div class="va-row-mods">Comp 3 &middot; AG 3 &middot; Mag 3 &middot; Padded Stock</div>
+        </div>
+      </div>
+      <div class="va-row" style="padding: 8px 10px;">
+        <div class="build-num">3</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name" style="font-size: 13px;">Medium - Long</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="range-pill range-long">Long</span>
+            <span class="badge rarity-rare" style="font-size: 9px;">Rare</span>
+          </div>
+          <div class="va-row-mods">Comp 3 &middot; AG 2 &middot; Mag 2 &middot; Stable Stock 1</div>
+        </div>
+      </div>
+      <div class="va-row" style="padding: 8px 10px;">
+        <div class="build-num">4</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name" style="font-size: 13px;">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="badge rarity-uncommon" style="font-size: 9px;">Uncommon</span>
+          </div>
+          <div class="va-row-mods">Comp 2 &middot; AG 2 &middot; Mag 1 &middot; Stable Stock 1</div>
+        </div>
+      </div>
+      <div class="va-row" style="padding: 8px 10px;">
+        <div class="build-num">5</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name" style="font-size: 13px;">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="badge rarity-common" style="font-size: 9px;">Common</span>
+          </div>
+          <div class="va-row-mods">Comp 1 &middot; AG 1 &middot; Mag 1 &middot; Stable Stock 1</div>
+        </div>
+      </div>
+      <div class="va-row" style="padding: 8px 10px;">
+        <div class="build-num">6</div>
+        <div class="va-row-main">
+          <div class="va-row-top">
+            <span class="va-row-name" style="font-size: 13px;">Short</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="badge rarity-common" style="font-size: 9px;">Common</span>
+          </div>
+          <div class="va-row-mods">Comp 1 &middot; AG 1 &middot; Mag 1 &middot; Stable Stock 1</div>
+        </div>
+      </div>
+      <div class="va-manual">
+        <div class="va-manual-text"><span>&#128295;</span> Build Manually</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     VARIATION B: "Card Stack" — Rich cards with mod detail
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="variation-label">Variation B — "Card Stack"</div>
+<div class="variation-desc">
+  Each build is a full card showing all 4 mod slots in a 2-column grid. Emphasis on
+  understanding exactly what you're getting before clicking. Tips/avoids/conditionals are
+  dedicated panels above the build list. "Build Manually" is a dashed card at the end.
+  Trades vertical space for clarity.
+</div>
+
+<div class="viewport-label">Desktop (900px)</div>
+<div class="frame frame-desktop">
+  <div class="frame-inner">
+
+    <!-- Weapon header -->
+    <div class="weapon-header">
+      <div class="weapon-img">S</div>
+      <div>
+        <h2>Stitcher</h2>
+        <div class="weapon-meta">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-class-smg) 13%, transparent); color: var(--color-class-smg);">SMG</span>
+          <span class="badge rarity-common">Common</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info panels -->
+    <div class="vb-panels">
+      <div class="callout callout-tip">
+        <div class="callout-title">Tips</div>
+        <p>Muzzle Brakes can feel great for no-recoil in the first 1-2 mags, but mid/long range shots become ineffective due to bloom. Learn to shoot with Compensators and avoid Muzzle Brakes.</p>
+      </div>
+      <div class="callout callout-avoid">
+        <div class="callout-title">Avoid</div>
+        <ul>
+          <li><strong>Muzzle Brakes</strong> — bloom kills mid-range accuracy</li>
+          <li><strong>Extended Barrel</strong> — pointless on SMG</li>
+          <li><strong>Vertical Grips</strong> — horizontal recoil is the issue, not vertical</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Build cards -->
+    <div class="vb-cards">
+      <!-- Build 1 -->
+      <div class="vb-card">
+        <div class="vb-card-header">
+          <div class="build-num">1</div>
+          <span class="vb-card-name">Short - Medium</span>
+          <span class="range-pill range-close">Close</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="badge rarity-legendary" style="font-size: 10px; margin-left: auto;">Legendary</span>
+        </div>
+        <div class="vb-card-slots">
+          <div class="vb-slot">
+            <div class="mod-icon">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Muzzle</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-rare);">Compensator 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Underbarrel</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-legendary);">Horizontal Grip</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Light Magazine</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-rare);">Light Mag 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Stock</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-legendary);">Kinetic Converter</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build 2 -->
+      <div class="vb-card">
+        <div class="vb-card-header">
+          <div class="build-num">2</div>
+          <span class="vb-card-name">Medium - Long</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="range-pill range-long">Long</span>
+          <span class="badge rarity-epic" style="font-size: 10px; margin-left: auto;">Epic</span>
+        </div>
+        <div class="vb-card-slots">
+          <div class="vb-slot">
+            <div class="mod-icon">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Muzzle</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-rare);">Compensator 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Underbarrel</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-rare);">Angled Grip 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Light Magazine</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-rare);">Light Mag 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Stock</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-epic);">Padded Stock</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build 3 -->
+      <div class="vb-card">
+        <div class="vb-card-header">
+          <div class="build-num">3</div>
+          <span class="vb-card-name">Medium - Long</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="range-pill range-long">Long</span>
+          <span class="badge rarity-rare" style="font-size: 10px; margin-left: auto;">Rare</span>
+        </div>
+        <div class="vb-card-slots">
+          <div class="vb-slot">
+            <div class="mod-icon">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Muzzle</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-rare);">Compensator 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Underbarrel</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-uncommon);">Angled Grip 2</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Light Magazine</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-uncommon);">Light Mag 2</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Stock</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Stable Stock 1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build 4 (abbreviated for space) -->
+      <div class="vb-card">
+        <div class="vb-card-header">
+          <div class="build-num">4</div>
+          <span class="vb-card-name">Short - Medium</span>
+          <span class="range-pill range-close">Close</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="badge rarity-uncommon" style="font-size: 10px; margin-left: auto;">Uncommon</span>
+        </div>
+        <div class="vb-card-slots">
+          <div class="vb-slot">
+            <div class="mod-icon">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Muzzle</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-uncommon);">Compensator 2</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Underbarrel</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-uncommon);">Angled Grip 2</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Light Magazine</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Light Mag 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Stock</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Stable Stock 1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build 5 -->
+      <div class="vb-card">
+        <div class="vb-card-header">
+          <div class="build-num">5</div>
+          <span class="vb-card-name">Short - Medium</span>
+          <span class="range-pill range-close">Close</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="badge rarity-common" style="font-size: 10px; margin-left: auto;">Common</span>
+        </div>
+        <div class="vb-card-slots">
+          <div class="vb-slot">
+            <div class="mod-icon">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Muzzle</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Compensator 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Underbarrel</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Angled Grip 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Light Magazine</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Light Mag 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Stock</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Stable Stock 1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build 6 -->
+      <div class="vb-card">
+        <div class="vb-card-header">
+          <div class="build-num">6</div>
+          <span class="vb-card-name">Short</span>
+          <span class="range-pill range-close">Close</span>
+          <span class="badge rarity-common" style="font-size: 10px; margin-left: auto;">Common</span>
+        </div>
+        <div class="vb-card-slots">
+          <div class="vb-slot">
+            <div class="mod-icon">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Muzzle</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Compensator 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Underbarrel</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Angled Grip 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Light Magazine</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Light Mag 1</span></div>
+            </div>
+          </div>
+          <div class="vb-slot">
+            <div class="mod-icon">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-label">Stock</div>
+              <div class="vb-slot-mod"><span style="color: var(--color-rarity-common);">Stable Stock 1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build Manually -->
+      <div class="vb-manual">
+        <div class="vb-manual-icon">&#128295;</div>
+        <div class="vb-manual-title">Build Manually</div>
+        <div class="vb-manual-desc">Pick your own attachments slot by slot</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Mobile -->
+<div class="viewport-label">Mobile (375px)</div>
+<div class="frame frame-mobile">
+  <div class="frame-inner" style="padding: 14px;">
+
+    <div class="weapon-header" style="gap: 10px;">
+      <div class="weapon-img" style="width: 56px; height: 38px; font-size: 18px;">S</div>
+      <div>
+        <h2 style="font-size: 18px;">Stitcher</h2>
+        <div class="weapon-meta">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-class-smg) 13%, transparent); color: var(--color-class-smg); font-size: 10px;">SMG</span>
+          <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vb-panels">
+      <div class="callout callout-avoid" style="font-size: 12px;">
+        <div class="callout-title" style="font-size: 10px;">Avoid</div>
+        <ul>
+          <li><strong>Muzzle Brakes</strong> — bloom</li>
+          <li><strong>Extended Barrel</strong> — pointless</li>
+          <li><strong>Vertical Grips</strong> — wrong axis</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="vb-cards">
+      <!-- Only showing 2 builds for mobile to demonstrate the pattern -->
+      <div class="vb-card">
+        <div class="vb-card-header" style="padding: 10px 12px 8px;">
+          <div class="build-num">1</div>
+          <span class="vb-card-name" style="font-size: 13px;">Short - Medium</span>
+          <span class="range-pill range-close">Close</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="badge rarity-legendary" style="font-size: 9px; margin-left: auto;">Leg.</span>
+        </div>
+        <div class="vb-card-slots" style="padding: 0 12px 10px; gap: 4px;">
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-rare);">Compensator 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-legendary);">Horiz. Grip</span></div>
+            </div>
+          </div>
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-rare);">Light Mag 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-legendary);">Kinetic Conv.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vb-card">
+        <div class="vb-card-header" style="padding: 10px 12px 8px;">
+          <div class="build-num">2</div>
+          <span class="vb-card-name" style="font-size: 13px;">Medium - Long</span>
+          <span class="range-pill range-mid">Mid</span>
+          <span class="range-pill range-long">Long</span>
+          <span class="badge rarity-epic" style="font-size: 9px; margin-left: auto;">Epic</span>
+        </div>
+        <div class="vb-card-slots" style="padding: 0 12px 10px; gap: 4px;">
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">M</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-rare);">Compensator 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">U</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-rare);">Angled Grip 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">L</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-rare);">Light Mag 3</span></div>
+            </div>
+          </div>
+          <div class="vb-slot" style="padding: 4px 6px;">
+            <div class="mod-icon" style="width: 22px; height: 22px; font-size: 9px;">S</div>
+            <div class="vb-slot-info">
+              <div class="vb-slot-mod" style="font-size: 11px;"><span style="color: var(--color-rarity-epic);">Padded Stock</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size: 12px; color: var(--color-text-muted); text-align: center; padding: 8px;">...4 more builds</div>
+
+      <div class="vb-manual" style="padding: 14px;">
+        <div class="vb-manual-icon" style="font-size: 22px;">&#128295;</div>
+        <div class="vb-manual-title" style="font-size: 13px;">Build Manually</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     VARIATION C: "Sidebar Info + Clean List" — Split layout
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="variation-label">Variation C — "Sidebar Info + Clean List"</div>
+<div class="variation-desc">
+  Desktop uses a 2-column layout: build cards on the left, weapon intel (tips, avoids,
+  conditionals) in a sticky sidebar on the right. The sidebar stays visible while scrolling
+  through builds. Mobile collapses the sidebar into an expandable "Weapon Intel" toggle
+  above the list. "Build Manually" is the first option (top of list).
+</div>
+
+<div class="viewport-label">Desktop (900px)</div>
+<div class="frame frame-desktop">
+  <div class="frame-inner">
+
+    <!-- Weapon header -->
+    <div class="weapon-header">
+      <div class="weapon-img">S</div>
+      <div>
+        <h2>Stitcher</h2>
+        <div class="weapon-meta">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-class-smg) 13%, transparent); color: var(--color-class-smg);">SMG</span>
+          <span class="badge rarity-common">Common</span>
+          <span style="color: var(--color-text-faint); font-size: 11px;">4 slots &middot; Light Ammo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-column layout -->
+    <div class="vc-layout">
+
+      <!-- Left: Build list -->
+      <div class="vc-cards">
+        <!-- Build Manually (first) -->
+        <div class="vc-manual">
+          <div class="vc-manual-icon">&#128295;</div>
+          <div>
+            <div class="vc-manual-text" style="font-weight: 600; color: var(--color-text-secondary);">Build Manually</div>
+            <div style="font-size: 11px; color: var(--color-text-muted);">Pick your own attachments</div>
+          </div>
+        </div>
+
+        <!-- Build 1 -->
+        <div class="vc-card">
+          <div class="build-num">1</div>
+          <div class="vc-card-body">
+            <div class="vc-card-top">
+              <span class="vc-card-name">Short - Medium</span>
+              <span class="range-pill range-close">Close</span>
+              <span class="range-pill range-mid">Mid</span>
+              <span class="badge rarity-legendary" style="font-size: 10px;">Legendary</span>
+            </div>
+            <div class="vc-card-mods">
+              <span style="color: var(--color-rarity-rare);">Compensator 3</span> &middot;
+              <span style="color: var(--color-rarity-legendary);">Horizontal Grip</span> &middot;
+              <span style="color: var(--color-rarity-rare);">Light Mag 3</span> &middot;
+              <span style="color: var(--color-rarity-legendary);">Kinetic Converter</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Build 2 -->
+        <div class="vc-card">
+          <div class="build-num">2</div>
+          <div class="vc-card-body">
+            <div class="vc-card-top">
+              <span class="vc-card-name">Medium - Long</span>
+              <span class="range-pill range-mid">Mid</span>
+              <span class="range-pill range-long">Long</span>
+              <span class="badge rarity-epic" style="font-size: 10px;">Epic</span>
+            </div>
+            <div class="vc-card-mods">
+              <span style="color: var(--color-rarity-rare);">Compensator 3</span> &middot;
+              <span style="color: var(--color-rarity-rare);">Angled Grip 3</span> &middot;
+              <span style="color: var(--color-rarity-rare);">Light Mag 3</span> &middot;
+              <span style="color: var(--color-rarity-epic);">Padded Stock</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Build 3 -->
+        <div class="vc-card">
+          <div class="build-num">3</div>
+          <div class="vc-card-body">
+            <div class="vc-card-top">
+              <span class="vc-card-name">Medium - Long</span>
+              <span class="range-pill range-mid">Mid</span>
+              <span class="range-pill range-long">Long</span>
+              <span class="badge rarity-rare" style="font-size: 10px;">Rare</span>
+            </div>
+            <div class="vc-card-mods">
+              <span style="color: var(--color-rarity-rare);">Compensator 3</span> &middot;
+              <span style="color: var(--color-rarity-uncommon);">Angled Grip 2</span> &middot;
+              <span style="color: var(--color-rarity-uncommon);">Light Mag 2</span> &middot;
+              <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Build 4 -->
+        <div class="vc-card">
+          <div class="build-num">4</div>
+          <div class="vc-card-body">
+            <div class="vc-card-top">
+              <span class="vc-card-name">Short - Medium</span>
+              <span class="range-pill range-close">Close</span>
+              <span class="range-pill range-mid">Mid</span>
+              <span class="badge rarity-uncommon" style="font-size: 10px;">Uncommon</span>
+            </div>
+            <div class="vc-card-mods">
+              <span style="color: var(--color-rarity-uncommon);">Compensator 2</span> &middot;
+              <span style="color: var(--color-rarity-uncommon);">Angled Grip 2</span> &middot;
+              <span style="color: var(--color-rarity-common);">Light Mag 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Build 5 -->
+        <div class="vc-card">
+          <div class="build-num">5</div>
+          <div class="vc-card-body">
+            <div class="vc-card-top">
+              <span class="vc-card-name">Short - Medium</span>
+              <span class="range-pill range-close">Close</span>
+              <span class="range-pill range-mid">Mid</span>
+              <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+            </div>
+            <div class="vc-card-mods">
+              <span style="color: var(--color-rarity-common);">Compensator 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Angled Grip 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Light Mag 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Build 6 -->
+        <div class="vc-card">
+          <div class="build-num">6</div>
+          <div class="vc-card-body">
+            <div class="vc-card-top">
+              <span class="vc-card-name">Short</span>
+              <span class="range-pill range-close">Close</span>
+              <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+            </div>
+            <div class="vc-card-mods">
+              <span style="color: var(--color-rarity-common);">Compensator 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Angled Grip 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Light Mag 1</span> &middot;
+              <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Sticky sidebar with weapon intel -->
+      <div class="vc-sidebar">
+        <div class="vc-sidebar-title">Weapon Intel</div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">Tips</div>
+          <p>Muzzle Brakes can feel great for no-recoil in the first 1-2 mags, but mid/long range shots become ineffective due to bloom. Learn to shoot with Compensators and avoid Muzzle Brakes.</p>
+        </div>
+
+        <div class="callout callout-avoid">
+          <div class="callout-title">Avoid</div>
+          <ul>
+            <li><strong>Muzzle Brakes</strong> — bloom kills mid-range accuracy</li>
+            <li><strong>Extended Barrel</strong> — pointless on SMG</li>
+            <li><strong>Vertical Grips</strong> — horizontal recoil is the issue, not vertical</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Mobile -->
+<div class="viewport-label">Mobile (375px)</div>
+<div class="frame frame-mobile">
+  <div class="frame-inner" style="padding: 14px;">
+
+    <div class="weapon-header" style="gap: 10px;">
+      <div class="weapon-img" style="width: 56px; height: 38px; font-size: 18px;">S</div>
+      <div>
+        <h2 style="font-size: 18px;">Stitcher</h2>
+        <div class="weapon-meta">
+          <span class="badge" style="background: color-mix(in srgb, var(--color-class-smg) 13%, transparent); color: var(--color-class-smg); font-size: 10px;">SMG</span>
+          <span class="badge rarity-common" style="font-size: 10px;">Common</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible intel toggle -->
+    <div class="vc-mobile-intel">
+      <div class="vc-mobile-toggle">
+        <span>Weapon Intel</span>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="vc-mobile-content">
+        <div class="callout callout-tip" style="font-size: 12px;">
+          <div class="callout-title" style="font-size: 10px;">Tips</div>
+          <p>Learn to shoot with Compensators — Muzzle Brakes kill mid-range accuracy with bloom.</p>
+        </div>
+        <div class="callout callout-avoid" style="font-size: 12px;">
+          <div class="callout-title" style="font-size: 10px;">Avoid</div>
+          <ul>
+            <li><strong>Muzzle Brakes</strong> — bloom</li>
+            <li><strong>Extended Barrel</strong> — pointless</li>
+            <li><strong>Vertical Grips</strong> — wrong axis</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Build list (single column) -->
+    <div class="vc-cards">
+      <div class="vc-manual" style="padding: 10px 12px;">
+        <div class="vc-manual-icon" style="font-size: 16px;">&#128295;</div>
+        <div>
+          <div class="vc-manual-text" style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary);">Build Manually</div>
+        </div>
+      </div>
+
+      <div class="vc-card" style="padding: 10px 12px;">
+        <div class="build-num">1</div>
+        <div class="vc-card-body">
+          <div class="vc-card-top">
+            <span class="vc-card-name" style="font-size: 13px;">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="badge rarity-legendary" style="font-size: 9px;">Leg.</span>
+          </div>
+          <div class="vc-card-mods" style="font-size: 10px;">
+            <span style="color: var(--color-rarity-rare);">Comp 3</span> &middot;
+            <span style="color: var(--color-rarity-legendary);">Horiz. Grip</span> &middot;
+            <span style="color: var(--color-rarity-rare);">Mag 3</span> &middot;
+            <span style="color: var(--color-rarity-legendary);">KC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vc-card" style="padding: 10px 12px;">
+        <div class="build-num">2</div>
+        <div class="vc-card-body">
+          <div class="vc-card-top">
+            <span class="vc-card-name" style="font-size: 13px;">Medium - Long</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="range-pill range-long">Long</span>
+            <span class="badge rarity-epic" style="font-size: 9px;">Epic</span>
+          </div>
+          <div class="vc-card-mods" style="font-size: 10px;">
+            <span style="color: var(--color-rarity-rare);">Comp 3</span> &middot;
+            <span style="color: var(--color-rarity-rare);">AG 3</span> &middot;
+            <span style="color: var(--color-rarity-rare);">Mag 3</span> &middot;
+            <span style="color: var(--color-rarity-epic);">Padded Stock</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vc-card" style="padding: 10px 12px;">
+        <div class="build-num">3</div>
+        <div class="vc-card-body">
+          <div class="vc-card-top">
+            <span class="vc-card-name" style="font-size: 13px;">Medium - Long</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="range-pill range-long">Long</span>
+            <span class="badge rarity-rare" style="font-size: 9px;">Rare</span>
+          </div>
+          <div class="vc-card-mods" style="font-size: 10px;">
+            <span style="color: var(--color-rarity-rare);">Comp 3</span> &middot;
+            <span style="color: var(--color-rarity-uncommon);">AG 2</span> &middot;
+            <span style="color: var(--color-rarity-uncommon);">Mag 2</span> &middot;
+            <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vc-card" style="padding: 10px 12px;">
+        <div class="build-num">4</div>
+        <div class="vc-card-body">
+          <div class="vc-card-top">
+            <span class="vc-card-name" style="font-size: 13px;">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="badge rarity-uncommon" style="font-size: 9px;">Uncommon</span>
+          </div>
+          <div class="vc-card-mods" style="font-size: 10px;">
+            <span style="color: var(--color-rarity-uncommon);">Comp 2</span> &middot;
+            <span style="color: var(--color-rarity-uncommon);">AG 2</span> &middot;
+            <span style="color: var(--color-rarity-common);">Mag 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vc-card" style="padding: 10px 12px;">
+        <div class="build-num">5</div>
+        <div class="vc-card-body">
+          <div class="vc-card-top">
+            <span class="vc-card-name" style="font-size: 13px;">Short - Medium</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="range-pill range-mid">Mid</span>
+            <span class="badge rarity-common" style="font-size: 9px;">Common</span>
+          </div>
+          <div class="vc-card-mods" style="font-size: 10px;">
+            <span style="color: var(--color-rarity-common);">Comp 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">AG 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">Mag 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vc-card" style="padding: 10px 12px;">
+        <div class="build-num">6</div>
+        <div class="vc-card-body">
+          <div class="vc-card-top">
+            <span class="vc-card-name" style="font-size: 13px;">Short</span>
+            <span class="range-pill range-close">Close</span>
+            <span class="badge rarity-common" style="font-size: 9px;">Common</span>
+          </div>
+          <div class="vc-card-mods" style="font-size: 10px;">
+            <span style="color: var(--color-rarity-common);">Comp 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">AG 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">Mag 1</span> &middot;
+            <span style="color: var(--color-rarity-common);">Stable Stock 1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>
