@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Builder Build List R4 — UX Refinement — ArcKits Prototype</title>
+  <style>
+    /* ================================================================
+       TOKENS — exact match of src/index.css dark theme
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg-base:         #030712;
+      --color-bg-mid:          #111827;
+      --color-surface:         #111827;
+      --color-surface-alt:     #1f2937;
+      --color-surface-hover:   #1f2937;
+      --color-border:          #374151;
+      --color-border-subtle:   #1f2937;
+      --color-text-primary:    #ffffff;
+      --color-text-secondary:  #9ca3af;
+      --color-text-muted:      #6b7280;
+      --color-text-faint:      #4b5563;
+      --color-accent:          #f97316;
+      --color-accent-text:     #fb923c;
+      --color-accent-hover:    #fdba74;
+      --color-accent-glow:     #f97316;
+      --color-danger-text:     #f87171;
+      --color-success:         #22c55e;
+      --color-warning:         #f59e0b;
+      --color-brand-from:      #fb923c;
+      --color-brand-to:        #ef4444;
+
+      --color-rarity-common:    #9CA3AF;
+      --color-rarity-uncommon:  #27BC57;
+      --color-rarity-rare:      #3b82f6;
+      --color-rarity-epic:      #CB3098;
+      --color-rarity-legendary: #FFC301;
+
+      --color-range-close:  #fb923c;
+      --color-range-mid:    #3b82f6;
+      --color-range-long:   #06b6d4;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--color-bg-base);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+    }
+
+    /* ── Prototype chrome ─────────────────────────────────────── */
+    .proto-section {
+      padding: 32px;
+      padding-top: 16px;
+    }
+    .proto-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+    .proto-subtitle {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .viewport-label {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      margin-top: 24px;
+    }
+    .design-note {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: var(--color-surface);
+      border-left: 3px solid var(--color-accent);
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+    .design-note strong { color: var(--color-accent-text); }
+
+    /* ── Frame containers ─────────────────────────────────────── */
+    .frame {
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--color-bg-base);
+    }
+    .frame-desktop { max-width: 1080px; }
+    .frame-mobile  { max-width: 390px; }
+
+    /* ── Header (mirrors Header.tsx) ──────────────────────────── */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      width: 100%;
+      border-bottom: 1px solid var(--color-border-subtle);
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .app-header-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      display: flex;
+      padding: 0 16px;
+      height: 56px;
+      align-items: center;
+      gap: 24px;
+    }
+    .app-title {
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--color-brand-from), var(--color-brand-to));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      flex-shrink: 0;
+    }
+    .tab-group {
+      display: flex;
+      background: var(--color-surface-alt);
+      border-radius: 8px;
+      padding: 2px;
+    }
+    .tab-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      background: none;
+      color: var(--color-text-secondary);
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: var(--color-text-primary); }
+    .tab-active {
+      background: var(--color-border);
+      color: var(--color-accent-text);
+    }
+    .tab-back {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tab-back svg { width: 12px; height: 12px; }
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    .theme-btn {
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+    }
+    .theme-btn:hover { background: var(--color-surface-alt); color: var(--color-text-primary); }
+    .theme-btn svg { width: 20px; height: 20px; }
+
+    /* ── Main content area ────────────────────────────────────── */
+    .main-content {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    /* ── Weapon Hero Header ───────────────────────────────────── */
+    .weapon-header-card {
+      background: linear-gradient(to right, var(--color-surface), var(--color-surface-alt));
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .weapon-hero {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .weapon-hero-img {
+      width: 120px;
+      height: auto;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+    .weapon-hero-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .weapon-hero-name-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .weapon-hero-name {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .weapon-rarity-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-rarity-common);
+    }
+    .weapon-desc {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .rarity-common    { background: color-mix(in srgb, var(--color-rarity-common) 13%, transparent);    color: var(--color-rarity-common); }
+    .rarity-uncommon  { background: color-mix(in srgb, var(--color-rarity-uncommon) 13%, transparent);  color: var(--color-rarity-uncommon); }
+    .rarity-rare      { background: color-mix(in srgb, var(--color-rarity-rare) 13%, transparent);      color: var(--color-rarity-rare); }
+    .rarity-epic      { background: color-mix(in srgb, var(--color-rarity-epic) 13%, transparent);      color: var(--color-rarity-epic); }
+    .rarity-legendary { background: color-mix(in srgb, var(--color-rarity-legendary) 13%, transparent); color: var(--color-rarity-legendary); }
+
+    /* ── Callout panels ───────────────────────────────────────── */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+    }
+    .callout-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .callout-tip       { border-left: 3px solid var(--color-accent); }
+    .callout-tip .callout-title { color: var(--color-accent-text); }
+    .callout-avoid      { border-left: 3px solid var(--color-danger-text); }
+    .callout-avoid .callout-title { color: var(--color-danger-text); }
+    .callout-conditional { border-left: 3px solid var(--color-warning); }
+    .callout-conditional .callout-title { color: var(--color-warning); }
+    .callout-weakness   { border-left: 3px solid var(--color-accent); }
+    .callout-weakness .callout-title { color: var(--color-accent-text); }
+    .callout p, .callout li { color: var(--color-text-secondary); }
+    .callout ul { padding-left: 16px; margin-top: 4px; }
+    .callout li { margin-bottom: 3px; }
+    .callout li strong { color: var(--color-text-primary); font-weight: 600; }
+
+    /* ── Build number ─────────────────────────────────────────── */
+    .build-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    /* Graduated build number colors by investment tier */
+    .build-num-legendary {
+      background: color-mix(in srgb, var(--color-rarity-legendary) 20%, transparent);
+      color: var(--color-rarity-legendary);
+    }
+    .build-num-epic {
+      background: color-mix(in srgb, var(--color-rarity-epic) 18%, transparent);
+      color: var(--color-rarity-epic);
+    }
+    .build-num-rare {
+      background: color-mix(in srgb, var(--color-rarity-rare) 18%, transparent);
+      color: var(--color-rarity-rare);
+    }
+    .build-num-uncommon {
+      background: color-mix(in srgb, var(--color-rarity-uncommon) 16%, transparent);
+      color: var(--color-rarity-uncommon);
+    }
+    .build-num-common {
+      background: var(--color-surface-alt);
+      color: var(--color-text-muted);
+    }
+
+    /* ================================================================
+       R4 — UX Refinement
+       ================================================================ */
+
+    /* ── 2-column layout ── */
+    .r4-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── Sidebar — always visible on desktop ── */
+    .r4-sidebar {
+      position: sticky;
+      top: 76px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .r4-sidebar-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* ── Build list header ── */
+    .builds-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .builds-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+    .builds-subtitle {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+    .builds-manual-link {
+      color: var(--color-accent-text);
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      font-size: 12px;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+    .builds-manual-link:hover {
+      color: var(--color-accent-hover);
+    }
+
+    /* ── Build cards — with graduated treatment ── */
+    .r4-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .r4-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .r4-card:hover {
+      border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+      background: color-mix(in srgb, var(--color-accent) 3%, var(--color-surface));
+    }
+    /* Graduated left border accent by investment tier */
+    .r4-card-tier-legendary {
+      border-left: 3px solid color-mix(in srgb, var(--color-rarity-legendary) 50%, transparent);
+    }
+    .r4-card-tier-epic {
+      border-left: 3px solid color-mix(in srgb, var(--color-rarity-epic) 45%, transparent);
+    }
+    .r4-card-tier-rare {
+      border-left: 3px solid color-mix(in srgb, var(--color-rarity-rare) 40%, transparent);
+    }
+    .r4-card-tier-uncommon {
+      border-left: 3px solid color-mix(in srgb, var(--color-rarity-uncommon) 35%, transparent);
+    }
+    .r4-card-tier-common {
+      border-left: 3px solid var(--color-border-subtle);
+    }
+
+    .r4-card-body { flex: 1; min-width: 0; }
+    .r4-card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .r4-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    /* Crafting requirement label — adjacent to range name */
+    .r4-craft-sep {
+      color: var(--color-text-faint);
+      font-size: 10px;
+    }
+    .r4-craft-label {
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    /* ── Mod gallery (matches Advisor R3 pattern) ── */
+    .r4-mod-gallery {
+      display: flex;
+      justify-content: flex-start;
+      gap: 6px;
+    }
+    .r4-mod-gallery-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 0 1 80px;
+      min-width: 0;
+    }
+    .r4-mod-gallery-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      object-fit: contain;
+      margin-bottom: 3px;
+    }
+    .r4-mod-gallery-label {
+      font-size: 10px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    /* ── Chevron affordance ── */
+    .r4-card-chevron {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-faint);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .r4-card:hover .r4-card-chevron {
+      color: var(--color-accent-text);
+      transform: translateX(2px);
+    }
+
+
+    /* ── Mobile layout ── */
+    .app-header-mobile {
+      border-bottom: 1px solid var(--color-border-subtle);
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+    }
+    .app-header-mobile-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px 4px;
+    }
+    .app-header-mobile-tabs {
+      display: flex;
+      padding: 4px 12px 8px;
+      gap: 6px;
+    }
+    .tab-btn-mobile {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      background: none;
+      color: var(--color-text-secondary);
+    }
+    .tab-btn-mobile.tab-active {
+      background: var(--color-border);
+      color: var(--color-accent-text);
+    }
+
+    .mobile-content {
+      padding: 12px;
+    }
+    .mobile-hero {
+      background: linear-gradient(to right, var(--color-surface), var(--color-surface-alt));
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .mobile-hero-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .mobile-hero-img {
+      width: 80px;
+      height: auto;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+    }
+    .mobile-hero-info { flex: 1; min-width: 0; }
+    .mobile-hero-name-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .mobile-hero-name {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .mobile-rarity-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-rarity-common);
+    }
+    .mobile-hero-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Mobile intel — collapsed */
+    .mobile-intel {
+      margin-bottom: 14px;
+    }
+    .mobile-intel-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .mobile-intel-toggle svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.2s;
+    }
+    .mobile-intel-toggle.open svg {
+      transform: rotate(180deg);
+    }
+    .mobile-intel-toggle.open {
+      border-radius: 8px 8px 0 0;
+      border-bottom: none;
+    }
+    .mobile-intel-body {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+    }
+    .mobile-intel-body.open {
+      display: flex;
+    }
+    .mobile-intel-body .callout {
+      border: none;
+      padding: 8px 10px;
+      background: var(--color-surface-alt);
+    }
+
+    /* Mobile builds */
+    .mobile-builds-header {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .mobile-builds-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+    .mobile-builds-subtitle {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+    .mobile-manual-link {
+      font-size: 11px;
+      color: var(--color-accent-text);
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+    }
+    .mobile-manual-link:hover {
+      color: var(--color-accent-hover);
+    }
+    .mobile-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mobile-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .mobile-card:hover {
+      border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
+      background: color-mix(in srgb, var(--color-accent) 3%, var(--color-surface));
+    }
+    /* Mobile graduated left borders */
+    .mobile-card-tier-legendary { border-left: 3px solid color-mix(in srgb, var(--color-rarity-legendary) 50%, transparent); }
+    .mobile-card-tier-epic      { border-left: 3px solid color-mix(in srgb, var(--color-rarity-epic) 45%, transparent); }
+    .mobile-card-tier-rare      { border-left: 3px solid color-mix(in srgb, var(--color-rarity-rare) 40%, transparent); }
+    .mobile-card-tier-uncommon  { border-left: 3px solid color-mix(in srgb, var(--color-rarity-uncommon) 35%, transparent); }
+    .mobile-card-tier-common    { border-left: 3px solid var(--color-border-subtle); }
+
+    .mobile-card-body { flex: 1; min-width: 0; }
+    .mobile-card-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+    .mobile-card-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .mobile-craft-sep {
+      color: var(--color-text-faint);
+      font-size: 9px;
+    }
+    .mobile-craft-label {
+      font-size: 9px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    /* ── Mobile mod gallery (same pattern, slightly smaller) ── */
+    .mobile-mod-gallery {
+      display: flex;
+      justify-content: flex-start;
+      gap: 4px;
+    }
+    .mobile-mod-gallery-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 0 1 70px;
+      min-width: 0;
+    }
+    .mobile-mod-gallery-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      object-fit: contain;
+      margin-bottom: 2px;
+    }
+    .mobile-mod-gallery-label {
+      font-size: 9px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .mobile-card-chevron {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-faint);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .mobile-card:hover .mobile-card-chevron {
+      color: var(--color-accent-text);
+      transform: translateX(2px);
+    }
+  </style>
+</head>
+<body>
+
+<div class="proto-section">
+  <div class="proto-title">Round 4 — UX Refinement</div>
+  <div class="proto-subtitle">
+    Building on R3 with UX expert refinements:<br>
+    1. <strong>Graduated visual hierarchy</strong> — left-border accent + numbered circle colored by highest-rarity mod in build (gold → pink → blue → green → gray).<br>
+    2. <strong>Crafting requirement label</strong> — right-aligned "Requires Mod Components" / "Requires Mech Components" / "Base Materials" per card.<br>
+    3. <strong>Always-visible Weapon Intel sidebar</strong> (desktop) / collapsible accordion (mobile). No extra click needed on desktop.<br>
+    4. <strong>Chevron click affordance</strong> — right-side arrow on each card, animates on hover to signal interactivity.<br>
+    5. <strong>Advisor-consistent abbreviations</strong> — mobile uses same rules as Advisor R3 (Comp., Vert. Grip, Ext. Lt. Mag, etc.).<br>
+    6. <strong>Mod gallery layout</strong> — attachments shown as vertical icon + label columns (matching Advisor R3 pattern) instead of horizontal inline chips. Creates visual consistency across the entire app.<br>
+  </div>
+
+
+  <!-- ============================================================
+       DESKTOP
+       ============================================================ -->
+  <div class="viewport-label">Desktop</div>
+  <div class="frame frame-desktop">
+    <!-- Header -->
+    <div class="app-header">
+      <div class="app-header-inner">
+        <div class="app-title">ARC RAIDERS</div>
+        <div class="tab-group">
+          <button class="tab-btn tab-active tab-back">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Weapons
+          </button>
+          <button class="tab-btn">Advisor</button>
+        </div>
+        <div class="header-right">
+          <button class="theme-btn">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Weapon Hero Header -->
+      <div class="weapon-header-card">
+        <div class="weapon-hero">
+          <img class="weapon-hero-img" src="https://arcraiders.wiki/w/images/thumb/3/3a/Stitcher-Level1.png/160px-Stitcher-Level1.webp" alt="Stitcher" />
+          <div class="weapon-hero-info">
+            <div class="weapon-hero-name-row">
+              <span class="weapon-hero-name">Stitcher</span>
+              <span class="weapon-rarity-label">Common</span>
+            </div>
+            <div class="weapon-desc">A high-agility SMG that shines in PVP as one of the highest sustained damage outputs among common weapons. Its spray and horizontal recoil make long-range fights messy, but in close quarters it melts shields and players alike. With upgraded and modded it becomes surprisingly competitive with higher-tier gear in tight engagements.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2-column layout -->
+      <div class="r4-layout">
+        <!-- Left: Build list -->
+        <div>
+          <!-- Section header with subtitle -->
+          <div class="builds-header">
+            <div class="builds-title">Suggested Attachments</div>
+            <div class="builds-subtitle">Select a set to enter builder, or <button class="builds-manual-link">build manually</button></div>
+          </div>
+
+          <div class="r4-cards">
+            <!-- Build 1 — Legendary tier -->
+            <div class="r4-card r4-card-tier-legendary">
+              <div class="build-num build-num-legendary">1</div>
+              <div class="r4-card-body">
+                <div class="r4-card-top">
+                  <span class="r4-card-name">Short - Medium</span>
+                  <span class="r4-craft-sep">·</span>
+                  <span class="r4-craft-label" style="color: var(--color-rarity-legendary);">Requires Legendaries</span>
+                </div>
+                <div class="r4-mod-gallery">
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/a/af/Compensator_III.png/96px-Compensator_III.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-rare);">Comp. III</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/89/Horizontal_Grip.png/96px-Horizontal_Grip.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-legendary);">Horizontal Grip</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/4/40/Extended_Light_Mag_III.png/96px-Extended_Light_Mag_III.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-rare);">Ext. Lt. Mag III</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/7/71/Kinetic_Converter.png/96px-Kinetic_Converter.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-legendary);">Kinetic Converter</span>
+                  </div>
+                </div>
+              </div>
+              <svg class="r4-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Build 2 — Epic tier -->
+            <div class="r4-card r4-card-tier-epic">
+              <div class="build-num build-num-epic">2</div>
+              <div class="r4-card-body">
+                <div class="r4-card-top">
+                  <span class="r4-card-name">Medium - Long</span>
+                  <span class="r4-craft-sep">·</span>
+                  <span class="r4-craft-label" style="color: var(--color-rarity-epic);">Requires Mod Components</span>
+                </div>
+                <div class="r4-mod-gallery">
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/a/af/Compensator_III.png/96px-Compensator_III.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-rare);">Comp. III</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/0/0f/Angled_Grip_III.png/96px-Angled_Grip_III.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-rare);">Angled Grip III</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/4/40/Extended_Light_Mag_III.png/96px-Extended_Light_Mag_III.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-rare);">Ext. Lt. Mag III</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/4/4b/Padded_Stock.png/96px-Padded_Stock.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-epic);">Padded Stock</span>
+                  </div>
+                </div>
+              </div>
+              <svg class="r4-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Build 3 — Rare tier -->
+            <div class="r4-card r4-card-tier-rare">
+              <div class="build-num build-num-rare">3</div>
+              <div class="r4-card-body">
+                <div class="r4-card-top">
+                  <span class="r4-card-name">Medium - Long</span>
+                  <span class="r4-craft-sep">·</span>
+                  <span class="r4-craft-label" style="color: var(--color-rarity-rare);">Requires Mod Components</span>
+                </div>
+                <div class="r4-mod-gallery">
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/a/af/Compensator_III.png/96px-Compensator_III.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-rare);">Comp. III</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/2b/Angled_Grip_II.png/96px-Angled_Grip_II.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Angled Grip II</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/c/cf/Extended_Light_Mag_II.png/96px-Extended_Light_Mag_II.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Ext. Lt. Mag II</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+                  </div>
+                </div>
+              </div>
+              <svg class="r4-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Build 4 — Uncommon tier -->
+            <div class="r4-card r4-card-tier-uncommon">
+              <div class="build-num build-num-uncommon">4</div>
+              <div class="r4-card-body">
+                <div class="r4-card-top">
+                  <span class="r4-card-name">Short - Medium</span>
+                  <span class="r4-craft-sep">·</span>
+                  <span class="r4-craft-label" style="color: var(--color-rarity-uncommon);">Requires Mech Components</span>
+                </div>
+                <div class="r4-mod-gallery">
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/0/0a/Compensator_II.png/96px-Compensator_II.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Comp. II</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/2b/Angled_Grip_II.png/96px-Angled_Grip_II.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Angled Grip II</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/23/Extended_Light_Mag_I.png/96px-Extended_Light_Mag_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Ext. Lt. Mag I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+                  </div>
+                </div>
+              </div>
+              <svg class="r4-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Build 5 — Common tier -->
+            <div class="r4-card r4-card-tier-common">
+              <div class="build-num build-num-common">5</div>
+              <div class="r4-card-body">
+                <div class="r4-card-top">
+                  <span class="r4-card-name">Short - Medium</span>
+                  <span class="r4-craft-sep">·</span>
+                  <span class="r4-craft-label" style="color: var(--color-text-faint);">Base Materials</span>
+                </div>
+                <div class="r4-mod-gallery">
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/5/5f/Compensator_I.png/96px-Compensator_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Comp. I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/b/b5/Angled_Grip_I.png/96px-Angled_Grip_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Angled Grip I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/23/Extended_Light_Mag_I.png/96px-Extended_Light_Mag_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Ext. Lt. Mag I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+                  </div>
+                </div>
+              </div>
+              <svg class="r4-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            <!-- Build 6 — Common tier -->
+            <div class="r4-card r4-card-tier-common">
+              <div class="build-num build-num-common">6</div>
+              <div class="r4-card-body">
+                <div class="r4-card-top">
+                  <span class="r4-card-name">Short</span>
+                  <span class="r4-craft-sep">·</span>
+                  <span class="r4-craft-label" style="color: var(--color-text-faint);">Base Materials</span>
+                </div>
+                <div class="r4-mod-gallery">
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/5/5f/Compensator_I.png/96px-Compensator_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Comp. I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/b/b5/Angled_Grip_I.png/96px-Angled_Grip_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Angled Grip I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/23/Extended_Light_Mag_I.png/96px-Extended_Light_Mag_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Ext. Lt. Mag I</span>
+                  </div>
+                  <div class="r4-mod-gallery-item">
+                    <img class="r4-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                    <span class="r4-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+                  </div>
+                </div>
+              </div>
+              <svg class="r4-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Always-visible Sidebar -->
+        <div class="r4-sidebar">
+          <div class="r4-sidebar-title">Weapon Intel</div>
+          <div class="callout callout-weakness">
+            <div class="callout-title">Weakness</div>
+            <p>12 rounds vanish instantly</p>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-title">Tips</div>
+            <p>Muzzle Brakes can feel great for no-recoil in the first 1-2 mags, but mid/long range shots become ineffective due to bloom. Learn to shoot with Compensators and avoid Muzzle Brakes.</p>
+          </div>
+          <div class="callout callout-avoid">
+            <div class="callout-title">Avoid</div>
+            <ul>
+              <li><strong>Muzzle Brakes</strong> — bloom kills mid-range accuracy</li>
+              <li><strong>Extended Barrel</strong> — pointless on SMG</li>
+              <li><strong>Vertical Grips</strong> — horizontal recoil is the issue, not vertical</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       MOBILE (390px)
+       ============================================================ -->
+  <div class="viewport-label">Mobile (390px)</div>
+  <div class="frame frame-mobile">
+    <!-- Mobile Header -->
+    <div class="app-header-mobile">
+      <div class="app-header-mobile-top">
+        <div class="app-title" style="font-size: 16px;">ARC RAIDERS</div>
+        <button class="theme-btn">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
+      </div>
+      <div class="app-header-mobile-tabs">
+        <button class="tab-btn-mobile tab-active tab-back">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:10px;height:10px;display:inline;vertical-align:-1px;margin-right:2px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Weapons
+        </button>
+        <button class="tab-btn-mobile">Advisor</button>
+      </div>
+    </div>
+
+    <div class="mobile-content">
+      <!-- Compact Hero -->
+      <div class="mobile-hero">
+        <div class="mobile-hero-top">
+          <img class="mobile-hero-img" src="https://arcraiders.wiki/w/images/thumb/3/3a/Stitcher-Level1.png/160px-Stitcher-Level1.webp" alt="Stitcher" />
+          <div class="mobile-hero-info">
+            <div class="mobile-hero-name-row">
+              <span class="mobile-hero-name">Stitcher</span>
+              <span class="mobile-rarity-label">Common</span>
+            </div>
+            <div class="mobile-hero-desc">A high-agility SMG that shines in PVP as one of the highest sustained damage outputs among common weapons. Its spray and horizontal recoil make long-range fights messy, but in close quarters it melts shields and players alike. With upgraded and modded it becomes surprisingly competitive with higher-tier gear in tight engagements.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Intel -->
+      <div class="mobile-intel">
+        <button class="mobile-intel-toggle" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open');">
+          <span style="display: flex; align-items: center; gap: 8px;">
+            Weapon Intel
+            <span class="intel-count">
+              <span class="intel-dot"></span>
+              3 warnings
+            </span>
+          </span>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="mobile-intel-body">
+          <div class="callout callout-weakness">
+            <div class="callout-title">Weakness</div>
+            <p>12 rounds vanish instantly</p>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-title">Tips</div>
+            <p>Learn to shoot with Compensators and avoid Muzzle Brakes — bloom kills mid-range accuracy.</p>
+          </div>
+          <div class="callout callout-avoid">
+            <div class="callout-title">Avoid</div>
+            <ul>
+              <li><strong>Muzzle Brakes</strong> — bloom</li>
+              <li><strong>Extended Barrel</strong> — pointless on SMG</li>
+              <li><strong>Vertical Grips</strong> — wrong recoil axis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build List -->
+      <div class="mobile-builds-header">
+        <div class="mobile-builds-title">Suggested Attachments</div>
+        <div class="mobile-builds-subtitle">Select a set to enter builder, or <button class="mobile-manual-link">build manually</button></div>
+      </div>
+
+      <div class="mobile-cards">
+        <!-- Build 1 — Legendary -->
+        <div class="mobile-card mobile-card-tier-legendary">
+          <div class="build-num build-num-legendary">1</div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <span class="mobile-card-name">Short - Medium</span>
+              <span class="mobile-craft-sep">·</span>
+              <span class="mobile-craft-label" style="color: var(--color-rarity-legendary);">Legendaries</span>
+            </div>
+            <div class="mobile-mod-gallery">
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/a/af/Compensator_III.png/96px-Compensator_III.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-rare);">Comp. III</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/89/Horizontal_Grip.png/96px-Horizontal_Grip.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-legendary);">H. Grip</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/4/40/Extended_Light_Mag_III.png/96px-Extended_Light_Mag_III.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-rare);">Ext. Lt. Mag III</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/7/71/Kinetic_Converter.png/96px-Kinetic_Converter.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-legendary);">K. Conv.</span>
+              </div>
+            </div>
+          </div>
+          <svg class="mobile-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+
+        <!-- Build 2 — Epic -->
+        <div class="mobile-card mobile-card-tier-epic">
+          <div class="build-num build-num-epic">2</div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <span class="mobile-card-name">Medium - Long</span>
+              <span class="mobile-craft-sep">·</span>
+              <span class="mobile-craft-label" style="color: var(--color-rarity-epic);">Mod Comps</span>
+            </div>
+            <div class="mobile-mod-gallery">
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/a/af/Compensator_III.png/96px-Compensator_III.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-rare);">Comp. III</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/0/0f/Angled_Grip_III.png/96px-Angled_Grip_III.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-rare);">Angled Grip III</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/4/40/Extended_Light_Mag_III.png/96px-Extended_Light_Mag_III.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-rare);">Ext. Lt. Mag III</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/4/4b/Padded_Stock.png/96px-Padded_Stock.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-epic);">Padded Stock</span>
+              </div>
+            </div>
+          </div>
+          <svg class="mobile-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+
+        <!-- Build 3 — Rare -->
+        <div class="mobile-card mobile-card-tier-rare">
+          <div class="build-num build-num-rare">3</div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <span class="mobile-card-name">Medium - Long</span>
+              <span class="mobile-craft-sep">·</span>
+              <span class="mobile-craft-label" style="color: var(--color-rarity-rare);">Mod Comps</span>
+            </div>
+            <div class="mobile-mod-gallery">
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/a/af/Compensator_III.png/96px-Compensator_III.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-rare);">Comp. III</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/2b/Angled_Grip_II.png/96px-Angled_Grip_II.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Angled Grip II</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/c/cf/Extended_Light_Mag_II.png/96px-Extended_Light_Mag_II.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Ext. Lt. Mag II</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+              </div>
+            </div>
+          </div>
+          <svg class="mobile-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+
+        <!-- Build 4 — Uncommon -->
+        <div class="mobile-card mobile-card-tier-uncommon">
+          <div class="build-num build-num-uncommon">4</div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <span class="mobile-card-name">Short - Medium</span>
+              <span class="mobile-craft-sep">·</span>
+              <span class="mobile-craft-label" style="color: var(--color-rarity-uncommon);">Mech Comps</span>
+            </div>
+            <div class="mobile-mod-gallery">
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/0/0a/Compensator_II.png/96px-Compensator_II.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Comp. II</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/2b/Angled_Grip_II.png/96px-Angled_Grip_II.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-uncommon);">Angled Grip II</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/23/Extended_Light_Mag_I.png/96px-Extended_Light_Mag_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Ext. Lt. Mag I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+              </div>
+            </div>
+          </div>
+          <svg class="mobile-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+
+        <!-- Build 5 — Common -->
+        <div class="mobile-card mobile-card-tier-common">
+          <div class="build-num build-num-common">5</div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <span class="mobile-card-name">Short - Medium</span>
+              <span class="mobile-craft-sep">·</span>
+              <span class="mobile-craft-label" style="color: var(--color-text-faint);">Base Materials</span>
+            </div>
+            <div class="mobile-mod-gallery">
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/5/5f/Compensator_I.png/96px-Compensator_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Comp. I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/b/b5/Angled_Grip_I.png/96px-Angled_Grip_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Angled Grip I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/23/Extended_Light_Mag_I.png/96px-Extended_Light_Mag_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Ext. Lt. Mag I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+              </div>
+            </div>
+          </div>
+          <svg class="mobile-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+
+        <!-- Build 6 — Common -->
+        <div class="mobile-card mobile-card-tier-common">
+          <div class="build-num build-num-common">6</div>
+          <div class="mobile-card-body">
+            <div class="mobile-card-top">
+              <span class="mobile-card-name">Short</span>
+              <span class="mobile-craft-sep">·</span>
+              <span class="mobile-craft-label" style="color: var(--color-text-faint);">Base Materials</span>
+            </div>
+            <div class="mobile-mod-gallery">
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/5/5f/Compensator_I.png/96px-Compensator_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Comp. I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/b/b5/Angled_Grip_I.png/96px-Angled_Grip_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Angled Grip I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/2/23/Extended_Light_Mag_I.png/96px-Extended_Light_Mag_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Ext. Lt. Mag I</span>
+              </div>
+              <div class="mobile-mod-gallery-item">
+                <img class="mobile-mod-gallery-icon" src="https://arcraiders.wiki/w/images/thumb/8/8d/Stable_Stock_I.png/96px-Stable_Stock_I.webp" alt="" />
+                <span class="mobile-mod-gallery-label" style="color: var(--color-rarity-common);">Stable Stock I</span>
+              </div>
+            </div>
+          </div>
+          <svg class="mobile-card-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design notes -->
+  <div class="design-note">
+    <strong>R4 Changes from R3:</strong><br><br>
+
+    <strong>1. Graduated visual hierarchy</strong><br>
+    Each build card gets a left-border accent colored by its highest-rarity mod (gold/pink/blue/green/gray). The numbered circle matches. At scan speed, players immediately see the "cost gradient" — expensive builds glow at the top, budget builds fade to neutral at the bottom. This leverages the looter-shooter rarity language players already understand.<br><br>
+
+    <strong>2. Crafting requirement labels</strong><br>
+    Right-aligned text on each card's name row. Desktop: "Requires Legendaries" / "Requires Mod Components" / "Requires Mech Components" / "Base Materials". Mobile: shortened to "Legendaries" / "Mod Comps" / "Mech Comps" / "Base Materials". Color matches the rarity tier. This directly mirrors the Advisor's crafting filter vocabulary, creating system-wide consistency.<br><br>
+
+    <strong>3. Weapon Intel sidebar</strong><br>
+    Desktop: always visible in sticky sidebar (same as R3) — no collapse toggle, no extra click. The content is compact enough to not compete with the build list. Mobile: collapsible accordion (collapsed by default) since vertical space is at a premium before the build list.<br><br>
+
+    <strong>4. Chevron click affordance</strong><br>
+    Right-aligned arrow icon on every card. Animates right + turns accent-orange on hover. Communicates "this is a navigation action" — clicking takes you into the builder with mods pre-loaded. Subtitle updated to "Select a set to enter builder" to reinforce the mental model.<br><br>
+
+    <strong>5. Advisor-consistent abbreviations</strong><br>
+    All mod names follow the same abbreviation rules as Advisor R3-final:<br>
+    &bull; "Compensator" &rarr; "Comp."<br>
+    &bull; "Extended" &rarr; "Ext."<br>
+    &bull; "Light" &rarr; "Lt."<br>
+    &bull; "Horizontal Grip" &rarr; "H. Grip" (mobile only, desktop keeps full name)<br>
+    &bull; "Kinetic Converter" &rarr; "K. Conv." (mobile only)<br>
+    &bull; "Angled Grip", "Stable Stock", "Padded Stock" &rarr; stay as-is<br>
+    &bull; Tier suffixes always shown (I, II, III)<br><br>
+
+    <strong>6. Mod gallery layout (Advisor consistency)</strong><br>
+    Attachments are displayed as vertical icon+label columns — 36px icon on top, 10px label below — matching the Advisor R3-final gallery pattern exactly. Desktop uses 80px max-width items with 6px gap; mobile uses 70px items with 4px gap and 30px icons. This creates a unified visual language for "mod display" across the entire application. Eliminates the horizontal chip pattern that only existed in the builder.<br><br>
+
+    <strong>7. Interaction model clarified</strong><br>
+    Clicking a build card = enter the builder with those mods pre-equipped. Same as the existing GoalCard behavior but with the new guide data. "Build manually" link enters builder with blank slate. This maps cleanly to the existing <code>applyGuideBuild</code> / <code>resetToBuilds</code> actions in the plan.
+  </div>
+
+  <!-- ================================================================
+       ENGINEERING HANDOFF NOTES
+       ================================================================ -->
+  <div style="margin-top: 40px; padding: 20px; background: #0d1117; border: 2px solid #f97316; border-radius: 10px; font-size: 13px; line-height: 1.7; color: #9ca3af;">
+    <div style="font-size: 16px; font-weight: 700; color: #fb923c; margin-bottom: 16px;">Engineering Handoff Notes</div>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Component Mapping (Prototype → React)</div>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px;">
+      <tr style="border-bottom: 1px solid #374151;">
+        <td style="padding: 4px 8px; color: #f97316; font-weight: 600;">Prototype Element</td>
+        <td style="padding: 4px 8px; color: #f97316; font-weight: 600;">Target Component</td>
+        <td style="padding: 4px 8px; color: #f97316; font-weight: 600;">Notes</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;"><code>.weapon-header-card</code></td>
+        <td style="padding: 4px 8px;"><code>WeaponHeader.tsx</code> (existing)</td>
+        <td style="padding: 4px 8px;">Reuse as-is. May need to add weapon description display.</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;"><code>.r4-card</code></td>
+        <td style="padding: 4px 8px;"><strong>New: <code>BuildCard.tsx</code></strong></td>
+        <td style="padding: 4px 8px;">Replaces <code>GoalCard.tsx</code>. One card per guide build.</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;"><code>.r4-mod-gallery</code></td>
+        <td style="padding: 4px 8px;"><strong>New: <code>shared/ModGallery.tsx</code></strong></td>
+        <td style="padding: 4px 8px;">Shared with Advisor. Extract as reusable component.</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;"><code>.r4-sidebar</code> (desktop)</td>
+        <td style="padding: 4px 8px;">Inline in <code>WeaponBuilder.tsx</code></td>
+        <td style="padding: 4px 8px;">Always-visible sticky sidebar. Same pattern as current sidebar.</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;"><code>.mobile-intel</code></td>
+        <td style="padding: 4px 8px;">Inline or extract</td>
+        <td style="padding: 4px 8px;">Collapsible accordion with <code>useState</code> toggle. Collapsed by default.</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 8px;"><code>.builds-header</code></td>
+        <td style="padding: 4px 8px;">Inline in <code>WeaponBuilder.tsx</code></td>
+        <td style="padding: 4px 8px;">"Suggested Attachments" header + "build manually" link.</td>
+      </tr>
+    </table>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Graduated Tier Derivation</div>
+    <p>The left border color and build number circle are determined by the <strong>highest-rarity mod</strong> in each build. Iterate the build's mods, find max rarity using <code>RARITY_ORDER</code> from <code>constants.ts</code>, then map to a tier class:</p>
+    <ul style="padding-left: 20px; margin: 8px 0 16px;">
+      <li><strong>Legendary</strong> → gold left border (50% opacity), gold circle</li>
+      <li><strong>Epic</strong> → pink left border (45%), pink circle</li>
+      <li><strong>Rare</strong> → blue left border (40%), blue circle</li>
+      <li><strong>Uncommon</strong> → green left border (35%), green circle</li>
+      <li><strong>Common</strong> → subtle gray border, gray circle</li>
+    </ul>
+    <p style="margin-bottom: 16px;">Use <code>color-mix(in srgb, var(--color-rarity-X) N%, transparent)</code> for the semi-transparent borders. The opacity decreases as rarity decreases (50→45→40→35→subtle) to reinforce the visual gradient.</p>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Crafting Requirement Labels</div>
+    <p>Derived from highest-rarity mod, shown adjacent to range name with <code>·</code> separator:</p>
+    <ul style="padding-left: 20px; margin: 8px 0 16px;">
+      <li><strong>Legendary</strong> → Desktop: "Requires Legendaries" / Mobile: "Legendaries" (gold)</li>
+      <li><strong>Epic</strong> → "Requires Mod Components" / "Mod Comps" (pink)</li>
+      <li><strong>Rare</strong> → "Requires Mod Components" / "Mod Comps" (blue)</li>
+      <li><strong>Uncommon</strong> → "Requires Mech Components" / "Mech Comps" (green)</li>
+      <li><strong>Common</strong> → "Base Materials" / "Base Materials" (<code>text-faint</code>)</li>
+    </ul>
+    <p style="margin-bottom: 16px;">Epic and Rare both say "Mod Components" — the color differentiates them visually.</p>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">ModGallery Shared Component</div>
+    <p style="margin-bottom: 8px;">Extract <code>ModGallery.tsx</code> into <code>src/components/shared/</code>. Both Builder and Advisor use the same vertical icon+label layout. Props:</p>
+    <ul style="padding-left: 20px; margin: 8px 0 16px;">
+      <li><code>mods: Array&lt;{ slot, family, tier }&gt;</code> — the build's mod selections</li>
+      <li><code>weaponId: string</code> — for mod image lookup from <code>mods.ts</code></li>
+      <li><code>compact?: boolean</code> — mobile (30px icons, 9px labels, 70px items) vs desktop (36px, 10px, 80px)</li>
+    </ul>
+    <p style="margin-bottom: 16px;">The Advisor's current inline mod display should also migrate to this shared component for consistency.</p>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Abbreviation Utility</div>
+    <p style="margin-bottom: 8px;">Extract to <code>src/utils/abbreviate.ts</code>. Used by both Builder and Advisor:</p>
+    <ul style="padding-left: 20px; margin: 8px 0 16px;">
+      <li>"Compensator" → "Comp." (always)</li>
+      <li>"Extended" → "Ext." (always)</li>
+      <li>"Light" (as in Light Mag) → "Lt." (always)</li>
+      <li>"Magazine" → "Mag" (always)</li>
+      <li>"Shotgun" → "SG" (always)</li>
+      <li>"Vertical" → "Vert." (always)</li>
+      <li>"Horizontal Grip" → "H. Grip" (mobile only)</li>
+      <li>"Kinetic Converter" → "K. Conv." (mobile only)</li>
+      <li>Tier suffixes I, II, III always shown</li>
+    </ul>
+    <p style="margin-bottom: 16px;">Consider a <code>compact</code> flag that enables mobile-only abbreviations.</p>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Responsive Breakpoints</div>
+    <ul style="padding-left: 20px; margin: 8px 0 16px;">
+      <li><strong>Desktop (lg+)</strong>: 2-col grid (<code>1fr 280px</code>), sidebar sticky at <code>top: 76px</code>, gallery icons 36px, cards <code>align-items: flex-start; padding: 14px</code></li>
+      <li><strong>Mobile (&lt;lg)</strong>: Single column, no sidebar. Intel accordion collapsed by default. Gallery icons 30px, cards <code>padding: 12px</code></li>
+    </ul>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Interaction Model</div>
+    <ul style="padding-left: 20px; margin: 8px 0 16px;">
+      <li><strong>Click build card</strong> → apply those mods to equipped state → transition to slot editing view (same as old <code>handleSelectGoal</code>)</li>
+      <li><strong>Click "build manually"</strong> → dismiss build list, enter builder with blank slate</li>
+      <li><strong>No persistent "active build"</strong> — once applied, mods are just regular equipped mods</li>
+      <li><strong>"Clear All Attachments"</strong> → returns to build list view</li>
+    </ul>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">State Changes from Current Code</div>
+    <p style="margin-bottom: 4px;"><strong style="color: #f87171;">Remove:</strong></p>
+    <ul style="padding-left: 20px; margin: 4px 0 12px;">
+      <li><code>GOAL_PRESETS</code> import and all references in <code>WeaponBuilder.tsx</code></li>
+      <li><code>GoalCard.tsx</code> component (replaced by <code>BuildCard.tsx</code>)</li>
+      <li><code>selectedGoal</code> state and <code>onSelectGoal</code> callback</li>
+      <li>Goal picker sidebar section</li>
+      <li><code>goalDismissed</code> / <code>goalExpanded</code> state → simplify to <code>showBuildList</code> boolean</li>
+    </ul>
+    <p style="margin-bottom: 4px;"><strong style="color: #22c55e;">Add:</strong></p>
+    <ul style="padding-left: 20px; margin: 4px 0 16px;">
+      <li><code>WeaponGuide</code> type in <code>types/index.ts</code></li>
+      <li>Guide data import (new data file, per <code>attachment_guide_plan.md</code> Steps 2-3)</li>
+      <li><code>BuildCard.tsx</code> component</li>
+      <li><code>shared/ModGallery.tsx</code> component (shared with Advisor)</li>
+      <li>Tier derivation utility (highest rarity → tier class)</li>
+      <li>Abbreviation utility (shared with Advisor)</li>
+    </ul>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Key File References</div>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px;">
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Current builder layout</td>
+        <td style="padding: 4px 8px;"><code>src/components/builder/WeaponBuilder.tsx</code></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Goal cards (to be replaced)</td>
+        <td style="padding: 4px 8px;"><code>src/components/goals/GoalCard.tsx</code></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Mod images (wiki URLs)</td>
+        <td style="padding: 4px 8px;"><code>src/data/mods.ts</code> — each family has an <code>img</code> field</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Weapon images</td>
+        <td style="padding: 4px 8px;"><code>src/data/constants.ts</code> — <code>WEAPON_IMAGES</code> map</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Rarity colors + ordering</td>
+        <td style="padding: 4px 8px;"><code>src/index.css</code> (CSS vars) + <code>constants.ts</code> (<code>RARITY_COLORS</code>, <code>RARITY_ORDER</code>)</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Advisor gallery reference</td>
+        <td style="padding: 4px 8px;"><code>prototypes/advisor/CLAUDE-r3-final.html</code></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #1f2937;">
+        <td style="padding: 4px 8px;">Master plan</td>
+        <td style="padding: 4px 8px;"><code>.claude/docs/attachment_guide_plan.md</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 8px;">Weapon data (desc, weakness)</td>
+        <td style="padding: 4px 8px;"><code>src/data/weapons.ts</code></td>
+      </tr>
+    </table>
+
+    <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">Visual QA Checklist</div>
+    <ul style="padding-left: 20px; margin: 8px 0;">
+      <li>Build cards show graduated left-border accent matching highest rarity</li>
+      <li>Build number circles match the same rarity color</li>
+      <li>Crafting labels appear adjacent to range name with dot separator</li>
+      <li>Mod gallery icons are 36px (desktop) / 30px (mobile)</li>
+      <li>Mod names are rarity-colored</li>
+      <li>Chevron animates right + turns orange on card hover</li>
+      <li>Desktop sidebar is always visible and sticky</li>
+      <li>Mobile intel accordion starts collapsed, shows warning count</li>
+      <li>Mobile intel expands/collapses with chevron rotation</li>
+      <li>Gallery layout visually matches Advisor R3-final's mod display</li>
+      <li>Abbreviations are consistent between Builder and Advisor</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

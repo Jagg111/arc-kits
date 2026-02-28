@@ -1,6 +1,6 @@
 # Attachment Guide System — Implementation Plan
 
-**Overall Progress:** `0%`
+**Overall Progress:** `8%`
 
 ## TLDR
 
@@ -106,11 +106,11 @@ Single-tier mods (Extended Barrel, Padded Stock, Lightweight Stock, Silencer III
 
 ## Tasks
 
-- [ ] 🟥 **Step 1: HTML prototypes**
-  - [ ] 🟥 Prototype Builder UI: build list presentation with range + rarity tags, tips display, avoid info, "Build Manually" option, back-to-list reset flow
-  - [ ] 🟥 Prototype Advisor: crafting material filter checkboxes layout + recommended build display on pairing cards (full slot layout with mod images/names/rarity, including blank slots)
+- [x] 🟩 **Step 1: HTML prototypes**
+  - [x] 🟩 Prototype Builder UI: build list presentation with range + rarity tags, tips display, avoid info, "Build Manually" option, back-to-list reset flow
+  - [x] 🟩 Prototype Advisor: crafting material filter checkboxes layout + recommended build display on pairing cards (full slot layout with mod images/names/rarity, including blank slots) — **R3 gallery layout approved** (`prototypes/advisor/CLAUDE-r3-final.html`)
   - [ ] 🟥 Review and iterate on prototypes before proceeding to implementation
-  - [ ] 🟥 Review final prototypes and note any changes needed to this plan and future steps to accomodate
+  - [ ] 🟥 Review final prototypes and note any changes needed to this plan and future steps to accomodate — No plan changes needed; R3 gallery layout is compatible with all planned steps
 
 - [ ] 🟥 **Step 2: Fix mod rarity data in `mods.ts`**
   - [ ] 🟥 Change Extended Barrel from `Rare` to `Epic` (key change in `tiers` object)
