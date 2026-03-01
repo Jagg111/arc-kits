@@ -52,6 +52,9 @@ export default function Header({
 
   const tabs = (
     <div className="flex bg-surface-alt rounded-lg p-0.5">
+      <button className={tabClass(activeView === "advisor")} onClick={() => onChangeView("advisor")}>
+        Advisor
+      </button>
       {isWeaponBuilder ? (
         <button
           onClick={onReset}
@@ -67,9 +70,6 @@ export default function Header({
           Weapons
         </button>
       )}
-      <button className={tabClass(activeView === "advisor")} onClick={() => onChangeView("advisor")}>
-        Advisor
-      </button>
     </div>
   );
 

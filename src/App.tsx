@@ -29,7 +29,10 @@ import type { AppView, GuideBuild } from "./types";
 
 export default function App() {
   // Top-level view state: which tab is active
-  const [activeView, setActiveView] = useState<AppView>("weapons");
+  // Default to advisor unless a shared build URL is present (?w=...)
+  const [activeView, setActiveView] = useState<AppView>(
+    new URLSearchParams(window.location.search).has("w") ? "weapons" : "advisor"
+  );
 
   // Theme: dark/light mode with OS preference detection and localStorage persistence
   const { theme, toggleTheme } = useTheme();

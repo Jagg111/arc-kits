@@ -17,8 +17,13 @@ No backend, no API calls, no database. All game data is hardcoded. Deployed to G
 - Tailwind CSS 4 (via @tailwindcss/vite plugin)
 - No state library — props-down/callbacks-up with custom hooks
 
+## Getting Started
+1. **Prerequisites**: Node.js 20+ and npm
+2. **Install dependencies**: `npm install`
+3. **Start dev server**: `npm run dev` — launches Vite with HMR at `http://localhost:5173/arc-kits/`
+
 ## Build & Dev Commands
-- `npm run dev` — Vite dev server with HMR on localhost:5173
+- `npm run dev` — Vite dev server with HMR at `http://localhost:5173/arc-kits/`
 - `npm run build` — TypeScript check (`tsc -b`) then Vite production build to `dist/`
 - `npm run preview` — serve production build locally
 
