@@ -42,6 +42,7 @@ export default function AttachmentSlot({
     const family = families.find((f) => f.fam === equipped.fam);
     const tierData = family?.tiers[equipped.tier];
     const color = RARITY_COLORS[equipped.tier];
+    const isSingleTier = family ? Object.keys(family.tiers).length === 1 : false;
 
     return (
       <div
@@ -59,12 +60,14 @@ export default function AttachmentSlot({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-text-primary text-sm truncate">{equipped.fam}</span>
-            <span
-              className="shrink-0 px-1.5 py-0.5 rounded text-xs font-bold"
-              style={{ backgroundColor: color, color: "white" }}
-            >
-              {RARITY_LABELS[equipped.tier]}
-            </span>
+            {!isSingleTier && (
+              <span
+                className="shrink-0 px-1.5 py-0.5 rounded text-xs font-bold"
+                style={{ backgroundColor: color, color: "white" }}
+              >
+                {RARITY_LABELS[equipped.tier]}
+              </span>
+            )}
           </div>
           <ul className="text-xs text-text-secondary mt-0.5 space-y-0.5">
             {tierData?.e.map((effect, i) => (

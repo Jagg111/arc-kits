@@ -1,85 +1,99 @@
 // ============================================================================
 // FILE: components/builder/WeaponBuilder.tsx
-// PURPOSE: Main builder screen layout — orchestrates goals, attachment slots, stats, and costs
+// PURPOSE: Main builder screen — build list (guide builds) or customizer (slot grid)
 // USED BY: App.tsx (shown when a weapon is selected)
 //
-// THREE RENDERING STATES:
-//   1. No slots — shows a "No Attachment Slots" message (e.g. Jupiter, Equalizer)
-//   2. Goal-first flow — shown when weapon first selected, before any mods are equipped.
-//      Displays goal preset cards + a "Build Manually" option.
-//   3. Main builder — shows attachment slot grid + sidebar (desktop) / bottom bar (mobile)
+// RENDERING STATES:
+//   1. No slots (e.g. Jupiter, Equalizer) — "No Attachment Slots" message
+//   2. Has slots but no guide (e.g. Hairpin) — "No attachment guide" lockdown
+//   3. Has guide + showBuildList — build list (suggested builds + Build Manually link)
+//   4. Has guide + !showBuildList — full customizer (slot grid, sidebar, ModDrawer)
 //
-// DESKTOP vs MOBILE:
-//   Desktop: 3-column grid — sidebar (col 1) has goals/stats/cost, slots (cols 2-3)
-//   Mobile: Slots only + StatsSummaryBar fixed at bottom of screen
+// BUILD LIST LAYOUT:
+//   Desktop (lg+): 2-column grid (1fr 280px) — build cards left, intel sidebar right
+//   Mobile (<lg):  Single column — intel accordion (collapsed) above build cards
+//
+// Local state: showBuildList (true = list of builds, false = slot editor).
+// No persistent "active build" — applying a build just sets equipped state.
 // ============================================================================
 
-import { useState } from "react";
-import type { Weapon, EquippedState, SlotType, Rarity, CumulativeEffect } from "../../types";
-import { GOAL_PRESETS } from "../../data/presets";
+import { useState, useEffect } from "react";
+import type { Weapon, EquippedState, SlotType, Rarity, CumulativeEffect, WeaponGuide } from "../../types";
 import { MATERIAL_INFO, RARITY_COLORS } from "../../data/constants";
-import WeaponHeader from "../goals/WeaponHeader";
-import GoalCard from "../goals/GoalCard";
+import WeaponHeader from "./WeaponHeader";
+import BuildCard from "./BuildCard";
+import WeaponIntel from "./WeaponIntel";
 import AttachmentSlot from "./AttachmentSlot";
 import ModDrawer from "./ModDrawer";
 import StatsSummaryBar from "./StatsSummaryBar";
 
 interface WeaponBuilderProps {
   weapon: Weapon;
-  selectedGoal: string | null;
+  guide: WeaponGuide | null;
   equipped: EquippedState;
   buildCost: Record<string, number>;
   cumulativeEffects: CumulativeEffect[];
-  onSelectGoal: (key: string) => void;
+  onApplyGuideBuild: (buildIndex: number) => void;
   onEquip: (slot: string, fam: string, tier: Rarity) => void;
   onRemove: (slot: string) => void;
   onClearAll: () => void;
+  onBackToBuilds: () => void;
 }
 
 export default function WeaponBuilder({
   weapon,
-  selectedGoal,
+  guide,
   equipped,
   buildCost,
   cumulativeEffects,
-  onSelectGoal,
+  onApplyGuideBuild,
   onEquip,
   onRemove,
   onClearAll,
+  onBackToBuilds,
 }: WeaponBuilderProps) {
-  const [activeSlot, setActiveSlot] = useState<SlotType | null>(null);  // Which slot's ModDrawer is open
-  const [goalDismissed, setGoalDismissed] = useState(false);           // Has user dismissed the goal-first flow
-  const [goalExpanded, setGoalExpanded] = useState(true);              // Is the goal picker expanded in sidebar
+  const [activeSlot, setActiveSlot] = useState<SlotType | null>(null);
+  /** When true, show build list; when false, show slot grid (customizer). */
+  const [showBuildList, setShowBuildList] = useState(true);
 
   const hasEquipped = Object.keys(equipped).length > 0;
   const hasCost = Object.keys(buildCost).length > 0;
   const totalSlots = weapon.slots.length;
 
-  // Show goal-first flow when weapon first selected, no mods, no goal, not dismissed
-  const showGoalFirst = totalSlots > 0 && !hasEquipped && !selectedGoal && !goalDismissed;
+  // When URL or external state loads with mods already equipped, show customizer
+  useEffect(() => {
+    if (guide && hasEquipped) setShowBuildList(false);
+  }, [guide, hasEquipped]);
 
-  const handleSelectGoal = (key: string) => {
-    onSelectGoal(key);
-    setGoalExpanded(false);
-    setGoalDismissed(true);
+  // -- Handlers ---------------------------------------------------------------
+
+  const handleSelectBuild = (buildIndex: number) => {
+    onApplyGuideBuild(buildIndex);
+    setShowBuildList(false);
   };
 
-  const handleClearGoal = () => {
+  const handleBuildManually = () => {
+    setShowBuildList(false);
+  };
+
+  const handleBackToBuilds = () => {
+    onBackToBuilds();
+    setShowBuildList(true);
+  };
+
+  const handleClearAll = () => {
     onClearAll();
-    setGoalExpanded(true);
-    setGoalDismissed(false);
+    // Stay in customizer with empty slots; "Back to builds" returns to list
   };
 
-  // Filter goals to only those that have a build defined for this weapon
-  const availableGoals = Object.entries(GOAL_PRESETS).filter(
-    ([, goal]) => goal.builds[weapon.id],
-  );
+  const showBuildListView = guide && showBuildList;
 
   return (
     <div className="space-y-6">
       <WeaponHeader weapon={weapon} />
 
-      {weapon.slots.length === 0 ? (
+      {/* STATE 1: No attachment slots */}
+      {totalSlots === 0 ? (
         <div className="bg-surface rounded-xl border border-border-subtle p-12 text-center">
           <div className="text-6xl mb-4">🔒</div>
           <p className="text-xl text-text-secondary font-semibold mb-2">
@@ -89,92 +103,79 @@ export default function WeaponBuilder({
             This weapon cannot be modified
           </p>
         </div>
-      ) : showGoalFirst ? (
-        /* Goal-first flow */
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-text-secondary">Choose a Build Goal</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {availableGoals.map(([key, goal]) => (
-              <GoalCard
-                key={key}
-                goalKey={key}
-                goal={goal}
-                weaponId={weapon.id}
-                isSelected={false}
-                onSelect={handleSelectGoal}
-              />
-            ))}
-            {/* Build Manually tile */}
-            <button
-              onClick={() => setGoalDismissed(true)}
-              className="flex items-center gap-4 p-5 rounded-xl border border-border bg-surface-alt/50 hover:border-text-secondary hover:bg-surface-alt transition-all text-left"
-            >
-              <svg className="w-8 h-8 text-text-secondary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l5.653-4.655m3.586-3.586a2.548 2.548 0 013.586 3.586m-6.586-6.586l6.586 6.586" />
-              </svg>
-              <div className="min-w-0">
-                <div className="font-bold text-text-primary">Build Manually</div>
-                <div className="text-sm text-text-secondary mt-0.5">Pick your own attachments slot by slot</div>
-              </div>
-            </button>
+
+      /* STATE 2: Has slots but no guide */
+      ) : !guide ? (
+        <div className="bg-surface rounded-xl border border-border-subtle p-12 text-center">
+          <div className="text-6xl mb-4">🔒</div>
+          <p className="text-xl text-text-secondary font-semibold mb-2">
+            No attachment guide
+          </p>
+          <p className="text-sm text-text-muted">
+            This weapon has no curated builds. You can still build manually from the weapon picker.
+          </p>
+        </div>
+
+      /* STATE 3: Build list screen */
+      ) : showBuildListView ? (
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+          {/* Left column: build list header + build cards */}
+          <div className="space-y-4">
+            {/* Mobile intel accordion (above cards on small screens) */}
+            <div className="lg:hidden">
+              <WeaponIntel weapon={weapon} guide={guide} />
+            </div>
+
+            {/* Build list header */}
+            <div>
+              <span className="text-[14px] font-bold uppercase text-text-muted tracking-wide">
+                Suggested Attachments
+              </span>
+              <p className="text-[12px] text-text-muted mt-0.5">
+                Select a set to enter builder, or{" "}
+                <button
+                  type="button"
+                  onClick={handleBuildManually}
+                  className="text-accent-text hover:text-accent-hover font-medium underline"
+                >
+                  build manually
+                </button>
+              </p>
+            </div>
+
+            {/* Build cards */}
+            <div className="space-y-2">
+              {guide.builds.map((build, i) => (
+                <BuildCard
+                  key={i}
+                  index={i + 1}
+                  build={build}
+                  allSlots={weapon.slots}
+                  onSelect={() => handleSelectBuild(i)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Right column: desktop intel sidebar (sticky) */}
+          <div className="hidden lg:block lg:sticky lg:top-[76px] lg:self-start">
+            <WeaponIntel weapon={weapon} guide={guide} />
           </div>
         </div>
+
+      /* STATE 4: Full builder/customizer screen */
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sidebar - hidden on mobile, shown on desktop */}
+          {/* Sidebar — "Back to builds" + effects + cost + clear */}
           <div className="hidden lg:block lg:col-span-1 space-y-4 lg:sticky lg:top-28 lg:self-start">
-            {/* Goal Picker */}
+            {/* Back to builds */}
             <div className="bg-surface rounded-xl border border-border-subtle p-4">
-              {selectedGoal && !goalExpanded ? (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{GOAL_PRESETS[selectedGoal].icon}</span>
-                    <div>
-                      <div className="font-semibold text-text-primary text-sm">{GOAL_PRESETS[selectedGoal].name}</div>
-                      <div className="text-xs text-text-secondary">Active goal</div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setGoalExpanded(true)}
-                    className="text-xs text-accent-text hover:text-accent-hover font-semibold transition-colors"
-                  >
-                    Change
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Quick Start</h4>
-                    {selectedGoal && (
-                      <button
-                        onClick={() => setGoalExpanded(false)}
-                        className="text-xs text-text-muted hover:text-text-secondary transition-colors"
-                      >
-                        Collapse
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    {availableGoals.map(([key, goal]) => (
-                      <button
-                        key={key}
-                        onClick={() => handleSelectGoal(key)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                          selectedGoal === key
-                            ? "border-accent bg-accent/10"
-                            : "border-border bg-surface-alt hover:border-accent/50"
-                        }`}
-                      >
-                        <span className="text-2xl shrink-0">{goal.icon}</span>
-                        <div className="min-w-0">
-                          <div className="font-semibold text-sm text-text-primary">{goal.name}</div>
-                          <div className="text-xs text-text-secondary truncate">{goal.desc}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <button
+                onClick={handleBackToBuilds}
+                className="w-full text-left text-sm text-accent-text hover:text-accent-hover font-semibold transition-colors"
+              >
+                ← Back to builds
+              </button>
             </div>
 
             {/* Cumulative Effects */}
@@ -247,7 +248,7 @@ export default function WeaponBuilder({
             {/* Clear All */}
             {hasEquipped && (
               <button
-                onClick={handleClearGoal}
+                onClick={handleClearAll}
                 className="w-full px-4 py-3 rounded-lg bg-danger-bg hover:bg-danger-bg-hover text-danger-text font-semibold transition-colors"
               >
                 Clear All Attachments
@@ -257,7 +258,16 @@ export default function WeaponBuilder({
 
           {/* Attachment Slots */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Slot Grid */}
+            {/* Back to builds — mobile */}
+            <div className="lg:hidden">
+              <button
+                onClick={handleBackToBuilds}
+                className="text-sm text-accent-text hover:text-accent-hover font-semibold"
+              >
+                ← Back to builds
+              </button>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {weapon.slots.map((slot) => (
                 <AttachmentSlot
@@ -272,10 +282,9 @@ export default function WeaponBuilder({
               ))}
             </div>
 
-            {/* Clear All - mobile only */}
             {hasEquipped && (
               <button
-                onClick={handleClearGoal}
+                onClick={handleClearAll}
                 className="lg:hidden w-full px-4 py-3 rounded-lg bg-danger-bg hover:bg-danger-bg-hover text-danger-text font-semibold transition-colors"
               >
                 Clear All Attachments
@@ -285,24 +294,23 @@ export default function WeaponBuilder({
         </div>
       )}
 
-      {/* Mobile Stats Summary Bar */}
-      <StatsSummaryBar
-        totalSlots={totalSlots}
-        buildCost={buildCost}
-        cumulativeEffects={cumulativeEffects}
-        selectedGoal={selectedGoal}
-        availableGoals={availableGoals}
-        onSelectGoal={handleSelectGoal}
-        hasEquipped={hasEquipped}
-        onClearAll={handleClearGoal}
-      />
+      {/* Mobile Stats Summary Bar — only in customizer, not build list */}
+      {!showBuildListView && (
+        <StatsSummaryBar
+          totalSlots={totalSlots}
+          buildCost={buildCost}
+          cumulativeEffects={cumulativeEffects}
+          hasEquipped={hasEquipped}
+          onClearAll={handleClearAll}
+        />
+      )}
 
-      {/* Mod Drawer */}
       {activeSlot && (
         <ModDrawer
           slot={activeSlot}
           weaponId={weapon.id}
           equippedMod={equipped[activeSlot]}
+          avoid={guide?.avoid}
           onEquip={onEquip}
           onClose={() => setActiveSlot(null)}
         />

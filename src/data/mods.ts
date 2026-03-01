@@ -8,7 +8,7 @@
 // HOW WEAPON COMPATIBILITY WORKS:
 // Each mod family has a `w` array listing which weapon IDs can equip that mod.
 // Helper arrays like MOST_MUZZLE exclude weapons that lack a muzzle slot.
-// The `poor` array (optional) marks weapons where the mod gives little benefit.
+// Per-weapon avoid lists (in guide data) replace the former "poor" field for warnings.
 // ============================================================================
 
 import type { ModFamilies } from "../types";
@@ -83,7 +83,6 @@ export const MOD_FAMILIES: ModFamilies = {
         },
       },
       w: MOST_MUZZLE,
-      poor: ["ferro"],
     },
     {
       fam: "Muzzle Brake",
@@ -106,7 +105,6 @@ export const MOD_FAMILIES: ModFamilies = {
         },
       },
       w: MOST_MUZZLE,
-      poor: ["ferro"],
     },
     {
       fam: "Silencer",
@@ -133,7 +131,7 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Extended Barrel",
       desc: "Increases velocity",
       tiers: {
-        Rare: {
+        Epic: {
           e: ["25% Increased Bullet Velocity", "15% Increased Vertical Recoil"],
           cr: "2x Mod Components, 8x Wires",
           img: W("2/2f", "Extended_Barrel.png"),
@@ -203,7 +201,6 @@ export const MOD_FAMILIES: ModFamilies = {
         },
       },
       w: MOST_UB,
-      poor: ["ferro"],
     },
     {
       fam: "Vertical Grip",
@@ -226,7 +223,6 @@ export const MOD_FAMILIES: ModFamilies = {
         },
       },
       w: MOST_UB,
-      poor: ["ferro"],
     },
     {
       fam: "Horizontal Grip",
@@ -239,7 +235,6 @@ export const MOD_FAMILIES: ModFamilies = {
         },
       },
       w: MOST_UB,
-      poor: ["ferro"],
     },
   ],
   "Light Magazine": [
@@ -341,7 +336,7 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Padded Stock",
       desc: "All-in-one stability",
       tiers: {
-        Rare: {
+        Epic: {
           e: ["15% Reduced Vertical Recoil", "15% Reduced Horizontal Recoil", "20% Reduced Per-Shot Dispersion", "20% Increased Equip Time", "20% Increased Unequip Time", "30% Reduced ADS Speed"],
           cr: "2x Mod Components, 5x Duct Tape",
           img: W("4/4b", "Padded_Stock.png"),
@@ -353,7 +348,7 @@ export const MOD_FAMILIES: ModFamilies = {
       fam: "Lightweight Stock",
       desc: "Fast ADS",
       tiers: {
-        Rare: {
+        Epic: {
           e: ["200% Increased ADS Speed", "30% Reduced Equip Time", "30% Reduced Unequip Time", "50% Increased Vertical Recoil", "50% Increased Recoil Recovery Time"],
           cr: "2x Mod Components, 5x Duct Tape",
           img: W("c/cb", "Lightweight_Stock.png"),
@@ -375,7 +370,6 @@ export const MOD_FAMILIES: ModFamilies = {
         "arpeggio", "rattler", "kettle", "vulcano", "osprey", "torrente",
         "ferro", "iltoro", "bettina", "stitcher", "bobcat", "tempest", "renegade",
       ],
-      poor: ["ferro"],
     },
   ],
   "Tech Mod": [

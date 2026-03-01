@@ -98,3 +98,4 @@ export function recommendLoadouts(
 }
 
 export { parseAdvisorQuery, serializeAdvisorQuery } from "./url-state";
+export { selectBuildForAdvisor } from "./attachment-selection";

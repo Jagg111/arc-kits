@@ -10,6 +10,7 @@ import type {
   AdvisorFocus,
   AdvisorPreferredRange,
   Rarity,
+  AdvisorCraftingFilters,
 } from "../../types";
 import type { AdvisorFilterState } from "../../hooks/useAdvisorFilters";
 import {
@@ -29,7 +30,24 @@ interface AdvisorFilterBarProps {
   onSetFocus: (fc: AdvisorFocus) => void;
   onSetRange: (rg: AdvisorPreferredRange) => void;
   onToggleRarity: (rarity: Rarity) => void;
+  onSetCraftingFilters: (update: Partial<AdvisorCraftingFilters>) => void;
 }
+
+/**
+ * Crafting material toggle definitions. Each maps a boolean key in
+ * AdvisorCraftingFilters to a user-facing label and accent color.
+ * Order matches the plan: Mechanical → Mod → KC → HG.
+ */
+const CRAFTING_TOGGLES: {
+  key: keyof AdvisorCraftingFilters;
+  label: string;
+  color: string;
+}[] = [
+  { key: "mechanicalComponents", label: "Mech Comps", color: "var(--color-rarity-uncommon)" },
+  { key: "modComponents", label: "Mod Comps", color: "var(--color-rarity-rare)" },
+  { key: "kineticConverter", label: "Kinetic Conv.", color: "var(--color-rarity-legendary)" },
+  { key: "horizontalGrip", label: "Horiz. Grip", color: "var(--color-rarity-legendary)" },
+];
 
 // Shared pill styling
 const basePill =
@@ -63,6 +81,7 @@ export default function AdvisorFilterBar({
   onSetFocus,
   onSetRange,
   onToggleRarity,
+  onSetCraftingFilters,
 }: AdvisorFilterBarProps) {
   return (
     <div className="bg-filter-bar-bg border-b border-border-subtle py-2.5 px-5 sticky top-[92px] sm:top-14 z-10">
@@ -73,7 +92,7 @@ export default function AdvisorFilterBar({
           {ADVISOR_INPUT_ENUMS.locations.map((loc) => (
             <button
               key={loc}
-              className={basePill + (filters.location !== loc ? ` border-border bg-surface-alt text-text-secondary hover:border-border hover:text-text-primary` : "")}
+              className={filters.location !== loc ? unselectedPill : basePill}
               style={filters.location === loc ? selectedPillStyle() : undefined}
               onClick={() => onSetLocation(loc)}
             >
@@ -135,7 +154,7 @@ export default function AdvisorFilterBar({
 
         <Separator />
 
-        {/* Rarity checkboxes */}
+        {/* Weapon rarity checkboxes — controls which weapons get recommended */}
         <div className="flex items-center gap-1.5">
           <FilterLabel>Rarity</FilterLabel>
           {ADVISOR_ALL_RARITIES.map((rarity) => {
@@ -166,6 +185,43 @@ export default function AdvisorFilterBar({
                   <span className="text-[0.65rem]">&#10007;</span>
                 )}
                 {rarity}
+              </button>
+            );
+          })}
+        </div>
+
+        <Separator />
+
+        {/* Crafting material toggles — controls which attachment builds are eligible */}
+        <div className="flex items-center gap-1.5">
+          <FilterLabel>Crafting</FilterLabel>
+          {CRAFTING_TOGGLES.map(({ key, label, color }) => {
+            const checked = filters.craftingFilters[key];
+            return (
+              <button
+                key={key}
+                className={`${basePill} inline-flex items-center gap-1`}
+                style={
+                  checked
+                    ? {
+                        backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
+                        borderColor: color,
+                        color: color,
+                      }
+                    : {
+                        borderColor: "var(--color-border)",
+                        backgroundColor: "var(--color-surface-alt)",
+                        color: "var(--color-text-muted)",
+                      }
+                }
+                onClick={() => onSetCraftingFilters({ [key]: !checked })}
+              >
+                {checked ? (
+                  <span className="font-bold text-[0.7rem]">&#10003;</span>
+                ) : (
+                  <span className="text-[0.65rem]">&#10007;</span>
+                )}
+                {label}
               </button>
             );
           })}

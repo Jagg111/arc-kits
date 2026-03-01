@@ -4,16 +4,19 @@
 // USED BY: AdvisorResults.tsx
 // ============================================================================
 
-import type { PairRecommendation } from "../../types";
+import type { PairRecommendation, GuideBuild } from "../../types";
 import WeaponBlock from "./WeaponBlock";
 import SynergyTagList from "./SynergyTagList";
 
 interface PairingCardProps {
   recommendation: PairRecommendation;
-  onOpenBuilder?: (weaponId: string) => void;
+  /** (weaponId, optional build for deep link). Passed through to WeaponBlock. */
+  onOpenBuilder?: (weaponId: string, build?: GuideBuild | null) => void;
+  /** Pre-computed best attachment build per weaponId (null = no guide data). */
+  buildsByWeapon?: Record<string, GuideBuild | null>;
 }
 
-export default function PairingCard({ recommendation, onOpenBuilder }: PairingCardProps) {
+export default function PairingCard({ recommendation, onOpenBuilder, buildsByWeapon }: PairingCardProps) {
   const isTopPick = recommendation.tier === "top_pick";
 
   return (
@@ -46,8 +49,18 @@ export default function PairingCard({ recommendation, onOpenBuilder }: PairingCa
 
       {/* Weapon blocks + synergy */}
       <div className="p-2.5 flex flex-col gap-2 flex-1">
-        <WeaponBlock weaponId={recommendation.primaryWeaponId} role="Primary" onOpenBuilder={onOpenBuilder} />
-        <WeaponBlock weaponId={recommendation.secondaryWeaponId} role="Secondary" onOpenBuilder={onOpenBuilder} />
+        <WeaponBlock
+          weaponId={recommendation.primaryWeaponId}
+          role="Primary"
+          onOpenBuilder={onOpenBuilder}
+          attachmentBuild={buildsByWeapon?.[recommendation.primaryWeaponId] ?? undefined}
+        />
+        <WeaponBlock
+          weaponId={recommendation.secondaryWeaponId}
+          role="Secondary"
+          onOpenBuilder={onOpenBuilder}
+          attachmentBuild={buildsByWeapon?.[recommendation.secondaryWeaponId] ?? undefined}
+        />
         <SynergyTagList tags={recommendation.synergyTags} />
       </div>
     </div>

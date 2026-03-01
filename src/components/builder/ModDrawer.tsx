@@ -3,17 +3,20 @@
 // PURPOSE: Slide-in drawer for selecting a mod for a specific slot
 // USED BY: WeaponBuilder.tsx (opened when user clicks an AttachmentSlot)
 //
+// AVOID WARNINGS: When the current weapon has a guide with an avoid list, mod
+// families that appear in that list are shown with a warning indicator and
+// reason (hover/tap). V1: visual cues only — no blocking or conditionals logic.
+//
 // ANIMATION: Uses a two-step approach for the slide-in:
 //   1. Component mounts with `isOpen = false` (drawer is off-screen via translate-x-full)
 //   2. `requestAnimationFrame` sets `isOpen = true` on next frame (triggers CSS transition)
 //   3. On close, sets `isOpen = false` first, then removes component after 300ms delay
 //
-// SCROLL LOCK: Sets `document.body.style.overflow = "hidden"` to prevent background scrolling
-// while the drawer is open. Restored on unmount via the useEffect cleanup function.
+// SCROLL LOCK: Sets `document.body.style.overflow = "hidden"` while open.
 // ============================================================================
 
 import { useState, useEffect, useRef } from "react";
-import type { SlotType, Rarity, ModFamily, EquippedMod } from "../../types";
+import type { SlotType, Rarity, ModFamily, EquippedMod, AvoidEntry } from "../../types";
 import { MOD_FAMILIES } from "../../data/mods";
 import ModFamilySection from "./ModFamilySection";
 
@@ -21,17 +24,23 @@ interface ModDrawerProps {
   slot: SlotType;
   weaponId: string;
   equippedMod?: EquippedMod;
+  /** Per-weapon avoid list from guide; avoided mods get a warning in the drawer. */
+  avoid?: AvoidEntry[];
   onEquip: (slot: string, fam: string, tier: Rarity) => void;
   onClose: () => void;
 }
 
-export default function ModDrawer({ slot, weaponId, equippedMod, onEquip, onClose }: ModDrawerProps) {
+export default function ModDrawer({ slot, weaponId, equippedMod, avoid, onEquip, onClose }: ModDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const families = (MOD_FAMILIES[slot] ?? []).filter((f: ModFamily) =>
     f.w.includes(weaponId),
   );
+
+  /** Resolve avoid reason for a mod family by name (guide avoid list uses mod name). */
+  const getAvoidReason = (famName: string): string | undefined =>
+    avoid?.find((e) => e.mod === famName)?.reason;
 
   useEffect(() => {
     requestAnimationFrame(() => setIsOpen(true));
@@ -51,6 +60,7 @@ export default function ModDrawer({ slot, weaponId, equippedMod, onEquip, onClos
       document.body.style.overflow = "";
       clearTimeout(scrollTimer);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally mount-only; equippedMod is captured at mount time
   }, []);
 
   const handleClose = () => {
@@ -100,6 +110,7 @@ export default function ModDrawer({ slot, weaponId, equippedMod, onEquip, onClos
               key={fam.fam}
               mod={fam}
               equippedTier={fam.fam === equippedMod?.fam ? equippedMod.tier : undefined}
+              avoidReason={getAvoidReason(fam.fam)}
               onSelect={handleSelect}
             />
           ))}

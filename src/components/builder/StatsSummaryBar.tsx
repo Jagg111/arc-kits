@@ -1,25 +1,21 @@
 // ============================================================================
 // FILE: components/builder/StatsSummaryBar.tsx
-// PURPOSE: Mobile-only bottom bar showing build stats, goals, effects, and costs
+// PURPOSE: Mobile-only bottom bar showing build stats, effects, and costs
 // USED BY: WeaponBuilder.tsx
 //
-// This is the mobile equivalent of the desktop sidebar in WeaponBuilder.
-// Hidden on desktop (lg:hidden). Shows a collapsed bar at the bottom that expands
-// upward to reveal goal picker, cumulative effects, cost breakdown, and clear button.
+// Hidden on desktop (lg:hidden). Expands upward to show cumulative effects,
+// cost breakdown, and clear button. Goal picker is optional (legacy); when
+// not provided, that section is omitted (Step 7 will add build list if needed).
 // ============================================================================
 
 import { useState } from "react";
-import type { CumulativeEffect, GoalPreset } from "../../types";
-import { GOAL_PRESETS } from "../../data/presets";
+import type { CumulativeEffect } from "../../types";
 import { MATERIAL_INFO, RARITY_COLORS } from "../../data/constants";
 
 interface StatsSummaryBarProps {
   totalSlots: number;
   buildCost: Record<string, number>;
   cumulativeEffects: CumulativeEffect[];
-  selectedGoal: string | null;
-  availableGoals: [string, GoalPreset][];
-  onSelectGoal: (key: string) => void;
   hasEquipped: boolean;
   onClearAll: () => void;
 }
@@ -28,9 +24,6 @@ export default function StatsSummaryBar({
   totalSlots,
   buildCost,
   cumulativeEffects,
-  selectedGoal,
-  availableGoals,
-  onSelectGoal,
   hasEquipped,
   onClearAll,
 }: StatsSummaryBarProps) {
@@ -42,43 +35,8 @@ export default function StatsSummaryBar({
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
-      {/* Expanded panel */}
       {expanded && (
         <div className="bg-surface border-t border-border max-h-[60vh] overflow-y-auto p-4 space-y-4">
-          {/* Goal picker */}
-          {availableGoals.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">
-                {selectedGoal ? "Active Goal" : "Quick Start"}
-              </h4>
-              {selectedGoal ? (
-                <div className="flex items-center gap-3 p-3 rounded-lg border border-accent bg-accent/10">
-                  <span className="text-2xl">{GOAL_PRESETS[selectedGoal].icon}</span>
-                  <div className="min-w-0">
-                    <div className="font-semibold text-sm text-text-primary">{GOAL_PRESETS[selectedGoal].name}</div>
-                    <div className="text-xs text-text-secondary">Active goal</div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {availableGoals.map(([key, goal]) => (
-                    <button
-                      key={key}
-                      onClick={() => onSelectGoal(key)}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg border border-border bg-surface-alt hover:border-accent/50 transition-all text-left"
-                    >
-                      <span className="text-2xl shrink-0">{goal.icon}</span>
-                      <div className="min-w-0">
-                        <div className="font-semibold text-sm text-text-primary">{goal.name}</div>
-                        <div className="text-xs text-text-secondary truncate">{goal.desc}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
           {/* Cumulative Effects */}
           {cumulativeEffects.length > 0 && (
             <div>

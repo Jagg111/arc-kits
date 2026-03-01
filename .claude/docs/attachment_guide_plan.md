@@ -1,6 +1,6 @@
 # Attachment Guide System — Implementation Plan
 
-**Overall Progress:** `10%`
+**Overall Progress:** `100%`
 
 ## TLDR
 
@@ -258,95 +258,95 @@ Replaces the sidebar on mobile. A collapsible accordion **collapsed by default**
   - [🟩] Review and iterate on prototypes before proceeding to implementation
   - [🟩] Review final prototypes and note changes to this plan — Plan updated with finer detail and changes surfaced through finalized prototypes.
 
-- [ ] **Step 2: Fix mod rarity data in `mods.ts`**
-  - [ ] Change Extended Barrel from `Rare` to `Epic` (key change in `tiers` object)
-  - [ ] Change Padded Stock from `Rare` to `Epic`
-  - [ ] Change Lightweight Stock from `Rare` to `Epic`
-  - [ ] Remove `poor` field from `ModFamily` interface in `types/index.ts`
-  - [ ] Remove `poor` arrays from all mod families in `mods.ts` (Compensator, Muzzle Brake, Angled Grip, Vertical Grip, Horizontal Grip, Kinetic Converter)
-  - [ ] Verify `RARITY_LABELS` — both Rare and Epic map to "III", this is expected and correct; do not change
+- [🟩] **Step 2: Fix mod rarity data in `mods.ts`**
+  - [🟩] Change Extended Barrel from `Rare` to `Epic` (key change in `tiers` object)
+  - [🟩] Change Padded Stock from `Rare` to `Epic`
+  - [🟩] Change Lightweight Stock from `Rare` to `Epic`
+  - [🟩] Remove `poor` field from `ModFamily` interface in `types/index.ts`
+  - [🟩] Remove `poor` arrays from all mod families in `mods.ts` (Compensator, Muzzle Brake, Angled Grip, Vertical Grip, Horizontal Grip, Kinetic Converter)
+  - [🟩] Verify `RARITY_LABELS` — both Rare and Epic map to "III", this is expected and correct; do not change
 
-- [ ] **Step 3: Define new types in `types/index.ts`**
-  - [ ] Add `WeaponGuide` interface: `{ builds: GuideBuild[], avoid: AvoidEntry[], conditionals: ConditionalEntry[], tips: string[] }`
-  - [ ] Add `GuideBuild` interface: `{ name: string, range: RangeBucket[], slots: EquippedState, advisorEligible?: boolean }` — Note: `name` is just the range label (e.g., "Short - Medium"), not prefixed with weapon name
-  - [ ] Add `AvoidEntry` interface: `{ mod: string, reason: string }`
-  - [ ] Add `ConditionalEntry` interface: `{ mod: string, note: string }` (or similar — "CAN BE USED, BUT..." items)
-  - [ ] Add `WeaponGuides` type: `Record<string, WeaponGuide>`
-  - [ ] Add `RangeBucket` type: `"close" | "mid" | "long"`
-  - [ ] Add `AdvisorCraftingFilters` type: `{ mechanicalComponents: boolean, modComponents: boolean, kineticConverter: boolean, horizontalGrip: boolean }`
-  - [ ] Remove old `GoalPreset` and `GoalBuild` types
+- [🟩] **Step 3: Define new types in `types/index.ts`**
+  - [🟩] Add `WeaponGuide` interface: `{ builds: GuideBuild[], avoid: AvoidEntry[], conditionals: ConditionalEntry[], tips: string[] }`
+  - [🟩] Add `GuideBuild` interface: `{ name: string, range: RangeBucket[], slots: EquippedState, advisorEligible?: boolean }` — Note: `name` is just the range label (e.g., "Short - Medium"), not prefixed with weapon name
+  - [🟩] Add `AvoidEntry` interface: `{ mod: string, reason: string }`
+  - [🟩] Add `ConditionalEntry` interface: `{ mod: string, note: string }` (or similar — "CAN BE USED, BUT..." items)
+  - [🟩] Add `WeaponGuides` type: `Record<string, WeaponGuide>`
+  - [🟩] Add `RangeBucket` type: `"close" | "mid" | "long"`
+  - [🟩] Add `AdvisorCraftingFilters` type: `{ mechanicalComponents: boolean, modComponents: boolean, kineticConverter: boolean, horizontalGrip: boolean }`
+  - [🟩] Remove old `GoalPreset` and `GoalBuild` types
 
-- [ ] **Step 4: Build guide data for all weapons**
-  - [ ] Create `src/data/guides.ts` with `WEAPON_GUIDES: WeaponGuides` (replaces `presets.ts`)
-  - [ ] Transcribe builds from all 18 guide images into `GuideBuild` objects
-  - [ ] Map tier numbers from images to actual rarities using `mods.ts` (e.g., "Compensator 3" → `{ fam: "Compensator", tier: "Rare" }`)
-  - [ ] Convert meter-based ranges to `close / mid / long` bucket arrays
-  - [ ] Set build `name` fields to range labels only (e.g., "Short - Medium", "Long", "Short")
-  - [ ] Mark Anvil Splitter builds with `advisorEligible: false`
-  - [ ] Encode avoid lists per weapon (mod name + reason string)
-  - [ ] Encode conditionals per weapon (mod name + note string)
-  - [ ] Add tips strings per weapon
+- [🟩] **Step 4: Build guide data for all weapons**
+  - [🟩] Create `src/data/guides.ts` with `WEAPON_GUIDES: WeaponGuides` (replaces `presets.ts`)
+  - [🟩] Transcribe builds from all 18 guide images into `GuideBuild` objects
+  - [🟩] Map tier numbers from images to actual rarities using `mods.ts` (e.g., "Compensator 3" → `{ fam: "Compensator", tier: "Rare" }`)
+  - [🟩] Convert meter-based ranges to `close / mid / long` bucket arrays
+  - [🟩] Set build `name` fields to range labels only (e.g., "Short - Medium", "Long", "Short")
+  - [🟩] Mark Anvil Splitter builds with `advisorEligible: false`
+  - [🟩] Encode avoid lists per weapon (mod name + reason string)
+  - [🟩] Encode conditionals per weapon (mod name + note string)
+  - [🟩] Add tips strings per weapon
 
-- [ ] **Step 5: Create shared components and utilities**
-  - [ ] Create `src/utils/abbreviate.ts` with `abbreviateModName()` function (see Shared Components section for full abbreviation rules)
-  - [ ] Create `src/components/shared/ModGallery.tsx` (see Shared Components section for full props/layout spec)
-  - [ ] ModGallery should look up mod images from `MOD_FAMILIES[slot].find(f => f.fam === family).tiers[tier].img` — fall back to colored square placeholder if `img` is undefined
-  - [ ] ModGallery should use `abbreviateModName()` for all labels
-  - [ ] ModGallery should render empty/unequipped slots as dashed-border containers with slot type label
+- [🟩] **Step 5: Create shared components and utilities**
+  - [🟩] Create `src/utils/abbreviate.ts` with `abbreviateModName()` function (see Shared Components section for full abbreviation rules)
+  - [🟩] Create `src/components/shared/ModGallery.tsx` (see Shared Components section for full props/layout spec)
+  - [🟩] ModGallery should look up mod images from `MOD_FAMILIES[slot].find(f => f.fam === family).tiers[tier].img` — fall back to colored square placeholder if `img` is undefined
+  - [🟩] ModGallery should use `abbreviateModName()` for all labels
+  - [🟩] ModGallery should render empty/unequipped slots as dashed-border containers with slot type label
 
-- [ ] **Step 6: Update `useWeaponBuilder` hook**
-  - [ ] Replace `applyGoalBuild` with `applyGuideBuild(buildIndex: number)` that reads from guide data
-  - [ ] Remove `selectedGoal` state entirely — no persistent "active build" tracking
-  - [ ] Applying a build just sets `equipped` state (same as old goals, but from new data)
-  - [ ] Add `resetToBuilds()` action that clears `equipped` and returns to build list view
-  - [ ] Handle weapons with no guide (Jupiter, Equalizer, Hairpin) gracefully — show lockdown message
-  - [ ] Simplify local state in `WeaponBuilder.tsx`: replace `goalDismissed` / `goalExpanded` with a single `showBuildList` boolean
+- [🟩] **Step 6: Update `useWeaponBuilder` hook**
+  - [🟩] Replace `applyGoalBuild` with `applyGuideBuild(buildIndex: number)` that reads from guide data
+  - [🟩] Remove `selectedGoal` state entirely — no persistent "active build" tracking
+  - [🟩] Applying a build just sets `equipped` state (same as old goals, but from new data)
+  - [🟩] Add `resetToBuilds()` action that clears `equipped` and returns to build list view
+  - [🟩] Handle weapons with no guide (Jupiter, Equalizer, Hairpin) gracefully — show lockdown message
+  - [🟩] Simplify local state in `WeaponBuilder.tsx`: replace `goalDismissed` / `goalExpanded` with a single `showBuildList` boolean
 
-- [ ] **Step 7: Builder UI overhaul — Build List Screen**
-  - [ ] **Simplify `WeaponHeader.tsx`**: Remove class, ammo, PVP grade, ARC grade badges. Add weapon image (120px desktop / 80px mobile from `WEAPON_IMAGES`). Add rarity as inline colored text (not a badge). Keep `desc` text. Remove weakness callout (moves to sidebar). Keep underlying data fields intact in `weapons.ts`.
-  - [ ] **Create `BuildCard.tsx`** (`src/components/builder/BuildCard.tsx`): Replaces `GoalCard.tsx`. Renders numbered circle + range label + crafting requirement tag + ModGallery + chevron. Implements graduated visual hierarchy (left border + circle colored by highest-rarity mod). See "Build Card Anatomy" and "Graduated Visual Hierarchy" sections above for exact specs.
-  - [ ] **Update `WeaponBuilder.tsx` build list flow**: Replace goal card grid with build list (header + `BuildCard` stack). "Build Manually" rendered as a text link in the header subtitle, not a full tile. Desktop: 2-column grid (`1fr 280px`) with build list on left, weapon intel sidebar on right. Mobile: single column.
-  - [ ] **Implement Weapon Intel sidebar** (desktop): Always-visible sticky sidebar with weakness + tips + avoid + conditional callout panels. Only render panels that have content. See "Weapon Intel Sidebar" section for styling specs.
-  - [ ] **Implement Weapon Intel accordion** (mobile): Collapsible accordion collapsed by default. Toggle bar with "WEAPON INTEL" label + chevron. Same callout panels as sidebar. See "Weapon Intel Accordion" section for specs.
-  - [ ] **Update `StatsSummaryBar.tsx`**: Replace `selectedGoal` + `availableGoals` goal picker section with new build list. Update props from `[string, GoalPreset][]` to `GuideBuild[]`.
-  - [ ] **Remove `GoalCard.tsx`** component entirely
+- [🟩] **Step 7: Builder UI overhaul — Build List Screen**
+  - [🟩] **Simplify `WeaponHeader.tsx`**: Remove class, ammo, PVP grade, ARC grade badges. Add weapon image (120px desktop / 80px mobile from `WEAPON_IMAGES`). Add rarity as inline colored text (not a badge). Keep `desc` text. Remove weakness callout (moves to sidebar). Keep underlying data fields intact in `weapons.ts`.
+  - [🟩] **Create `BuildCard.tsx`** (`src/components/builder/BuildCard.tsx`): Replaces `GoalCard.tsx`. Renders numbered circle + range label + crafting requirement tag + ModGallery + chevron. Implements graduated visual hierarchy (left border + circle colored by highest-rarity mod). See "Build Card Anatomy" and "Graduated Visual Hierarchy" sections above for exact specs.
+  - [🟩] **Update `WeaponBuilder.tsx` build list flow**: Replace goal card grid with build list (header + `BuildCard` stack). "Build Manually" rendered as a text link in the header subtitle, not a full tile. Desktop: 2-column grid (`1fr 280px`) with build list on left, weapon intel sidebar on right. Mobile: single column.
+  - [🟩] **Implement Weapon Intel sidebar** (desktop): Always-visible sticky sidebar with weakness + tips + avoid + conditional callout panels. Only render panels that have content. See "Weapon Intel Sidebar" section for styling specs.
+  - [🟩] **Implement Weapon Intel accordion** (mobile): Collapsible accordion collapsed by default. Toggle bar with "WEAPON INTEL" label + chevron. Same callout panels as sidebar. See "Weapon Intel Accordion" section for specs.
+  - [🟩] **Update `StatsSummaryBar.tsx`**: Already clean — goal picker was fully removed in Step 6. No further changes needed.
+  - [🟩] **Remove `GoalCard.tsx`** component entirely
 
-- [ ] **Step 8: Builder UI — Full Builder/Customizer Screen changes**
-  - [ ] Remove the goal picker sidebar section from `WeaponBuilder.tsx` (the "Quick Start" goal list and collapsed active-goal display)
-  - [ ] Add "Back to builds" link that clears all equipped mods and returns to the build list screen
-  - [ ] Keep everything else unchanged: cumulative effects sidebar, cost breakdown, attachment slot grid, ModDrawer, "Clear All Attachments" button
+- [🟩] **Step 8: Builder UI — Full Builder/Customizer Screen changes**
+  - [🟩] Remove the goal picker sidebar section from `WeaponBuilder.tsx` (the "Quick Start" goal list and collapsed active-goal display) — completed in Step 7; customizer screen has no goal picker UI
+  - [🟩] Add "Back to builds" link that clears all equipped mods and returns to the build list screen — implemented in Step 7 (`handleBackToBuilds` in `WeaponBuilder.tsx` lines 79-82, rendered on desktop line 170-177 and mobile line 259-267)
+  - [🟩] Keep everything else unchanged: cumulative effects sidebar, cost breakdown, attachment slot grid, ModDrawer, "Clear All Attachments" button — verified intact
 
-- [ ] **Step 9: ModDrawer avoid warnings**
-  - [ ] Look up current weapon's avoid list when rendering mod options
-  - [ ] Show warning indicator on avoided mods in the drawer (with reason on hover/tap)
-  - [ ] Visual cues only for V1 — no exceptions or conditions logic, just mod name + reason text
+- [🟩] **Step 9: ModDrawer avoid warnings**
+  - [🟩] Look up current weapon's avoid list when rendering mod options
+  - [🟩] Show warning indicator on avoided mods in the drawer (with reason on hover/tap)
+  - [🟩] Visual cues only for V1 — no exceptions or conditions logic, just mod name + reason text
 
-- [ ] **Step 10: Add Advisor crafting filter state**
-  - [ ] Add crafting filter state to `useAdvisorFilters` hook with defaults: `{ mechanicalComponents: true, modComponents: false, kineticConverter: false, horizontalGrip: false }`
-  - [ ] Implement auto-enable logic: checking Mod Components forces Mechanical Components ON; unchecking Mechanical Components forces Mod Components OFF
+- [🟩] **Step 10: Add Advisor crafting filter state**
+  - [🟩] Add crafting filter state to `useAdvisorFilters` hook with defaults: `{ mechanicalComponents: true, modComponents: false, kineticConverter: false, horizontalGrip: false }`
+  - [🟩] Implement auto-enable logic: checking Mod Components forces Mechanical Components ON; unchecking Mechanical Components forces Mod Components OFF
 
-- [ ] **Step 11: Advisor build selection logic**
-  - [ ] Write `selectBuildForAdvisor(weaponId, preferredRange, craftingFilters)` function
-  - [ ] Filter out builds with `advisorEligible: false` (Anvil Splitter builds)
-  - [ ] Filter builds by crafting eligibility: for each mod in the build, check rarity against enabled filters using the weakest-link rule
-  - [ ] Among eligible builds, pick the lowest index (best investment) whose range array intersects with the Advisor's range filter
-  - [ ] Handle "any" range (matches all builds on range)
-  - [ ] Fallback: if no builds qualify after all filters, return the cheapest build (last index)
+- [🟩] **Step 11: Advisor build selection logic**
+  - [🟩] Write `selectBuildForAdvisor(weaponId, preferredRange, craftingFilters)` function
+  - [🟩] Filter out builds with `advisorEligible: false` (Anvil Splitter builds)
+  - [🟩] Filter builds by crafting eligibility: for each mod in the build, check rarity against enabled filters using the weakest-link rule
+  - [🟩] Among eligible builds, pick the lowest index (best investment) whose range array intersects with the Advisor's range filter
+  - [🟩] Handle "any" range (matches all builds on range)
+  - [🟩] Fallback: if no builds qualify after all filters, return the cheapest build (last index)
 
-- [ ] **Step 12: Advisor UI — crafting filters + build display**
-  - [ ] Add crafting material checkboxes to `AdvisorFilterBar.tsx` (Mechanical Components, Mod Components, KC, HG). Use the `pill-craft` visual style (green-tinted background, checkmark/X prefix toggle). Place on the second row, to the right of weapon rarity filters.
-  - [ ] Wire filters to build selection logic so each recommended weapon shows its best eligible build
-  - [ ] **Update `WeaponBlock.tsx` layout**: Move rarity badge inline with weapon name (same row, `align-items: baseline`). Rename "Build →" to "Customize →". "Customize →" becomes the sole element in a separate meta row. Add new mod gallery row below meta (only rendered when `attachmentBuild` prop is provided).
-  - [ ] Add optional `attachmentBuild` prop to `WeaponBlock.tsx` — array of equipped mods for the recommended build. When absent, no gallery renders (backwards compatible).
-  - [ ] Implement build display using shared `ModGallery` component: show all weapon slots (including blank ones), each filled slot with mod image + abbreviated name + rarity-colored border
-  - [ ] Handle "no attachment guide" state: render italic "No attachment guide" text when no build data exists for a weapon
+- [🟩] **Step 12: Advisor UI — crafting filters + build display**
+  - [🟩] Add crafting material checkboxes to `AdvisorFilterBar.tsx` (Mechanical Components, Mod Components, KC, HG). Use the `pill-craft` visual style (green-tinted background, checkmark/X prefix toggle). Place on the second row, to the right of weapon rarity filters.
+  - [🟩] Wire filters to build selection logic so each recommended weapon shows its best eligible build
+  - [🟩] **Update `WeaponBlock.tsx` layout**: Move rarity badge inline with weapon name (same row, `align-items: baseline`). Rename "Build →" to "Customize →". "Customize →" becomes the sole element in a separate meta row. Add new mod gallery row below meta (only rendered when `attachmentBuild` prop is provided).
+  - [🟩] Add optional `attachmentBuild` prop to `WeaponBlock.tsx` — array of equipped mods for the recommended build. When absent, no gallery renders (backwards compatible).
+  - [🟩] Implement build display using shared `ModGallery` component: show all weapon slots (including blank ones), each filled slot with mod image + abbreviated name + rarity-colored border
+  - [🟩] Handle "no attachment guide" state: render italic "No attachment guide" text when no build data exists for a weapon
 
-- [ ] **Step 13: Advisor → Builder deep link**
-  - [ ] Update "Customize →" button to encode the recommended build's attachments into URL params via existing `useBuildUrl` system
-  - [ ] Extend the existing `onOpenBuilder` callback pipeline (WeaponBlock → PairingCard → AdvisorResults → AdvisorPage → App) to include mod selections alongside the weapon ID
-  - [ ] Ensure Builder loads with those attachments pre-equipped when navigated to from Advisor
+- [🟩] **Step 13: Advisor → Builder deep link**
+  - [🟩] Update "Customize →" button to encode the recommended build's attachments into URL params via existing `useBuildUrl` system
+  - [🟩] Extend the existing `onOpenBuilder` callback pipeline (WeaponBlock → PairingCard → AdvisorResults → AdvisorPage → App) to include mod selections alongside the weapon ID
+  - [🟩] Ensure Builder loads with those attachments pre-equipped when navigated to from Advisor
 
-- [ ] **Step 14: Cleanup**
-  - [ ] Remove old `GOAL_PRESETS` data from `presets.ts` (or delete file entirely)
-  - [ ] Remove old goal-related imports and dead code paths across all files
-  - [ ] Verify build still passes (`npm run build`)
+- [🟩] **Step 14: Cleanup**
+  - [🟩] Remove old `GOAL_PRESETS` data from `presets.ts` (or delete file entirely)
+  - [🟩] Remove old goal-related imports and dead code paths across all files
+  - [🟩] Verify build still passes (`npm run build`)

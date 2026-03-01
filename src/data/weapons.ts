@@ -3,7 +3,7 @@
 // PURPOSE: Master list of all weapons in the game
 // USED BY: useWeaponBuilder (to look up weapon by ID), WeaponPicker (to display all weapons),
 //          mods.ts (to build weapon compatibility lists)
-// NOTE: The `id` field must match the keys used in presets.ts builds and in URL params (?w=tempest)
+// NOTE: The `id` field must match the keys used in guides.ts and in URL params (?w=tempest)
 // ============================================================================
 
 import type { Weapon } from "../types";

@@ -14,24 +14,27 @@ import {
   ADVISOR_RANGE_LABELS,
 } from "../../data/advisor_config";
 import { recommendLoadouts } from "../../advisor/engine";
+import { selectBuildForAdvisor } from "../../advisor/engine/attachment-selection";
+import type { GuideBuild } from "../../types";
 import AdvisorFilterBar from "./AdvisorFilterBar";
 import AdvisorOnboarding from "./AdvisorOnboarding";
 import AdvisorResults from "./AdvisorResults";
 import AdvisorEmptyState from "./AdvisorEmptyState";
 
+/** Called when user clicks "Customize →" on a weapon. Build is the recommended attachment set when present. */
+export type OnOpenBuilder = (weaponId: string, build?: GuideBuild | null) => void;
+
 interface AdvisorPageProps {
-  onSelectWeapon: (id: string) => void;
-  onNavigateToBuilder: () => void;
+  onOpenBuilder: OnOpenBuilder;
 }
 
-export default function AdvisorPage({ onSelectWeapon, onNavigateToBuilder }: AdvisorPageProps) {
-  const { filters, setLocation, setSquad, setFocus, setRange, toggleRarity } =
+export default function AdvisorPage({ onOpenBuilder }: AdvisorPageProps) {
+  const { filters, setLocation, setSquad, setFocus, setRange, toggleRarity, setCraftingFilters } =
     useAdvisorFilters();
 
-  const handleOpenBuilder = useCallback((weaponId: string) => {
-    onSelectWeapon(weaponId);
-    onNavigateToBuilder();
-  }, [onSelectWeapon, onNavigateToBuilder]);
+  const handleOpenBuilder = useCallback<OnOpenBuilder>((weaponId, build) => {
+    onOpenBuilder(weaponId, build);
+  }, [onOpenBuilder]);
 
   // Build context echo line from active filters
   const contextLine = filters.location
@@ -62,6 +65,21 @@ export default function AdvisorPage({ onSelectWeapon, onNavigateToBuilder }: Adv
   const hasResults = result?.status === "results";
   const isEmpty = result?.status === "empty";
 
+  // Pre-compute the best attachment build for every weapon in the results.
+  // Keyed by weaponId so WeaponBlock can look up its recommended build directly.
+  const buildsByWeapon = useMemo(() => {
+    if (!hasResults) return {} as Record<string, GuideBuild | null>;
+    const map: Record<string, GuideBuild | null> = {};
+    for (const rec of result!.recommendations) {
+      for (const wid of [rec.primaryWeaponId, rec.secondaryWeaponId]) {
+        if (!(wid in map)) {
+          map[wid] = selectBuildForAdvisor(wid, filters.preferredRange, filters.craftingFilters);
+        }
+      }
+    }
+    return map;
+  }, [hasResults, result, filters.preferredRange, filters.craftingFilters]);
+
   return (
     <>
       <AdvisorFilterBar
@@ -71,12 +89,13 @@ export default function AdvisorPage({ onSelectWeapon, onNavigateToBuilder }: Adv
         onSetFocus={setFocus}
         onSetRange={setRange}
         onToggleRarity={toggleRarity}
+        onSetCraftingFilters={setCraftingFilters}
       />
 
       <div className="max-w-[80rem] mx-auto px-5 py-4 pb-8">
         {isIdle && <AdvisorOnboarding />}
         {hasResults && (
-          <AdvisorResults recommendations={result!.recommendations} contextLine={contextLine} onOpenBuilder={handleOpenBuilder} />
+          <AdvisorResults recommendations={result!.recommendations} contextLine={contextLine} onOpenBuilder={handleOpenBuilder} buildsByWeapon={buildsByWeapon} />
         )}
         {isEmpty && (
           <>

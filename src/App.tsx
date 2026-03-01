@@ -21,10 +21,11 @@ import { useCumulativeEffects } from "./hooks/useCumulativeEffects";
 import { useBuildUrl } from "./hooks/useBuildUrl";
 import { useTheme } from "./hooks/useTheme";
 import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 import WeaponPicker from "./components/weapons/WeaponPicker";
 import WeaponBuilder from "./components/builder/WeaponBuilder";
 import AdvisorPage from "./components/advisor/AdvisorPage";
-import type { AppView } from "./types";
+import type { AppView, GuideBuild } from "./types";
 
 export default function App() {
   // Top-level view state: which tab is active
@@ -33,17 +34,19 @@ export default function App() {
   // Theme: dark/light mode with OS preference detection and localStorage persistence
   const { theme, toggleTheme } = useTheme();
 
-  // Core state: selected weapon, goal, equipped mods, and all action functions
+  // Core state: selected weapon, guide (if any), equipped mods, and all actions
   const {
     gun,
     gunObj,
-    selectedGoal,
+    guide,
     equipped,
     selectWeapon,
-    applyGoalBuild,
+    openBuilderWithBuild,
+    applyGuideBuild,
     equipMod,
     removeMod,
     clearAll,
+    resetToBuilds,
     resetSelection,
   } = useWeaponBuilder();
 
@@ -60,7 +63,7 @@ export default function App() {
   }, [activeView, gun]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg-base via-bg-mid to-bg-base text-text-primary">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-bg-base via-bg-mid to-bg-base text-text-primary">
       <Header
         activeView={activeView}
         onChangeView={setActiveView}
@@ -70,32 +73,43 @@ export default function App() {
         toggleTheme={toggleTheme}
       />
 
-      {activeView === "weapons" && (
-        <div className="max-w-6xl mx-auto px-4 py-6 pb-20 lg:pb-6">
-          {!gun && <WeaponPicker onSelect={selectWeapon} />}
+      <div className="flex-1">
+        {activeView === "weapons" && (
+          <div className="max-w-6xl mx-auto px-4 py-6 pb-20 lg:pb-6">
+            {!gun && <WeaponPicker onSelect={selectWeapon} />}
 
-          {gun && gunObj && (
-            <WeaponBuilder
-              weapon={gunObj}
-              selectedGoal={selectedGoal}
-              equipped={equipped}
-              buildCost={buildCost}
-              cumulativeEffects={cumulativeEffects}
-              onSelectGoal={applyGoalBuild}
-              onEquip={equipMod}
-              onRemove={removeMod}
-              onClearAll={clearAll}
-            />
-          )}
-        </div>
-      )}
+            {gun && gunObj && (
+              <WeaponBuilder
+                weapon={gunObj}
+                guide={guide}
+                equipped={equipped}
+                buildCost={buildCost}
+                cumulativeEffects={cumulativeEffects}
+                onApplyGuideBuild={applyGuideBuild}
+                onEquip={equipMod}
+                onRemove={removeMod}
+                onClearAll={clearAll}
+                onBackToBuilds={resetToBuilds}
+              />
+            )}
+          </div>
+        )}
 
-      {activeView === "advisor" && (
-        <AdvisorPage
-          onSelectWeapon={selectWeapon}
-          onNavigateToBuilder={() => setActiveView("weapons")}
-        />
-      )}
+        {activeView === "advisor" && (
+          <AdvisorPage
+            onOpenBuilder={(weaponId: string, build?: GuideBuild | null) => {
+              if (build?.slots && Object.keys(build.slots).length > 0) {
+                openBuilderWithBuild(weaponId, build.slots);
+              } else {
+                selectWeapon(weaponId);
+              }
+              setActiveView("weapons");
+            }}
+          />
+        )}
+      </div>
+
+      <Footer />
     </div>
   );
 }

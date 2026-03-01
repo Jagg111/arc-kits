@@ -6,7 +6,7 @@
 
 // A single weapon in the game (one entry per gun in weapons.ts)
 export interface Weapon {
-  id: string;           // Lowercase unique key, must match keys in presets.ts and URL params
+  id: string;           // Lowercase unique key, must match keys in guides.ts and URL params
   name: string;         // Display name shown in the UI
   weaponClass: WeaponClass;
   ammoType: AmmoType;
@@ -64,7 +64,6 @@ export interface ModFamily {
   leg?: boolean;                            // True if this mod only comes in Legendary rarity
   tiers: Partial<Record<Rarity, TierData>>; // Available tiers — not every rarity exists for every mod
   w: string[];                              // Weapon compatibility — list of weapon IDs that can use this mod
-  poor?: string[];                          // Weapons where this mod is a poor choice (shown as warning)
 }
 
 // Maps each slot type to an array of mod families available for that slot
@@ -80,22 +79,60 @@ export interface EquippedMod {
 // Example: { "Muzzle": { fam: "Compensator", tier: "Rare" }, "Stock": { fam: "Stable Stock", tier: "Common" } }
 export type EquippedState = Record<string, EquippedMod>;
 
-// A preset build for a specific weapon within a goal (e.g. "Fix This Gun" for the Tempest)
-export interface GoalBuild {
-  slots: EquippedState;  // Which mods to equip in which slots
-  fix: string;           // Short description like "Controls vertical climb"
+// ---------------------------------------------------------------------------
+// Attachment guide system (replaces legacy goal presets)
+// ---------------------------------------------------------------------------
+
+/** Range bucket for build/advisor filtering; matches Advisor vocabulary. */
+export type RangeBucket = "close" | "mid" | "long";
+
+/** Single "do not use" entry: mod name + reason shown in ModDrawer and intel. */
+export interface AvoidEntry {
+  mod: string;
+  reason: string;
 }
 
-// A goal preset — contains a recommended build for multiple weapons
-export interface GoalPreset {
-  icon: string;                         // Emoji icon shown on the goal card
-  name: string;                         // Display name (e.g. "Fix This Gun", "Budget Build")
-  desc: string;                         // Short description of the goal's philosophy
-  builds: Record<string, GoalBuild>;    // Keyed by weapon ID — each weapon gets its own build
+/** "Can be used, but..." entry: mod name + conditional note (e.g. "-30% ADS"). */
+export interface ConditionalEntry {
+  mod: string;
+  note: string;
 }
 
-// Maps goal keys (e.g. "fix", "budget", "recoil") to their GoalPreset definitions
-export type GoalPresets = Record<string, GoalPreset>;
+/**
+ * One curated build in a weapon's guide. Ordered by investment (index 0 = best).
+ * name: range label only (e.g. "Short - Medium", "Long"); weapon name is never embedded.
+ * advisorEligible: false for niche builds (e.g. Anvil Splitter) excluded from Advisor auto-pick.
+ */
+export interface GuideBuild {
+  name: string;
+  range: RangeBucket[];
+  slots: EquippedState;
+  advisorEligible?: boolean;
+}
+
+/** Per-weapon attachment guide: builds, avoid list, conditionals, and tips. */
+export interface WeaponGuide {
+  builds: GuideBuild[];
+  avoid: AvoidEntry[];
+  conditionals: ConditionalEntry[];
+  tips: string[];
+}
+
+/** Map of weapon ID → weapon guide. Weapons without a guide (e.g. Hairpin) have no entry. */
+export type WeaponGuides = Record<string, WeaponGuide>;
+
+/**
+ * Advisor crafting material toggles. Used to filter which builds are eligible.
+ * mechanicalComponents: Uncommon mods; default ON.
+ * modComponents: Rare/Epic mods; when ON, mechanicalComponents is forced ON.
+ * kineticConverter / horizontalGrip: Legendary mod toggles.
+ */
+export interface AdvisorCraftingFilters {
+  mechanicalComponents: boolean;
+  modComponents: boolean;
+  kineticConverter: boolean;
+  horizontalGrip: boolean;
+}
 
 // Aggregated stat bonus from combining multiple mods (computed by useCumulativeEffects hook)
 export interface CumulativeEffect {
