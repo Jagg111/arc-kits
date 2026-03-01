@@ -23,9 +23,12 @@ Tab routing via `activeView` state in `src/App.tsx`.
 
 ## Canonical Context Files
 Read these first each session:
-1. `CLAUDE.md`
-2. `.claude/docs/architectural_patterns.md`
-3. `.claude/docs/weapon_advisor_feature.md` (for upcoming advisor work)
+1. `GEMINI.md` (takes absolute precedence)
+2. `CLAUDE.md`
+3. `DESIGN_SYSTEM.md`
+4. `UI_UX_WORKFLOW.md`
+5. `.claude/docs/architectural_patterns.md`
+6. `.claude/docs/weapon_advisor_feature.md` (for upcoming advisor work)
 
 ## Architecture Rules (Current)
 - Builder state: `src/hooks/useWeaponBuilder.ts` (consumed by App).
