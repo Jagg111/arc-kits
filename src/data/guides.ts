@@ -76,15 +76,16 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Tiny magazine burns instantly",
+    tips: [
+      "Silencers will help reduce noise for stealth, less ARC aggro, and confusing raiders",
+      "Do NOT use Muzzle Brakes on Burletta — you want dispersion reduction, use Compensators",
+    ],
     avoid: [
       { mod: "Muzzle Brake", reason: "You want as much dispersion reduction as possible; use Compensators" },
       { mod: "Extended Barrel", reason: "Not useful on a pistol with this range profile" },
     ],
     conditionals: [],
-    tips: [
-      "Silencers will help reduce noise for stealth, less ARC aggro, and confusing raiders",
-      "Do NOT use Muzzle Brakes on Burletta — you want dispersion reduction, use Compensators",
-    ],
   },
 
   kettle: {
@@ -122,15 +123,16 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Bloom degrades accuracy over time",
+    tips: [
+      "Kinetic Converters don't work on Kettle because it's pull-capped — they feed the RPM to 600 but it has no effect on a semi-auto gun",
+    ],
     avoid: [
       { mod: "Kinetic Converter", reason: "Doesn't work on Kettle — it's pull-capped so fire rate has no effect, and the recoil penalty hurts" },
       { mod: "Muzzle Brake", reason: "Kettle's issue is bloom, not recoil; Compensators are the only option" },
       { mod: "Vertical Grip", reason: "Angled Grips handle the horizontal spread better on this weapon" },
     ],
     conditionals: [],
-    tips: [
-      "Kinetic Converters don't work on Kettle because it's pull-capped — they feed the RPM to 600 but it has no effect on a semi-auto gun",
-    ],
   },
 
   stitcher: {
@@ -191,17 +193,18 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "12 rounds vanish instantly",
+    tips: [
+      "Muzzle Brakes can be used as well for no-recoil (for Stitcher 1-2 only)",
+      "However long/mid range shots will be way less effective due to the bullets going everywhere",
+      "Learn and adapt on how to shoot with compensators and avoid muzzle brakes",
+    ],
     avoid: [
       { mod: "Muzzle Brake", reason: "Stitcher has bloom, not recoil, as its main issue; Compensators are the only option" },
       { mod: "Extended Barrel", reason: "Not worth the slot on an SMG with this range" },
       { mod: "Vertical Grip", reason: "Horizontal recoil is more problematic; use Angled Grip or Horizontal Grip" },
     ],
     conditionals: [],
-    tips: [
-      "Muzzle Brakes can be used as well for no-recoil (for Stitcher 1-2 only)",
-      "However long/mid range shots will be way less effective due to the bullets going everywhere",
-      "Learn and adapt on how to shoot with compensators and avoid muzzle brakes",
-    ],
   },
 
   bobcat: {
@@ -273,16 +276,17 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Extended Barrel", reason: "Not worth the slot on an SMG" },
-      { mod: "Vertical Grip", reason: "Horizontal recoil is the bigger problem; use Angled or Horizontal Grip" },
-    ],
-    conditionals: [],
+    weakness: "Extreme recoil from insane fire rate",
     tips: [
       "Muzzle Brakes can be used as well for no-recoil (for Bobcat 1-2 only)",
       "However long/mid range shots will be way less effective due to the bullets going everywhere",
       "Learn and adapt on how to shoot with compensators and avoid muzzle brakes",
     ],
+    avoid: [
+      { mod: "Extended Barrel", reason: "Not worth the slot on an SMG" },
+      { mod: "Vertical Grip", reason: "Horizontal recoil is the bigger problem; use Angled or Horizontal Grip" },
+    ],
+    conditionals: [],
   },
 
   // ===========================================================================
@@ -342,16 +346,17 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Low base ammo capacity and slow reloads",
+    tips: [
+      "Muzzle Brakes are pointless on Rattler — the gun has so much bloom",
+      "Compensators are the only option",
+    ],
     avoid: [
       { mod: "Muzzle Brake", reason: "Rattler has so much bloom — Compensators are the only option" },
       { mod: "Extended Barrel", reason: "Not effective on this weapon" },
       { mod: "Vertical Grip", reason: "Angled Grips are preferred for Rattler's horizontal spread" },
     ],
     conditionals: [],
-    tips: [
-      "Muzzle Brakes are pointless on Rattler — the gun has so much bloom",
-      "Compensators are the only option",
-    ],
   },
 
   arpeggio: {
@@ -412,6 +417,12 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Recoil & dispersion risk missing mid-burst. Requires investment to make competitive",
+    tips: [
+      "Muzzle Brakes are pointless on Arpeggio — the gun has so much bloom",
+      "Compensators are the only option",
+      "Angled Grips are not worth it because the gun kicks vertically a lot",
+    ],
     avoid: [
       { mod: "Muzzle Brake", reason: "Arpeggio has so much bloom — Compensators are the only option" },
       { mod: "Extended Barrel", reason: "Not needed on this weapon" },
@@ -420,11 +431,6 @@ export const WEAPON_GUIDES: WeaponGuides = {
     ],
     conditionals: [
       { mod: "Vertical Grip III", note: "-30% ADS speed penalty; only use if you can tolerate the slower aim" },
-    ],
-    tips: [
-      "Muzzle Brakes are pointless on Arpeggio — the gun has so much bloom",
-      "Compensators are the only option",
-      "Angled Grips are not worth it because the gun kicks vertically a lot",
     ],
   },
 
@@ -490,17 +496,18 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Padded Stock", reason: "Not useful on a lever-action weapon" },
-      { mod: "Muzzle Brake", reason: "Compensators are not needed (unless you don't have a stock)" },
-    ],
-    conditionals: [],
+    weakness: "Bullet velocity feels sluggish at range",
     tips: [
       "Extended Barrels help in long range fighting — less need to lead your shots due to higher bullet velocity",
       "Compensators won't help here because by the time you are ready to shoot next shot, stocks already recover the crosshair back to 100% accuracy",
       "Silencers will help in reducing noise for stealth, less ARC aggro, and confusing raiders",
       "Must have Compensator if using Lightweight Stock",
     ],
+    avoid: [
+      { mod: "Padded Stock", reason: "Not useful on a lever-action weapon" },
+      { mod: "Muzzle Brake", reason: "Compensators are not needed (unless you don't have a stock)" },
+    ],
+    conditionals: [],
   },
 
   venator: {
@@ -542,15 +549,16 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Default mag size",
+    tips: [
+      "Vertical Grips are pointless on Venator — the gun kicks a lot left/right",
+      "To control vertical recoil, just pull down; Angled Grips are the only option",
+    ],
     avoid: [
       { mod: "Vertical Grip", reason: "The gun kicks a lot left/right; Angled Grips are the only option to control horizontal recoil, just pull down" },
       { mod: "Horizontal Grip", reason: "Legendary grip not worth it on Venator — Angled Grips handle it" },
     ],
     conditionals: [],
-    tips: [
-      "Vertical Grips are pointless on Venator — the gun kicks a lot left/right",
-      "To control vertical recoil, just pull down; Angled Grips are the only option",
-    ],
   },
 
   torrente: {
@@ -616,17 +624,18 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Shots spray everywhere without mods",
+    tips: [
+      "Muzzle Brakes are pointless on Torrente — the gun has so much bloom",
+      "Compensators are the only option",
+      "Stable Stock 1 is not that effective — invest in higher tiers or skip",
+    ],
     avoid: [
       { mod: "Extended Barrel", reason: "Not effective on an LMG" },
       { mod: "Muzzle Brake", reason: "Torrente has so much bloom — Compensators are the only option" },
       { mod: "Padded Stock", reason: "Not that effective on Torrente" },
     ],
     conditionals: [],
-    tips: [
-      "Muzzle Brakes are pointless on Torrente — the gun has so much bloom",
-      "Compensators are the only option",
-      "Stable Stock 1 is not that effective — invest in higher tiers or skip",
-    ],
   },
 
   osprey: {
@@ -678,11 +687,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Padded Stock", reason: "Stocks won't do anything if you use Osprey 4; only useful with Osprey 1" },
-      { mod: "Muzzle Brake", reason: "Not needed on a bolt-action sniper" },
-    ],
-    conditionals: [],
+    weakness: "Slow bullet velocity at distance",
     tips: [
       "Extended Barrels help in long range fighting — less need to lead your shots due to higher bullet velocity",
       "Compensators won't help here because by the time you are ready to shoot next shot, stocks already recover the crosshair back to 100% accuracy",
@@ -690,6 +695,11 @@ export const WEAPON_GUIDES: WeaponGuides = {
       "If you have Osprey 4, you can put Vertical Grip if needed and a grip/ammo stock",
       "Compensators are not needed on Osprey",
     ],
+    avoid: [
+      { mod: "Padded Stock", reason: "Stocks won't do anything if you use Osprey 4; only useful with Osprey 1" },
+      { mod: "Muzzle Brake", reason: "Not needed on a bolt-action sniper" },
+    ],
+    conditionals: [],
   },
 
   tempest: {
@@ -755,6 +765,11 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Vertical climb during sustained fire",
+    tips: [
+      "Muzzle Brakes are pointless on Tempest — the gun has so much bloom",
+      "Compensators are the only option",
+    ],
     avoid: [
       { mod: "Muzzle Brake", reason: "Tempest has bloom issues — Compensators are the only option" },
       { mod: "Extended Barrel", reason: "Not effective on Tempest" },
@@ -763,10 +778,6 @@ export const WEAPON_GUIDES: WeaponGuides = {
     conditionals: [
       { mod: "Horizontal Grip", note: "-30% ADS speed penalty; consider if you can tolerate slower aim" },
       { mod: "Angled Grip III", note: "-30% ADS speed penalty; powerful but slows your aim-down-sights" },
-    ],
-    tips: [
-      "Muzzle Brakes are pointless on Tempest — the gun has so much bloom",
-      "Compensators are the only option",
     ],
   },
 
@@ -811,6 +822,13 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Sluggish aim down sights speed",
+    tips: [
+      "Stable Stocks, Muzzle Brakes, Compensators are pointless on Ferro",
+      "Because it's a one-shot weapon — all dispersion is already recovered after your shot and is fully accurate on next reload",
+      "Silencer or Extended Barrel is your only option for muzzle",
+      "For stocks use ONLY Lightweight Stock for quick ADS",
+    ],
     avoid: [
       { mod: "Vertical Grip", reason: "Single-shot break-action; recoil is irrelevant since you reload between shots" },
       { mod: "Padded Stock", reason: "Stability is pointless on a single-shot weapon" },
@@ -821,12 +839,6 @@ export const WEAPON_GUIDES: WeaponGuides = {
       { mod: "Angled Grip", reason: "Recoil control is irrelevant for break-action" },
     ],
     conditionals: [],
-    tips: [
-      "Stable Stocks, Muzzle Brakes, Compensators are pointless on Ferro",
-      "Because it's a one-shot weapon — all dispersion is already recovered after your shot and is fully accurate on next reload",
-      "Silencer or Extended Barrel is your only option for muzzle",
-      "For stocks use ONLY Lightweight Stock for quick ADS",
-    ],
   },
 
   anvil: {
@@ -874,14 +886,15 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Muzzle Brake", reason: "DO NOT USE Muzzle Brakes on Anvil — you want as much dispersion reduction as possible, use Compensators" },
-    ],
-    conditionals: [],
+    weakness: "Relatively slow reload cycle, dispersion recovery is sluggish making rapid consecutive shots inaccurate",
     tips: [
       "Extended Barrels help in long range fighting — less need to lead your shots due to higher bullet velocity",
       "Silencers will help in reducing noise for stealth, less ARC aggro, and confusing raiders",
     ],
+    avoid: [
+      { mod: "Muzzle Brake", reason: "DO NOT USE Muzzle Brakes on Anvil — you want as much dispersion reduction as possible, use Compensators" },
+    ],
+    conditionals: [],
   },
 
   bettina: {
@@ -947,19 +960,20 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Vertical Grip", reason: "Can be used instead of Angled Grip III, but Angled is generally preferred" },
-    ],
-    conditionals: [
-      { mod: "Angled Grip III", note: "Can be used instead of Horizontal Grip — less ADS penalty" },
-      { mod: "Padded Stock", note: "Use Padded Stock if full-autoing; use Stable Stock if bursting" },
-    ],
+    weakness: "Feels out of control during full-auto",
     tips: [
       "Extended Barrels are good for Bettina to avoid bloom — if not using Compensators, you are forced to burst the gun instead of full auto",
       "Muzzle Brakes can be an exception for Bettina, ONLY for close range",
       "Shooting long enough in mid-long range will spread your bullets A LOT",
       "Compensators still best overall",
       "Use Padded Stock if full-autoing; use Stable Stocks if bursting",
+    ],
+    avoid: [
+      { mod: "Vertical Grip", reason: "Can be used instead of Angled Grip III, but Angled is generally preferred" },
+    ],
+    conditionals: [
+      { mod: "Angled Grip III", note: "Can be used instead of Horizontal Grip — less ADS penalty" },
+      { mod: "Padded Stock", note: "Use Padded Stock if full-autoing; use Stable Stock if bursting" },
     ],
   },
 
@@ -1017,6 +1031,13 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Tiny magazine punishes missed shots, pellets scatter without a choke",
+    tips: [
+      "Stable Stocks are pointless on Il Toro — the gun doesn't recover recoil after shots, dispersion recovers naturally on its own. A stock basically won't do anything since the gun shoots slowly",
+      "Shotgun Chokes are EXTREMELY important — makes all pellets shoot tighter in the center",
+      "Vertical Grips are pointless — the gun just kicks up, you have more than enough time to drag down between pump cycles",
+      "If you struggle with vertical/horizontal recoil, put vertical/angled grip then",
+    ],
     avoid: [
       { mod: "Shotgun Silencer", reason: "Not useful on a shotgun" },
       { mod: "Padded Stock", reason: "Dispersion recovers naturally between pump cycles" },
@@ -1024,12 +1045,6 @@ export const WEAPON_GUIDES: WeaponGuides = {
     ],
     conditionals: [
       { mod: "Lightweight Stock", note: "Can be used with Il Toro — makes ADS very fast for peek shots" },
-    ],
-    tips: [
-      "Stable Stocks are pointless on Il Toro — the gun doesn't recover recoil after shots, dispersion recovers naturally on its own. A stock basically won't do anything since the gun shoots slowly",
-      "Shotgun Chokes are EXTREMELY important — makes all pellets shoot tighter in the center",
-      "Vertical Grips are pointless — the gun just kicks up, you have more than enough time to drag down between pump cycles",
-      "If you struggle with vertical/horizontal recoil, put vertical/angled grip then",
     ],
   },
 
@@ -1080,16 +1095,17 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Shotgun Silencer", reason: "Not effective on Vulcano; does excessive fire rate for stealth" },
-      { mod: "Padded Stock", reason: "Not effective on a semi-auto shotgun" },
-    ],
-    conditionals: [],
+    weakness: "Tiny mag punishes missed shots, pellets scatter without a choke",
     tips: [
       "Stable Stocks work on Vulcano if you shoot fast enough, however they are not as effective as on other weapons",
       "Shotgun Chokes are EXTREMELY important — makes all pellets shoot tighter in the center",
       "Kinetic Converter is not that effective, but does increase fire rate for raw DPS",
     ],
+    avoid: [
+      { mod: "Shotgun Silencer", reason: "Not effective on Vulcano; does excessive fire rate for stealth" },
+      { mod: "Padded Stock", reason: "Not effective on a semi-auto shotgun" },
+    ],
+    conditionals: [],
   },
 
   // ===========================================================================
@@ -1126,12 +1142,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
-    avoid: [
-      { mod: "Padded Stock", reason: "Not useful on a pump-action grenade launcher" },
-      { mod: "Horizontal Grip", reason: "Hullcracker has no horizontal recoil" },
-      { mod: "Angled Grip", reason: "The gun has vertical recoil only; use Vertical Grips" },
-    ],
-    conditionals: [],
+    weakness: "Zero player damage, launcher ammo burns fast",
     tips: [
       "The gun has vertical recoil and no horizontal recoil, making Vertical Grips useful",
       "It takes quite long to recover dispersion/recoil, making Stable Stock 3 best for medium/long range",
@@ -1139,6 +1150,12 @@ export const WEAPON_GUIDES: WeaponGuides = {
       "However it's not that effective for medium range due to increased recoil recovery time from Lightweight Stock",
       "If you don't care about Kinetic Converters (or don't use them for PVP or anything else), they can be used for faster shots as a grenade launcher",
     ],
+    avoid: [
+      { mod: "Padded Stock", reason: "Not useful on a pump-action grenade launcher" },
+      { mod: "Horizontal Grip", reason: "Hullcracker has no horizontal recoil" },
+      { mod: "Angled Grip", reason: "The gun has vertical recoil only; use Vertical Grips" },
+    ],
+    conditionals: [],
   },
 
   aphelion: {
@@ -1171,6 +1188,13 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
     ],
+    weakness: "Burst recoil splits shots at range",
+    tips: [
+      "The gun has a lot of vertical recoil and no horizontal recoil — Vertical Grips are the way to go",
+      "It takes long to recover dispersion/recoil, making Stable Stock 3 best for medium/long range",
+      "Lightweight Stock makes ADS very fast in short/medium ranges — works best with Vertical Grip 3",
+      "Kinetic Converter is terrible on Aphelion — only 7% RPM increase",
+    ],
     avoid: [
       { mod: "Kinetic Converter", reason: "Terrible on Aphelion — only increases RPM by 7%, not worth the recoil penalty" },
       { mod: "Horizontal Grip", reason: "Aphelion has vertical recoil, not horizontal" },
@@ -1178,12 +1202,5 @@ export const WEAPON_GUIDES: WeaponGuides = {
       { mod: "Padded Stock", reason: "Not effective on a burst-fire weapon" },
     ],
     conditionals: [],
-    tips: [
-      "The gun has a lot of vertical recoil and no horizontal recoil — Vertical Grips are the way to go",
-      "It takes long to recover dispersion/recoil, making Stable Stock 3 best for medium/long range",
-      "Lightweight Stock makes ADS very fast in short/medium ranges — works best with Vertical Grip 3",
-      "Kinetic Converter is terrible on Aphelion — only 7% RPM increase",
-    ],
   },
 };
-

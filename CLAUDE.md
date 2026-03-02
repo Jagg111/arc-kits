@@ -42,7 +42,8 @@ src/
   types/index.ts           — All TypeScript interfaces and type aliases
 
   data/                    — Static game data (immutable, no logic)
-    weapons.ts             — Weapon definitions (id, stats, slots, grades)
+    weapons.ts             - Intrinsic weapon definitions (id, stats, slots, grades, description)
+    guides.ts              - Per-weapon advisory intel (weakness, builds, avoids, conditionals, tips)
     mods.ts                — Mod families by slot type (tiers, effects, costs, compatibility)
     presets.ts             — Goal-based preset builds (fix, budget, recoil, stealth, pvp, arc)
     constants.ts           — Label maps, color maps, rarity ordering, weapon images, material metadata
@@ -107,7 +108,7 @@ src/
 - URL state sync via `useBuildUrl` hook — builds are shareable via query params (`?w=tempest&m=Muzzle:Compensator:Rare,...`), synced with `history.replaceState`
 
 ## How to Add Game Content
-- **New weapon**: Add entry to `src/data/weapons.ts`, add preset builds in `src/data/presets.ts`
+- **New weapon**: Add entry to `src/data/weapons.ts` and matching advisory data in `src/data/guides.ts` (including weakness + builds). Add preset builds in `src/data/presets.ts` only where still needed.
 - **New mod family**: Add to the appropriate slot array in `src/data/mods.ts`, set `w` (weapon compatibility) array
 - **New goal preset**: Add new key to `GOAL_PRESETS` in `src/data/presets.ts` with icon, name, desc, and per-weapon builds
 - **New stat type for effects**: Add regex pattern to `STAT_PATTERNS` in `src/hooks/useCumulativeEffects.ts:5-16`
@@ -119,15 +120,16 @@ src/
 
 ## Type System
 All types in `src/types/index.ts`. Key interfaces:
-- `Weapon` — weapon definition with stats, slots, grades
-- `ModFamily` — mod with tiers, effects, weapon compatibility
-- `EquippedState` — `Record<string, EquippedMod>` mapping slot to mod
-- `GoalPreset` — preset build template with per-weapon configurations
-- `CumulativeEffect` — aggregated stat bonus from multiple mods
-- `AppView` — top-level tab routing (`"weapons" | "advisor"`)
-- `AdvisorInputs` — advisor questionnaire state (location, squad, focus, range, rarities)
-- `PairRecommendation` — engine output per weapon pairing (scores, tier, synergy tags)
-- `AdvisorResult` — full engine response (status + recommendations array)
+- `Weapon` - intrinsic weapon definition with stats, slots, grades
+- `WeaponGuide` - advisory weapon data (weakness, builds, avoid list, conditionals, tips)
+- `ModFamily` - mod with tiers, effects, weapon compatibility
+- `EquippedState` - `Record<string, EquippedMod>` mapping slot to mod
+- `GoalPreset` - preset build template with per-weapon configurations
+- `CumulativeEffect` - aggregated stat bonus from multiple mods
+- `AppView` - top-level tab routing (`"weapons" | "advisor"`)
+- `AdvisorInputs` - advisor questionnaire state (location, squad, focus, range, rarities)
+- `PairRecommendation` - engine output per weapon pairing (scores, tier, synergy tags)
+- `AdvisorResult` - full engine response (status + recommendations array)
 
 ## Additional Documentation
 When working on patterns, conventions, or architectural questions, check:

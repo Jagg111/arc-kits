@@ -20,7 +20,6 @@ export interface Weapon {
   pvp: string;          // Letter grade for PVP effectiveness (S/A/B/C/D/F)
   arc: string;          // Letter grade for ARC (robot) combat effectiveness
   desc: string;         // Flavor/strategy description
-  weakness: string;     // Known weakness text shown in the builder
 }
 
 // Short codes for weapon classes — expanded to full names via CLASS_LABELS in constants.ts
@@ -110,8 +109,9 @@ export interface GuideBuild {
   advisorEligible?: boolean;
 }
 
-/** Per-weapon attachment guide: builds, avoid list, conditionals, and tips. */
+/** Per-weapon attachment guide: weakness, builds, avoid list, conditionals, and tips. */
 export interface WeaponGuide {
+  weakness: string;
   builds: GuideBuild[];
   avoid: AvoidEntry[];
   conditionals: ConditionalEntry[];

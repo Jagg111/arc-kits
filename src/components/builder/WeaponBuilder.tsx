@@ -123,7 +123,7 @@ export default function WeaponBuilder({
           <div className="space-y-4">
             {/* Mobile intel accordion (above cards on small screens) */}
             <div className="lg:hidden">
-              <WeaponIntel weapon={weapon} guide={guide} />
+              <WeaponIntel guide={guide} />
             </div>
 
             {/* Build list header */}
@@ -159,7 +159,7 @@ export default function WeaponBuilder({
 
           {/* Right column: desktop intel sidebar (sticky) */}
           <div className="hidden lg:block lg:sticky lg:top-[76px] lg:self-start">
-            <WeaponIntel weapon={weapon} guide={guide} />
+            <WeaponIntel guide={guide} />
           </div>
         </div>
 

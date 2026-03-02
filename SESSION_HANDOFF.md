@@ -41,6 +41,7 @@ Read these first each session:
 - Props-down / callbacks-up. No Context, Redux, or router.
 - Data-driven UI from:
 - `src/data/weapons.ts`
+- `src/data/guides.ts`
 - `src/data/mods.ts`
 - `src/data/presets.ts`
 - `src/data/constants.ts`

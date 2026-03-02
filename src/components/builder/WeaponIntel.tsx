@@ -7,15 +7,14 @@
 //   Desktop (lg+): Always-visible sticky sidebar with callout panels
 //   Mobile (<lg):  Collapsible accordion, collapsed by default
 //
-// Only renders callout panels that have content. If the weapon has no
+// Only renders callout panels that have content. If the guide has no
 // weakness, tips, avoids, or conditionals, nothing renders.
 // ============================================================================
 
 import { useState } from "react";
-import type { Weapon, WeaponGuide } from "../../types";
+import type { WeaponGuide } from "../../types";
 
 interface WeaponIntelProps {
-  weapon: Weapon;
   guide: WeaponGuide;
 }
 
@@ -52,14 +51,14 @@ function Callout({ title, icon, borderColor, children }: CalloutProps) {
 // Intel content (shared between desktop & mobile)
 // ---------------------------------------------------------------------------
 
-function IntelPanels({ weapon, guide }: WeaponIntelProps) {
+function IntelPanels({ guide }: WeaponIntelProps) {
   return (
     <div className="space-y-2">
       {/* Weakness */}
-      {weapon.weakness && (
+      {guide.weakness && (
         <Callout title="Known Weakness" icon="⚠️" borderColor="var(--color-accent)">
           <p className="text-sm text-text-secondary leading-relaxed">
-            {weapon.weakness}
+            {guide.weakness}
           </p>
         </Callout>
       )}
@@ -115,9 +114,9 @@ function IntelPanels({ weapon, guide }: WeaponIntelProps) {
 // Count how many intel items exist (for the mobile badge)
 // ---------------------------------------------------------------------------
 
-function countIntelItems(weapon: Weapon, guide: WeaponGuide): number {
+function countIntelItems(guide: WeaponGuide): number {
   let count = 0;
-  if (weapon.weakness) count++;
+  if (guide.weakness) count++;
   count += guide.tips.length;
   count += guide.avoid.length;
   count += guide.conditionals.length;
@@ -128,9 +127,9 @@ function countIntelItems(weapon: Weapon, guide: WeaponGuide): number {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function WeaponIntel({ weapon, guide }: WeaponIntelProps) {
+export default function WeaponIntel({ guide }: WeaponIntelProps) {
   const [expanded, setExpanded] = useState(false);
-  const total = countIntelItems(weapon, guide);
+  const total = countIntelItems(guide);
 
   // Nothing to show — skip rendering entirely
   if (total === 0) return null;
@@ -142,7 +141,7 @@ export default function WeaponIntel({ weapon, guide }: WeaponIntelProps) {
         <h3 className="text-[12px] font-bold uppercase tracking-wide text-text-muted mb-2">
           Weapon Intel
         </h3>
-        <IntelPanels weapon={weapon} guide={guide} />
+        <IntelPanels guide={guide} />
       </aside>
 
       {/* Mobile: collapsible accordion */}
@@ -175,7 +174,7 @@ export default function WeaponIntel({ weapon, guide }: WeaponIntelProps) {
 
         {expanded && (
           <div className="mt-2">
-            <IntelPanels weapon={weapon} guide={guide} />
+            <IntelPanels guide={guide} />
           </div>
         )}
       </div>
