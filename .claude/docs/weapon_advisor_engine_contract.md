@@ -191,3 +191,13 @@ Key tuning workflow:
 5. No shuffle/rotation UX.
 6. No "why not this other option" explanations.
 7. No advisor URL sharing in runtime.
+
+## 13. Phase 2+ Extensibility Notes
+
+| Future Feature | How it slots in |
+|---|---|
+| Stealth filter | Re-add `stealthImportant` to `AdvisorInputs` + re-enable 1-line check in `filters.ts`. Feature map already tracks `stealthEligible`. |
+| Economy-aware ranking | Add `costTier` derived from rarity → small multiplier on pair score for high-risk (squad) runs. One new config value. |
+| Attachment recommendations | Orthogonal to engine — uses guide data from `src/data/guides.ts`. Already shipped as a UI layer; engine is untouched. |
+| Shuffle / "show more" | Re-add shuffle as a layer on top of deterministic ranker. Engine already produces full sorted list. |
+| Per-pairing reasoning text | Synergy tags provide the "why" for V1. Reasoning text is additive — compute from the same data used for tags. |
