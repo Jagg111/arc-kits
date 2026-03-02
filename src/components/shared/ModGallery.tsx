@@ -192,7 +192,7 @@ export default function ModGallery({
         : "w-[60%] h-[60%]";
   const labelClass =
     resolvedSize === "advisor"
-      ? "text-[10px]"
+      ? "text-[11px]"
       : resolvedSize === "compact"
         ? "text-[10px]"
         : "text-[11px]";

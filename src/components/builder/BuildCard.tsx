@@ -133,7 +133,7 @@ export default function BuildCard({ index, build, allSlots, onSelect }: BuildCar
         </div>
 
         {/* Mod gallery row */}
-        <ModGallery mods={build.slots} allSlots={allSlots} />
+        <ModGallery mods={build.slots} allSlots={allSlots} labelMode="full" size="advisor" />
       </div>
 
       {/* Chevron — animates right on hover */}
