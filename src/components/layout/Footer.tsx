@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border-subtle py-4 px-4">
       <div className="max-w-6xl mx-auto text-center text-xs text-text-muted">
-        A fan project by{" "}
+        A fan project built by{" "}
         <a
           href="https://www.mitchelburton.com/"
           target="_blank"
@@ -17,9 +17,9 @@ export default function Footer() {
         >
           Mitchel Burton
         </a>
-        , built while learning AI-assisted web dev
+        {" "} with AI tooling
         <span className="mx-2 text-border">&middot;</span>
-        Weapon tips and attachment recommendations by{" "}
+        Credit to {" "}
         <a
           href="https://www.youtube.com/@Doomeris"
           target="_blank"
@@ -28,6 +28,7 @@ export default function Footer() {
         >
           Doomeris
         </a>
+        {" "} for attachment recommendations and weapon insights
       </div>
     </footer>
   );
