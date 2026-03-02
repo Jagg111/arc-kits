@@ -239,7 +239,7 @@ export const MOD_FAMILIES: ModFamilies = {
   ],
   "Light Magazine": [
     {
-      fam: "Extended Light Magazine",
+      fam: "Light Magazine",
       desc: "More rounds",
       tiers: {
         Common: {
@@ -263,7 +263,7 @@ export const MOD_FAMILIES: ModFamilies = {
   ],
   "Medium Magazine": [
     {
-      fam: "Extended Medium Magazine",
+      fam: "Medium Magazine",
       desc: "More rounds",
       tiers: {
         Common: {
@@ -287,7 +287,7 @@ export const MOD_FAMILIES: ModFamilies = {
   ],
   "Shotgun Magazine": [
     {
-      fam: "Extended Shotgun Magazine",
+      fam: "Shotgun Magazine",
       desc: "More shells",
       tiers: {
         Common: {
@@ -387,3 +387,4 @@ export const MOD_FAMILIES: ModFamilies = {
     },
   ],
 };
+

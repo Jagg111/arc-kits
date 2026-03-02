@@ -36,7 +36,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Rare" },
         },
       },
       {
@@ -45,7 +45,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Uncommon" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -54,7 +54,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Uncommon" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -63,7 +63,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
         },
       },
       {
@@ -72,7 +72,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
         },
       },
     ],
@@ -96,7 +96,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Uncommon" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -107,7 +107,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -142,7 +142,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Horizontal Grip", tier: "Legendary" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Rare" },
           Stock: { fam: "Kinetic Converter", tier: "Legendary" },
         },
       },
@@ -153,7 +153,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Rare" },
           Stock: { fam: "Padded Stock", tier: "Epic" },
         },
       },
@@ -164,7 +164,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Uncommon" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -175,7 +175,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -186,7 +186,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -197,7 +197,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -224,7 +224,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Horizontal Grip", tier: "Legendary" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Rare" },
           Stock: { fam: "Kinetic Converter", tier: "Legendary" },
         },
       },
@@ -235,7 +235,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Horizontal Grip", tier: "Legendary" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Rare" },
           Stock: { fam: "Padded Stock", tier: "Epic" },
         },
       },
@@ -246,7 +246,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Rare" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Rare" },
           Stock: { fam: "Padded Stock", tier: "Epic" },
         },
       },
@@ -257,7 +257,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -268,7 +268,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -279,7 +279,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Light Magazine": { fam: "Extended Light Magazine", tier: "Common" },
+          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -374,7 +374,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Vertical Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
           Stock: { fam: "Padded Stock", tier: "Epic" },
         },
       },
@@ -385,7 +385,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Vertical Grip", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
           Stock: { fam: "Stable Stock", tier: "Rare" },
         },
       },
@@ -396,7 +396,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Vertical Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Uncommon" },
         },
       },
@@ -407,7 +407,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Vertical Grip", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -418,7 +418,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
           Underbarrel: { fam: "Vertical Grip", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -447,7 +447,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["long"],
         slots: {
           Muzzle: { fam: "Extended Barrel", tier: "Epic" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Rare" },
         },
       },
@@ -457,7 +457,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["mid", "long"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
           Stock: { fam: "Lightweight Stock", tier: "Epic" },
         },
       },
@@ -467,7 +467,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["long"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Rare" },
         },
       },
@@ -477,7 +477,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["long"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Rare" },
         },
       },
@@ -487,7 +487,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["long"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Rare" },
         },
       },
@@ -496,7 +496,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         name: "Long",
         range: ["long"],
         slots: {
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -522,7 +522,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["long"],
         slots: {
           Underbarrel: { fam: "Angled Grip", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -531,7 +531,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -540,7 +540,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
         },
       },
       {
@@ -549,7 +549,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
         },
       },
     ],
@@ -572,7 +572,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Kinetic Converter", tier: "Legendary" },
         },
       },
@@ -582,7 +582,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Lightweight Stock", tier: "Epic" },
         },
       },
@@ -592,7 +592,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -602,7 +602,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -612,7 +612,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -622,7 +622,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -648,7 +648,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["long"],
         slots: {
           Muzzle: { fam: "Extended Barrel", tier: "Epic" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
           Stock: { fam: "Lightweight Stock", tier: "Epic" },
         },
       },
@@ -657,7 +657,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         name: "Long",
         range: ["long"],
         slots: {
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -666,7 +666,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         name: "Long",
         range: ["long"],
         slots: {
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -675,7 +675,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         name: "Long",
         range: ["long"],
         slots: {
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -684,7 +684,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         name: "Long",
         range: ["long"],
         slots: {
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Common" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Common" },
           Stock: { fam: "Stable Stock", tier: "Common" },
         },
       },
@@ -712,7 +712,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
         },
       },
       {
@@ -722,7 +722,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
         },
       },
       {
@@ -732,7 +732,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Rare" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Rare" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Rare" },
         },
       },
       {
@@ -742,7 +742,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -752,7 +752,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Vertical Grip", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -762,7 +762,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           Muzzle: { fam: "Compensator", tier: "Common" },
           Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Medium Magazine": { fam: "Extended Medium Magazine", tier: "Uncommon" },
+          "Medium Magazine": { fam: "Medium Magazine", tier: "Uncommon" },
         },
       },
     ],
@@ -986,7 +986,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close"],
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Rare" },
           Stock: { fam: "Kinetic Converter", tier: "Legendary" },
         },
       },
@@ -996,7 +996,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close"],
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Rare" },
           Stock: { fam: "Lightweight Stock", tier: "Epic" },
         },
       },
@@ -1006,7 +1006,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close", "mid"],
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Rare" },
         },
       },
       {
@@ -1015,7 +1015,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close"],
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Uncommon" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Uncommon" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Uncommon" },
         },
       },
       {
@@ -1024,7 +1024,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         range: ["close"],
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Common" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Common" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Common" },
         },
       },
     ],
@@ -1053,7 +1053,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Uncommon" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Uncommon" },
           Stock: { fam: "Kinetic Converter", tier: "Legendary" },
         },
       },
@@ -1064,7 +1064,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Rare" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Rare" },
           Stock: { fam: "Lightweight Stock", tier: "Epic" },
         },
       },
@@ -1075,7 +1075,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Rare" },
           Underbarrel: { fam: "Angled Grip", tier: "Rare" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Rare" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Rare" },
           Stock: { fam: "Stable Stock", tier: "Uncommon" },
         },
       },
@@ -1086,7 +1086,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         slots: {
           "Shotgun Muzzle": { fam: "Shotgun Choke", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
-          "Shotgun Magazine": { fam: "Extended Shotgun Magazine", tier: "Uncommon" },
+          "Shotgun Magazine": { fam: "Shotgun Magazine", tier: "Uncommon" },
           Stock: { fam: "Stable Stock", tier: "Uncommon" },
         },
       },
@@ -1197,3 +1197,4 @@ export const WEAPON_GUIDES: WeaponGuides = {
     ],
   },
 };
+
