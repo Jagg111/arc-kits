@@ -159,8 +159,8 @@ export const WEAPON_GUIDES: WeaponGuides = {
       },
       {
         // (3) Stitcher — Medium - Long, 35m
-        name: "Medium - Long",
-        range: ["mid", "long"],
+        name: "Short - Medium",
+        range: ["close", "mid"],
         slots: {
           Muzzle: { fam: "Compensator", tier: "Uncommon" },
           Underbarrel: { fam: "Angled Grip", tier: "Uncommon" },
@@ -180,18 +180,7 @@ export const WEAPON_GUIDES: WeaponGuides = {
         },
       },
       {
-        // (5) Stitcher — Short - Medium, 25m
-        name: "Short - Medium",
-        range: ["close", "mid"],
-        slots: {
-          Muzzle: { fam: "Compensator", tier: "Common" },
-          Underbarrel: { fam: "Angled Grip", tier: "Common" },
-          "Light Magazine": { fam: "Light Magazine", tier: "Common" },
-          Stock: { fam: "Stable Stock", tier: "Common" },
-        },
-      },
-      {
-        // (6) Stitcher — Short, 20m
+        // (5) Stitcher — Short, 20m
         name: "Short",
         range: ["close"],
         slots: {
