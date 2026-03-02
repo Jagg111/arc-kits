@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advisor Prototype A — Tweaked 3-Column Layout</title>
+  <style>
+    /* ── CSS tokens (dark theme, copied from src/index.css) ── */
+    :root {
+      --color-bg-base:         #030712;
+      --color-bg-mid:          #111827;
+      --color-surface:         #111827;
+      --color-surface-alt:     #1f2937;
+      --color-border:          #374151;
+      --color-border-subtle:   #1f2937;
+      --color-text-primary:    #ffffff;
+      --color-text-secondary:  #9ca3af;
+      --color-text-muted:      #6b7280;
+      --color-text-faint:      #4b5563;
+      --color-accent:          #f97316;
+      --color-accent-text:     #fb923c;
+      --color-filter-bar-bg:   #0f1a2e;
+      --color-success:         #22c55e;
+      --color-warning:         #f59e0b;
+
+      --color-rarity-common:    #9CA3AF;
+      --color-rarity-uncommon:  #27BC57;
+      --color-rarity-rare:      #3b82f6;
+      --color-rarity-epic:      #CB3098;
+      --color-rarity-legendary: #FFC301;
+
+      --color-ammo-light:   #e6da35;
+      --color-ammo-medium:  #6285fc;
+      --color-ammo-heavy:   #d21818;
+      --color-ammo-shotgun: #e38c8c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, var(--color-bg-base) 0%, var(--color-bg-mid) 100%);
+      color: var(--color-text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 0 1.25rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #fb923c, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.04em;
+    }
+    .tab {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      border: 1px solid transparent;
+    }
+    .tab.active {
+      background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+      border-color: var(--color-accent);
+      color: var(--color-accent-text);
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      background: var(--color-filter-bar-bg);
+      border-bottom: 1px solid var(--color-border-subtle);
+      padding: 0.6rem 1.25rem;
+      position: sticky;
+      top: 56px;
+      z-index: 10;
+    }
+    .filter-bar-inner {
+      max-width: 80rem;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .filter-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      margin-right: 0.1rem;
+    }
+    .pill {
+      padding: 0.25rem 0.625rem;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-alt);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .pill.active-accent {
+      background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+      border-color: var(--color-accent);
+      color: var(--color-accent-text);
+    }
+    .pill.active-rare {
+      background: color-mix(in srgb, var(--color-rarity-rare) 15%, transparent);
+      border-color: var(--color-rarity-rare);
+      color: var(--color-rarity-rare);
+    }
+    .pill.active-epic {
+      background: color-mix(in srgb, var(--color-rarity-epic) 15%, transparent);
+      border-color: var(--color-rarity-epic);
+      color: var(--color-rarity-epic);
+    }
+    .pill.active-uncommon {
+      background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, transparent);
+      border-color: var(--color-rarity-uncommon);
+      color: var(--color-rarity-uncommon);
+    }
+    .pill.active-common {
+      background: color-mix(in srgb, var(--color-rarity-common) 15%, transparent);
+      border-color: var(--color-rarity-common);
+      color: var(--color-rarity-common);
+    }
+    .separator {
+      width: 1px;
+      height: 20px;
+      background: var(--color-border);
+      flex-shrink: 0;
+    }
+
+    /* ── Main content ── */
+    main {
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem 1.25rem;
+    }
+
+    /* ── Results header ── */
+    .results-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.875rem;
+    }
+    .results-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-secondary);
+    }
+    .results-context {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Section dividers ── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.625rem;
+    }
+    .section-divider-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+    .section-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    /* ── Card grid ── */
+    .card-grid-three {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    /* ── Pairing card ── */
+    .pairing-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-subtle);
+      border-top-width: 2px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .pairing-card.top-pick {
+      border-top-color: var(--color-accent);
+      background: linear-gradient(180deg,
+        color-mix(in srgb, var(--color-accent) 4%, transparent) 0%,
+        var(--color-surface) 40%
+      );
+    }
+    .pairing-card.strong {
+      border-top-color: var(--color-border);
+    }
+
+    /* ── Tier badge ── */
+    .tier-badge-row {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .tier-badge.top-pick {
+      background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+      color: var(--color-accent-text);
+    }
+    .tier-badge.strong {
+      background: transparent;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Card body ── */
+    .card-body {
+      padding: 0.5rem 0.625rem 0.625rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;  /* CHANGE: more gap between weapon blocks */
+      flex: 1;
+    }
+
+    /* ── Weapon block ── */
+    .weapon-block {
+      background: var(--color-surface-alt);
+      border-radius: 8px;
+      padding: 0.5rem 0.625rem 0.5rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .role-label {
+      position: absolute;
+      top: -7px;
+      left: 10px;
+      font-size: 0.6rem;  /* CHANGE: slightly larger than 0.52rem */
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-text-secondary); /* CHANGE: brighter than text-muted */
+      background: var(--color-surface-alt);
+      padding: 0 3px;
+      font-weight: 600;
+    }
+
+    /* Row 1: weapon image + name */
+    .weapon-row1 {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      margin-top: 2px;
+    }
+    .weapon-img-placeholder {
+      height: 52px;
+      width: 120px;
+      flex-shrink: 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      opacity: 0.4;
+    }
+    .weapon-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+    .weapon-rarity {
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-left: 0.375rem;
+    }
+
+    /* Row 2: Attachment gallery (CHANGE: now before customize) */
+    .attachment-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    .attachment-slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+    .attachment-icon {
+      width: 56px;   /* CHANGE: up from 36px */
+      height: 56px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .attachment-icon.filled {
+      border: 2px solid;
+    }
+    .attachment-icon.empty {
+      border: 2px dashed var(--color-border);
+      background: transparent;
+    }
+    .attachment-icon.empty img {
+      width: 60%;
+      height: 60%;
+      object-fit: contain;
+      opacity: 0.4;
+    }
+    .attachment-label {
+      font-size: 10px;   /* CHANGE: same size but now full name, not abbreviated */
+      text-align: center;
+      line-height: 1.2;
+      margin-top: 3px;
+    }
+    .attachment-label.empty-label {
+      color: var(--color-text-faint);
+    }
+
+    /* Customize button — anchored bottom-right of weapon block */
+    .customize-btn-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.375rem;
+    }
+    .customize-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border-subtle);
+      background: transparent;
+      cursor: pointer;
+    }
+    .customize-btn:hover {
+      color: var(--color-accent-text);
+      border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+    }
+
+    /* ── Synergy tags ── */
+    .synergy-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-top: 0.125rem;
+    }
+    .synergy-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.6rem;
+      font-weight: 600;
+    }
+    .synergy-tag.positive {
+      background: color-mix(in srgb, var(--color-success) 8%, transparent);
+      color: var(--color-success);
+    }
+    .synergy-tag.warning {
+      background: color-mix(in srgb, var(--color-warning) 8%, transparent);
+      color: var(--color-warning);
+    }
+
+    /* ── Change annotation callouts ── */
+    .change-note {
+      position: absolute;
+      right: -2px;
+      top: -2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f97316;
+      opacity: 0.7;
+    }
+    .legend {
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.72rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+    .legend strong { color: var(--color-accent-text); }
+    .legend ul { margin: 0.375rem 0 0 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <span class="brand">ARC RAIDERS</span>
+  <button class="tab active">Advisor</button>
+  <button class="tab">Weapons</button>
+</header>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+  <div class="filter-bar-inner">
+    <div class="filter-group">
+      <span class="filter-label">Where</span>
+      <button class="pill">Buried City</button>
+      <button class="pill">Spaceport</button>
+      <button class="pill active-accent">Dam</button>
+      <button class="pill">Blue Gate</button>
+      <button class="pill">Stella M.</button>
+    </div>
+    <div class="separator"></div>
+    <div class="filter-group">
+      <span class="filter-label">Squad</span>
+      <button class="pill active-accent">Solo</button>
+      <button class="pill">Squad</button>
+    </div>
+    <div class="separator"></div>
+    <div class="filter-group">
+      <span class="filter-label">Focus</span>
+      <button class="pill">PVE</button>
+      <button class="pill">PVP</button>
+      <button class="pill active-accent">Mixed</button>
+    </div>
+    <div class="separator"></div>
+    <div class="filter-group">
+      <span class="filter-label">Range</span>
+      <button class="pill">Close</button>
+      <button class="pill">Mid</button>
+      <button class="pill">Long</button>
+      <button class="pill active-accent">Any</button>
+    </div>
+    <div class="separator"></div>
+    <div class="filter-group">
+      <span class="filter-label">Rarity</span>
+      <button class="pill active-common">✓ Common</button>
+      <button class="pill active-uncommon">✓ Uncommon</button>
+      <button class="pill active-rare">✓ Rare</button>
+      <button class="pill active-epic">✓ Epic</button>
+      <button class="pill">✗ Legendary</button>
+    </div>
+    <div class="separator"></div>
+    <div class="filter-group">
+      <span class="filter-label">Crafting</span>
+      <button class="pill active-uncommon">✓ Mech Comps</button>
+      <button class="pill">✗ Mod Comps</button>
+      <button class="pill">✗ Kinetic Conv.</button>
+      <button class="pill">✗ Horiz. Grip</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main content -->
+<main>
+
+  <!-- Change notes legend -->
+  <div class="legend">
+    <strong>Prototype A — Changes from current layout:</strong>
+    <ul>
+      <li><strong>Attachment icons 56px</strong> (up from 36px) with full unabbreviated mod names below each icon</li>
+      <li><strong>Attachment slots centered</strong> within each weapon block with consistent spacing between slots regardless of how many slots a weapon has</li>
+      <li><strong>Empty slots</strong> — dashed border with slot icon centered inside and slot name label underneath, matching the weapon builder pattern for visual consistency</li>
+      <li><strong>"Customize →" anchored bottom-right</strong> of each weapon block</li>
+      <li><strong>PRIMARY / SECONDARY labels</strong> slightly larger and brighter, with more gap between the two weapon blocks</li>
+      <li><strong>All 3 cards vertically aligned</strong> — tier badge row on every card so Primary/Secondary weapon blocks align horizontally across all columns</li>
+    </ul>
+  </div>
+
+  <!-- Results header -->
+  <div class="results-header">
+    <span class="results-label">Recommendations</span>
+    <span class="results-context">— Dam · Solo · Mixed</span>
+  </div>
+
+  <!-- All 3 cards in one unified 3-column grid -->
+  <!-- Top Pick in col 1, divider label floats above cols 2-3 via the grid approach below -->
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+
+    <!-- TOP PICK card -->
+    <div class="pairing-card top-pick">
+      <div class="tier-badge-row">
+        <span class="tier-badge top-pick">Top Pick</span>
+      </div>
+      <div class="card-body">
+
+        <!-- Primary weapon block -->
+        <div class="weapon-block">
+          <span class="role-label">Primary</span>
+          <div class="weapon-row1">
+            <div class="weapon-img-placeholder" style="background: color-mix(in srgb, var(--color-ammo-medium) 12%, transparent);">
+              <span style="color: var(--color-ammo-medium);">R</span>
+            </div>
+            <div>
+              <span class="weapon-name">Renegade</span>
+              <span class="weapon-rarity" style="color: var(--color-rarity-rare);">Rare</span>
+            </div>
+          </div>
+          <div class="attachment-row">
+            <div class="attachment-slot">
+              <div class="attachment-icon empty">
+                <img src="https://static.wikia.nocookie.net/arc-raiders/images/4/4b/Mods_Muzzle.png" alt="Muzzle" />
+              </div>
+              <span class="attachment-label empty-label">Muzzle</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-rare); background: color-mix(in srgb, var(--color-rarity-rare) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-rare); text-align:center; line-height:1.2; padding:2px;">Ext<br>Mag</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-rare);">Ext. Med. Mag I</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-rare); background: color-mix(in srgb, var(--color-rarity-rare) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-rare); text-align:center; line-height:1.2; padding:2px;">Stb<br>Stk</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-rare);">Stable Stock I</span>
+            </div>
+          </div>
+          <div class="customize-btn-row"><button class="customize-btn">Customize →</button></div>
+        </div>
+
+        <!-- Secondary weapon block -->
+        <div class="weapon-block">
+          <span class="role-label">Secondary</span>
+          <div class="weapon-row1">
+            <div class="weapon-img-placeholder" style="background: color-mix(in srgb, var(--color-ammo-shotgun) 12%, transparent);">
+              <span style="color: var(--color-ammo-shotgun);">V</span>
+            </div>
+            <div>
+              <span class="weapon-name">Vulcano</span>
+              <span class="weapon-rarity" style="color: var(--color-rarity-epic);">Epic</span>
+            </div>
+          </div>
+          <div class="attachment-row">
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-uncommon); background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-uncommon); text-align:center; line-height:1.2; padding:2px;">SG<br>Chk</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-uncommon);">SG Choke II</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-uncommon); background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-uncommon); text-align:center; line-height:1.2; padding:2px;">Ang<br>Grp</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-uncommon);">Angled Grip II</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-uncommon); background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-uncommon); text-align:center; line-height:1.2; padding:2px;">Ext<br>Mag</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-uncommon);">Ext. SG Mag II</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-uncommon); background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-uncommon); text-align:center; line-height:1.2; padding:2px;">Stb<br>Stk</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-uncommon);">Stable Stock II</span>
+            </div>
+          </div>
+          <div class="customize-btn-row"><button class="customize-btn">Customize →</button></div>
+        </div>
+
+        <div class="synergy-row">
+          <span class="synergy-tag positive">✓ Ammo Split</span>
+          <span class="synergy-tag positive">✓ Range Coverage</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strong option 1 -->
+    <div class="pairing-card strong">
+      <div class="tier-badge-row">
+        <span class="tier-badge strong">Strong Option</span>
+      </div>
+      <div class="card-body">
+
+        <div class="weapon-block">
+          <span class="role-label">Primary</span>
+          <div class="weapon-row1">
+            <div class="weapon-img-placeholder" style="background: color-mix(in srgb, var(--color-ammo-medium) 12%, transparent);">
+              <span style="color: var(--color-ammo-medium);">R</span>
+            </div>
+            <div>
+              <span class="weapon-name">Renegade</span>
+              <span class="weapon-rarity" style="color: var(--color-rarity-rare);">Rare</span>
+            </div>
+          </div>
+          <div class="attachment-row">
+            <div class="attachment-slot">
+              <div class="attachment-icon empty">
+                <img src="https://static.wikia.nocookie.net/arc-raiders/images/4/4b/Mods_Muzzle.png" alt="Muzzle" />
+              </div>
+              <span class="attachment-label empty-label">Muzzle</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-rare); background: color-mix(in srgb, var(--color-rarity-rare) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-rare); text-align:center; line-height:1.2; padding:2px;">Ext<br>Mag</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-rare);">Ext. Med. Mag I</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-rare); background: color-mix(in srgb, var(--color-rarity-rare) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-rare); text-align:center; line-height:1.2; padding:2px;">Stb<br>Stk</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-rare);">Stable Stock I</span>
+            </div>
+          </div>
+          <div class="customize-btn-row"><button class="customize-btn">Customize →</button></div>
+        </div>
+
+        <div class="weapon-block">
+          <span class="role-label">Secondary</span>
+          <div class="weapon-row1">
+            <div class="weapon-img-placeholder" style="background: color-mix(in srgb, var(--color-ammo-medium) 12%, transparent);">
+              <span style="color: var(--color-ammo-medium);">A</span>
+            </div>
+            <div>
+              <span class="weapon-name">Anvil</span>
+              <span class="weapon-rarity" style="color: var(--color-rarity-uncommon);">Uncommon</span>
+            </div>
+          </div>
+          <div class="attachment-row">
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-uncommon); background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-uncommon); text-align:center; line-height:1.2; padding:2px;">Cmp</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-uncommon);">Compensator II</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon empty">
+                <img src="https://static.wikia.nocookie.net/arc-raiders/images/c/cc/Mods_Tech-Mod.png" alt="Tech Mod" />
+              </div>
+              <span class="attachment-label empty-label">Tech Mod</span>
+            </div>
+          </div>
+          <div class="customize-btn-row"><button class="customize-btn">Customize →</button></div>
+        </div>
+
+        <div class="synergy-row">
+          <span class="synergy-tag positive">✓ Ammo Split</span>
+          <span class="synergy-tag positive">✓ Range Coverage</span>
+          <span class="synergy-tag positive">✓ Role Split</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strong option 2 -->
+    <div class="pairing-card strong">
+      <div class="tier-badge-row">
+        <span class="tier-badge strong">Strong Option</span>
+      </div>
+      <div class="card-body">
+
+        <div class="weapon-block">
+          <span class="role-label">Primary</span>
+          <div class="weapon-row1">
+            <div class="weapon-img-placeholder" style="background: color-mix(in srgb, var(--color-ammo-medium) 12%, transparent);">
+              <span style="color: var(--color-ammo-medium);">R</span>
+            </div>
+            <div>
+              <span class="weapon-name">Renegade</span>
+              <span class="weapon-rarity" style="color: var(--color-rarity-rare);">Rare</span>
+            </div>
+          </div>
+          <div class="attachment-row">
+            <div class="attachment-slot">
+              <div class="attachment-icon empty">
+                <img src="https://static.wikia.nocookie.net/arc-raiders/images/4/4b/Mods_Muzzle.png" alt="Muzzle" />
+              </div>
+              <span class="attachment-label empty-label">Muzzle</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-rare); background: color-mix(in srgb, var(--color-rarity-rare) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-rare); text-align:center; line-height:1.2; padding:2px;">Ext<br>Mag</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-rare);">Ext. Med. Mag I</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-rare); background: color-mix(in srgb, var(--color-rarity-rare) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-rare); text-align:center; line-height:1.2; padding:2px;">Stb<br>Stk</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-rare);">Stable Stock I</span>
+            </div>
+          </div>
+          <div class="customize-btn-row"><button class="customize-btn">Customize →</button></div>
+        </div>
+
+        <div class="weapon-block">
+          <span class="role-label">Secondary</span>
+          <div class="weapon-row1">
+            <div class="weapon-img-placeholder" style="background: color-mix(in srgb, var(--color-ammo-light) 12%, transparent);">
+              <span style="color: var(--color-ammo-light);">F</span>
+            </div>
+            <div>
+              <span class="weapon-name">Ferro</span>
+              <span class="weapon-rarity" style="color: var(--color-rarity-common);">Common</span>
+            </div>
+          </div>
+          <div class="attachment-row">
+            <div class="attachment-slot">
+              <div class="attachment-icon filled" style="border-color: var(--color-rarity-uncommon); background: color-mix(in srgb, var(--color-rarity-uncommon) 15%, var(--color-surface-alt));">
+                <span style="font-size: 0.55rem; font-weight:700; color: var(--color-rarity-uncommon); text-align:center; line-height:1.2; padding:2px;">Slnc</span>
+              </div>
+              <span class="attachment-label" style="color: var(--color-rarity-uncommon);">Silencer II</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon empty">
+                <img src="https://static.wikia.nocookie.net/arc-raiders/images/0/01/Mods_Underbarrel.png" alt="Underbarrel" />
+              </div>
+              <span class="attachment-label empty-label">Underbarrel</span>
+            </div>
+            <div class="attachment-slot">
+              <div class="attachment-icon empty">
+                <img src="https://static.wikia.nocookie.net/arc-raiders/images/f/f5/Mods_Stock.png" alt="Stock" />
+              </div>
+              <span class="attachment-label empty-label">Stock</span>
+            </div>
+          </div>
+          <div class="customize-btn-row"><button class="customize-btn">Customize →</button></div>
+        </div>
+
+        <div class="synergy-row">
+          <span class="synergy-tag positive">✓ Ammo Split</span>
+          <span class="synergy-tag positive">✓ Range Coverage</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end unified 3-col grid -->
+
+</main>
+</body>
+</html>

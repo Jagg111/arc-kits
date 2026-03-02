@@ -5,7 +5,7 @@
 // IMPORTS FROM: types/index.ts (for type aliases)
 // ============================================================================
 
-import type { WeaponClass, AmmoType, Rarity } from "../types";
+import type { WeaponClass, AmmoType, Rarity, SlotType } from "../types";
 
 // Expands short weapon class codes (e.g. "AR") to full display names (e.g. "Assault Rifle")
 export const CLASS_LABELS: Record<WeaponClass, string> = {
@@ -120,6 +120,21 @@ export const WEAPON_IMAGES: Record<string, string> = {
   aphelion:     WI("8/88", "Aphelion.png"),
   jupiter:      WI("6/68", "Jupiter.png"),
   equalizer:    WI("9/96", "Equalizer.png"),
+};
+
+// Wiki icons for each attachment slot type — shown in empty slot placeholders
+const SI = (hash: string, file: string) =>
+  `https://arcraiders.wiki/w/images/${hash}/${file}`;
+
+export const SLOT_ICONS: Record<SlotType, string> = {
+  "Muzzle":           SI("4/4b", "Mods_Muzzle.png"),
+  "Shotgun Muzzle":   SI("b/bd", "Mods_Shotgun-Muzzle.png"),
+  "Underbarrel":      SI("0/01", "Mods_Underbarrel.png"),
+  "Light Magazine":   SI("6/60", "Mods_Light-Mag.png"),
+  "Medium Magazine":  SI("c/c6", "Mods_Medium-Mag.png"),
+  "Shotgun Magazine": SI("6/66", "Mods_Shotgun-Mag.png"),
+  "Stock":            SI("f/f5", "Mods_Stock.png"),
+  "Tech Mod":         SI("c/cc", "Mods_Tech-Mod.png"),
 };
 
 // Display order for ammo type groups on the weapon picker screen

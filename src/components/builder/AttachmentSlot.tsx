@@ -14,7 +14,7 @@
 // ============================================================================
 
 import type { EquippedMod, ModFamily, SlotType, Rarity } from "../../types";
-import { RARITY_LABELS, RARITY_COLORS } from "../../data/constants";
+import { RARITY_LABELS, RARITY_COLORS, SLOT_ICONS } from "../../data/constants";
 import { MOD_FAMILIES } from "../../data/mods";
 import CostPill from "../shared/CostPill";
 
@@ -105,9 +105,11 @@ export default function AttachmentSlot({
       className="w-full bg-surface/50 rounded-xl border-2 border-dashed border-border hover:border-accent/50 p-3 flex items-center gap-3 transition-colors text-left group"
     >
       <div className="w-12 h-12 rounded bg-surface-alt flex items-center justify-center shrink-0 group-hover:bg-surface-hover">
-        <svg className="w-5 h-5 text-text-faint group-hover:text-accent-text transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
+        <img
+          src={SLOT_ICONS[slot]}
+          alt={slot}
+          className="w-8 h-8 object-contain opacity-40 group-hover:opacity-70 transition-opacity"
+        />
       </div>
       <div>
         <div className="font-semibold text-sm text-text-secondary group-hover:text-text-primary">{slot}</div>

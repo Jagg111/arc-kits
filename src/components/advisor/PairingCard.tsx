@@ -48,7 +48,7 @@ export default function PairingCard({ recommendation, onOpenBuilder, buildsByWea
       </div>
 
       {/* Weapon blocks + synergy */}
-      <div className="p-2.5 flex flex-col gap-2 flex-1">
+      <div className="p-2.5 flex flex-col gap-2.5 flex-1">
         <WeaponBlock
           weaponId={recommendation.primaryWeaponId}
           role="Primary"
