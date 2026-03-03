@@ -7,11 +7,12 @@
 import { MOD_FAMILIES } from "../../data/mods";
 import { WEAPONS } from "../../data/weapons";
 import type { Weapon } from "../../types";
-import { isBurstFireMode, isSustainedFireMode, pickRangeBand, type RangeBand } from "./utils";
+import type { RangeBucket } from "../../types";
+import { isBurstFireMode, isSustainedFireMode } from "./utils";
 
 export interface WeaponFeatures {
   weapon: Weapon;
-  rangeBand: RangeBand;
+  rangeBands: RangeBucket[];
   burstCapable: boolean;
   sustainedCapable: boolean;
   stealthEligible: boolean;
@@ -41,7 +42,7 @@ export function buildWeaponFeatureMap(): Record<string, WeaponFeatures> {
   for (const weapon of WEAPONS) {
     featureMap[weapon.id] = {
       weapon,
-      rangeBand: pickRangeBand(weapon.range),
+      rangeBands: weapon.rangeBands,
       burstCapable: isBurstFireMode(weapon.fireMode),
       sustainedCapable: isSustainedFireMode(weapon.fireMode),
       stealthEligible: stealthEligible.has(weapon.id),

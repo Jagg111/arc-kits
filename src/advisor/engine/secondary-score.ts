@@ -15,7 +15,7 @@ import {
   WEIGHT_RANGE_DIVERSITY,
 } from "../../data/advisor_config";
 import type { AdvisorComplementBreakdown, Weapon } from "../../types";
-import { clamp, pickRangeBand } from "./utils";
+import { bandDistance, clamp } from "./utils";
 
 export function scoreSecondaryComplement(
   primary: Weapon,
@@ -27,21 +27,15 @@ export function scoreSecondaryComplement(
     ? AMMO_DIVERSITY_SAME
     : AMMO_DIVERSITY_DIFFERENT;
 
-  // Range diversity: different bands = best, adjacent = decent, same = worst.
-  const rangePrimary = pickRangeBand(primary.range);
-  const rangeSecondary = pickRangeBand(secondary.range);
+  // Range diversity: use minimum band distance between the two weapons' range sets.
+  const dist = bandDistance(primary.rangeBands, secondary.rangeBands);
   let rangeDiversity: number;
-  if (rangePrimary === rangeSecondary) {
-    rangeDiversity = RANGE_DIVERSITY_SAME;
-  } else if (
-    (rangePrimary === "close" && rangeSecondary === "long") ||
-    (rangePrimary === "long" && rangeSecondary === "close")
-  ) {
-    // Maximum spread (close↔long) — best possible range coverage
-    rangeDiversity = RANGE_DIVERSITY_DIFFERENT;
+  if (dist === 0) {
+    rangeDiversity = RANGE_DIVERSITY_SAME;      // shared band
+  } else if (dist === 2) {
+    rangeDiversity = RANGE_DIVERSITY_DIFFERENT; // close↔long max spread
   } else {
-    // Adjacent bands (close↔mid or mid↔long) — decent but not max coverage
-    rangeDiversity = RANGE_DIVERSITY_ADJACENT;
+    rangeDiversity = RANGE_DIVERSITY_ADJACENT;  // adjacent bands
   }
 
   // Weighted blend for final secondary complement score.

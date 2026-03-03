@@ -20,7 +20,7 @@ import type {
   Weapon,
 } from "../../types";
 import { scoreSecondaryComplement } from "./secondary-score";
-import { clamp, pairKey, pickRangeBand, roundTo } from "./utils";
+import { bandDistance, clamp, pairKey, roundTo } from "./utils";
 
 export interface ScoredWeaponCandidate {
   weapon: Weapon;
@@ -49,9 +49,7 @@ function deriveSynergyTags(primary: Weapon, secondary: Weapon): SynergyTag[] {
   }
 
   // Range coverage
-  const rangePrimary = pickRangeBand(primary.range);
-  const rangeSecondary = pickRangeBand(secondary.range);
-  if (rangePrimary !== rangeSecondary) {
+  if (bandDistance(primary.rangeBands, secondary.rangeBands) > 0) {
     tags.push({ type: "positive", label: "Range Coverage" });
   } else {
     tags.push({ type: "warning", label: "Range Overlap" });
@@ -107,9 +105,7 @@ export function rankPairCandidates(
 
       // Squad mode bonus: reward pairs that specialize into different range bands.
       if (inputs.squad === "squad") {
-        const bandPrimary = pickRangeBand(primary.weapon.range);
-        const bandSecondary = pickRangeBand(secondary.weapon.range);
-        if (bandPrimary !== bandSecondary) {
+        if (bandDistance(primary.weapon.rangeBands, secondary.weapon.rangeBands) > 0) {
           pairScore = clamp(pairScore + SQUAD_RANGE_BONUS);
         }
       }

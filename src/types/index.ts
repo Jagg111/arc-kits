@@ -15,6 +15,7 @@ export interface Weapon {
   rateOfFire: number;
   dps: number;          // Damage per second (damage × rateOfFire)
   range: number;
+  rangeBands: RangeBucket[];  // Authored in weapons.ts; not derived from numeric range stat
   slots: SlotType[];    // Which attachment slots this weapon has (empty = no mods possible)
   rarity: Rarity;
   pvp: string;          // Letter grade for PVP effectiveness (S/A/B/C/D/F)

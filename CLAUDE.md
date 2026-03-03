@@ -61,13 +61,13 @@ src/
 
   advisor/engine/          — Deterministic weapon pairing recommendation engine
     index.ts               — Public API: recommendLoadouts(), buildRankedRecommendations()
-    feature-map.ts         — Per-weapon derived facts (range band, burst/sustained, stealth)
+    feature-map.ts         — Per-weapon derived facts (rangeBands passthrough, burst/sustained, stealth)
     filters.ts             — Input normalization and hard constraint filtering
     primary-score.ts       — Standalone weapon scoring (map fit, role fit, range fit)
     secondary-score.ts     — Complement scoring (ammo diversity, range diversity, quality floor)
     pair-ranker.ts         — Pair construction, tier assignment, synergy tag generation
     url-state.ts           — URL query param serialization (V2, preserved in code)
-    utils.ts               — Shared math helpers (grade-to-score, range band, clamp)
+    utils.ts               — Shared math helpers (grade-to-score, bandDistance, clamp)
 
   components/              — UI organized by feature domain
     layout/Header.tsx      — Sticky header with Weapons/Advisor tabs, theme toggle, reset button

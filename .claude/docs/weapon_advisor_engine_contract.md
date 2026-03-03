@@ -75,7 +75,7 @@ Range adjacency: close↔mid and mid↔long are "adjacent". Close↔long is "dif
 pairScore = primaryScore × 0.60 + complementScore × 0.40
 ```
 
-Squad mode bonus: +0.05 pair score when primary and secondary occupy different range bands (squad mode only).
+Squad mode bonus: +0.05 pair score when `bandDistance(primary.rangeBands, secondary.rangeBands) > 0` (squad mode only).
 
 ### 4.5 Deterministic Sort Order
 
@@ -109,8 +109,8 @@ Derived per-pair from weapon data — no curation, pure logic:
 |-----|------|-----------|
 | Ammo Split | positive | `primary.ammoType !== secondary.ammoType` |
 | Same Ammo | warning | `primary.ammoType === secondary.ammoType` |
-| Range Coverage | positive | `pickRangeBand(primary.range) !== pickRangeBand(secondary.range)` |
-| Range Overlap | warning | `pickRangeBand(primary.range) === pickRangeBand(secondary.range)` |
+| Range Coverage | positive | `bandDistance(primary.rangeBands, secondary.rangeBands) > 0` |
+| Range Overlap | warning | `bandDistance(primary.rangeBands, secondary.rangeBands) === 0` |
 | Role Split | positive | One weapon has PvP grade S/A AND other has ARC grade S/A |
 
 ## 8. Output Contract

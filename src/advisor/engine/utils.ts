@@ -4,9 +4,7 @@
 // ============================================================================
 
 import { ADVISOR_GRADE_TO_SCORE, ADVISOR_RANGE_TARGETS } from "../../data/advisor_config";
-import type { AdvisorPreferredRange, TierData } from "../../types";
-
-export type RangeBand = "close" | "mid" | "long";
+import type { AdvisorPreferredRange, RangeBucket, TierData } from "../../types";
 
 // Clamp any number into [min, max].
 export function clamp(value: number, min = 0, max = 1): number {
@@ -26,11 +24,19 @@ export function gradeToScore(grade: string): number {
   return ADVISOR_GRADE_TO_SCORE[grade] ?? ADVISOR_GRADE_TO_SCORE.C;
 }
 
-// Convert numeric weapon range into a coarse distance band.
-export function pickRangeBand(range: number): RangeBand {
-  if (range < ADVISOR_RANGE_TARGETS.mid.min) return "close";
-  if (range <= ADVISOR_RANGE_TARGETS.mid.max) return "mid";
-  return "long";
+// Returns the minimum distance between two sets of range bands.
+// 0 = shared band, 1 = adjacent (close↔mid or mid↔long), 2 = opposite extremes (close↔long).
+const BAND_ORDER: Record<RangeBucket, number> = { close: 0, mid: 1, long: 2 };
+
+export function bandDistance(a: RangeBucket[], b: RangeBucket[]): number {
+  let min = Infinity;
+  for (const x of a) {
+    for (const y of b) {
+      const d = Math.abs(BAND_ORDER[x] - BAND_ORDER[y]);
+      if (d < min) min = d;
+    }
+  }
+  return min === Infinity ? 0 : min;
 }
 
 // Soft range fit around preferred min/max boundaries.
