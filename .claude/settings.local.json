@@ -9,7 +9,8 @@
       "WebFetch(domain:www.gamesradar.com)",
       "WebFetch(domain:steamcommunity.com)",
       "WebFetch(domain:www.dualshockers.com)",
-      "WebFetch(domain:www.pcgamer.com)"
+      "WebFetch(domain:www.pcgamer.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
