@@ -1,8 +1,9 @@
 # ArcKits
 
-**Weapon loadout builder and advisor for [Arc Raiders](https://www.arcraiders.com/)**
+**Weapon loadout builder and advisor for Arc Raiders. View the [live website here](https://jagg111.github.io/arc-kits/).**
 
-[![Live App](https://img.shields.io/badge/Live%20App-arc--kits-blue?style=flat-square)](https://jagg111.github.io/arc-kits/)
+****
+
 [![Deploy](https://github.com/Jagg111/arc-kits/actions/workflows/deploy.yml/badge.svg)](https://github.com/Jagg111/arc-kits/actions/workflows/deploy.yml)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
