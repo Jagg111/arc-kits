@@ -26,3 +26,5 @@ prototypes/footer/option-b.html
 prototypes/footer/option-c.html
 .dev-server.log
 .claude/settings.local.json
+.claude/tmp/
+tsconfig.tsbuildinfo
