@@ -6,6 +6,7 @@
 // ============================================================================
 
 import type { WeaponClass, AmmoType, Rarity, SlotType } from "../types";
+import { ITEMS, itemImgUrl } from "./items";
 
 // Expands short weapon class codes (e.g. "AR") to full display names (e.g. "Assault Rifle")
 export const CLASS_LABELS: Record<WeaponClass, string> = {
@@ -79,19 +80,14 @@ export const GRADE_COLORS: Record<string, string> = {
   F: "var(--color-grade-f)",
 };
 
-// Crafting material metadata — maps material names to their rarity tier and wiki thumbnail icon.
-// Used by cost display components to color-code materials and show icons.
-// Image URLs follow the same wiki thumbnail pattern as mod icons in mods.ts.
-export const MATERIAL_INFO: Record<string, { rarity: Rarity; img: string }> = {
-  "Metal Parts":           { rarity: "Common",   img: "https://arcraiders.wiki/w/images/thumb/8/89/Metal_Parts.png/96px-Metal_Parts.png.webp" },
-  "Plastic Parts":         { rarity: "Common",   img: "https://arcraiders.wiki/w/images/thumb/c/c9/Plastic_Parts.png/96px-Plastic_Parts.png.webp" },
-  "Rubber Parts":          { rarity: "Common",   img: "https://arcraiders.wiki/w/images/thumb/9/93/Rubber_Parts.png/96px-Rubber_Parts.png.webp" },
-  "Wires":                 { rarity: "Common",   img: "https://arcraiders.wiki/w/images/thumb/3/39/Wires.png/96px-Wires.png.webp" },
-  "Duct Tape":             { rarity: "Uncommon", img: "https://arcraiders.wiki/w/images/thumb/4/4e/Duct_Tape.png/96px-Duct_Tape.png.webp" },
-  "Steel Spring":          { rarity: "Uncommon", img: "https://arcraiders.wiki/w/images/thumb/d/db/Steel_Spring.png/96px-Steel_Spring.png.webp" },
-  "Mechanical Components": { rarity: "Uncommon", img: "https://arcraiders.wiki/w/images/thumb/9/94/Mechanical_Components.png/96px-Mechanical_Components.png.webp" },
-  "Mod Components":        { rarity: "Rare",     img: "https://arcraiders.wiki/w/images/thumb/0/0f/Mod_Components.png/96px-Mod_Components.png.webp" },
-};
+// Crafting material metadata — derived view over `ITEMS` for legacy consumers
+// (CostPill, useBuildCost, WeaponBuilder, StatsSummaryBar) that look up materials
+// by display name. The full item index lives in `data/items.ts`. New code should
+// import from there directly; this shim is preserved so the builder doesn't churn.
+export const MATERIAL_INFO: Record<string, { rarity: Rarity; img: string }> =
+  Object.fromEntries(
+    Object.values(ITEMS).map((it) => [it.name, { rarity: it.rarity, img: itemImgUrl(it.img) }])
+  );
 
 // Weapon images — wiki thumbnail URLs keyed by weapon id.
 // Same pattern as MATERIAL_INFO and mod icons in mods.ts.

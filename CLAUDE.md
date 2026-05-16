@@ -46,7 +46,14 @@ src/
     guides.ts              - Per-weapon advisory intel (weakness, builds, avoids, conditionals, tips)
     mods.ts                — Mod families by slot type (tiers, effects, costs, compatibility)
     presets.ts             — Goal-based preset builds (fix, budget, recoil, stealth, pvp, arc)
-    constants.ts           — Label maps, color maps, rarity ordering, weapon images, material metadata
+    constants.ts           — Label maps, color maps, rarity ordering, weapon images; derives MATERIAL_INFO view over ITEMS
+    items.ts               — Master item index (materials, recyclables, trinkets, nature, quick-use) sourced from wiki Loot page
+    workbenches.ts         — Workshop benches + Scrappy per-tier material recipes; references ITEMS by id
+    expedition.ts          — Current expedition cycle window + departure policy (single CURRENT_EXPEDITION object, not a timeline)
+    projects.ts            — Speranza multi-stage build projects (Expedition, Avian Alarm, Trophy Display) with per-stage requirements and deadlines
+    events.ts              — Current live time-windowed event (e.g. Miniature Voyages) — minimal shape with prioritized item ids for the Looter
+    map_conditions.ts      — Catalog of hourly-rotating map modifiers (Night Raid, Lush Blooms, etc.) with loot-boost mappings + map applicability
+    loot_zones.ts          — Per-map named POIs (zones) + in-game legend taxonomy (ZoneCategory, LootMarkerKind); owns the ZoneCategory → ItemCategory bridge for the Looter engine. Re-exports MapId from map_conditions.ts.
     advisor_config.ts      — Advisor scoring weights, location tiers, filter label maps, input enums
     advisor_mock.ts        — Temporary mock pairing data (delete when engine wired to UI)
     advisor_golden_cases.ts — Golden scenario test cases for regression validation
@@ -112,14 +119,20 @@ src/
 - **New mod family**: Add to the appropriate slot array in `src/data/mods.ts`, set `w` (weapon compatibility) array
 - **New goal preset**: Add new key to `GOAL_PRESETS` in `src/data/presets.ts` with icon, name, desc, and per-weapon builds
 - **New stat type for effects**: Add regex pattern to `STAT_PATTERNS` in `src/hooks/useCumulativeEffects.ts:5-16`
-- **New crafting material**: Add entry to `MATERIAL_INFO` in `src/data/constants.ts` with its rarity and wiki thumbnail URL
+- **New item / crafting material**: Add entry to `ITEMS` in `src/data/items.ts` with `id` (slug), `name`, `rarity`, `category`, `stack`, `sell`, `recyclesTo`, and `img: { file, hash }` (hash is the MediaWiki 2-segment MD5 prefix from the wiki — not derivable). `MATERIAL_INFO` in `constants.ts` is a derived view by display name for the builder; no changes needed there.
+- **New workbench tier or recipe change**: Edit `WORKBENCHES` in `src/data/workbenches.ts`. Recipe `itemId` values must reference existing `ITEMS` keys — a dev-time guard at module load throws on typos. To re-derive from wiki data, run `node .claude/tmp/gen_workbenches.cjs > .claude/tmp/workbenches_body.txt` after refreshing `items_final.json`.
+- **New expedition cycle announced**: Replace `CURRENT_EXPEDITION` in `src/data/expedition.ts` with the new cycle's number, optional codename, and confirmed `departureWindowStart` / `departureWindowEnd` (UTC ISO 8601). Past cycles aren't tracked — only the live one. Helpers (`daysUntilDeparture`, `inDepartureWindow`) derive automatically.
+- **Project rotation (new cycle starts)**: Update cycle-scoped projects in `src/data/projects.ts` — replace each `stages[].requirement` from in-game screenshots and bump `endsAt`. `trophy_display` is persistent and doesn't rotate. Stage requirements are one of three `kind`s: `items` (most stages), `task` (Avian Alarm stage 1 with optional `mapId`), or `value_by_category` (Expedition stage 5 bulk coin commits). Use the optional `umbrella` field to group a project with an event under a shared "season" name (e.g. Avian Alarm + Miniature Voyages = "Last Resort"). Dev-time guard validates every `itemId` resolves in `ITEMS`.
+- **New event drops**: Replace `CURRENT_EVENT` in `src/data/events.ts` with the new event's `id`, `name`, optional `umbrella`, `description`, `endsAt`, and `prioritizeItemIds` (the items the Looter should tell players to hold onto). Set to `null` when no event is active. Per-tier merit progress is intentionally not modeled — user completion state lives in the Looter persistence hook, not data.
+- **New map condition / modifier change**: Add entry to `MAP_CONDITIONS` in `src/data/map_conditions.ts` with `class` ("major" | "minor"), `maps` ("all" or explicit `MapId[]`), `effect`, optional `hazard` / `specialRules`, and one or more of `lootBoostItemIds` / `lootBoostCategories` / `lootBoostNote`. Use `suppressesLoot: true` for negative-uplift conditions (e.g. Close Scrutiny) and `unconfirmed: true` when source data is ambiguous. `MapId` is owned by `map_conditions.ts` and re-exported from `loot_zones.ts`.
+- **New POI / loot zone**: Add an entry to the appropriate `MapZoneCatalog.zones` in `src/data/loot_zones.ts` with `id` (slug), `name` (verbatim in-game label), `mapId`, optional `level` (multi-level maps only), optional `categories` (array — zones often carry multiple themed icons, e.g. Scrap Yard is `["mechanical", "industrial"]`; each must be in the catalog's `availableCategories` — dev-time guard enforces this), optional `markers`, and `unconfirmed: true` when the source was ambiguous. To add a new ZoneCategory or LootMarkerKind, extend the union at the top of the file and update `ZONE_CATEGORY_TO_ITEM_CATEGORIES` so the Looter engine has a bridge to `ItemCategory`.
 - **New game color** (ammo/rarity/grade/class): Add a CSS custom property to both theme blocks in `src/index.css` (dark + light variants), register it in `@theme inline`, then add the `var(--color-...)` reference to the appropriate map in `src/data/constants.ts`. Use `color-mix(in srgb, <color> <percent>%, transparent)` for semi-transparent backgrounds.
 - **New UI color**: Add a CSS custom property to both theme blocks in `src/index.css`, register it in the `@theme inline` block, then use the Tailwind utility (e.g., `bg-[name]`, `text-[name]`)
 - **New advisor location**: Add to `ADVISOR_INPUT_ENUMS.locations` and `ADVISOR_LOCATION_LABELS` in `src/data/advisor_config.ts`, add `LOCATION_CLASS_TIERS` entry with strong/okay/weak weapon classes
 - **Tune advisor scoring**: Edit values in `src/data/advisor_config.ts`, run `node scripts/advisor/run-matrix.mjs` to validate golden cases
 
 ## Type System
-All types in `src/types/index.ts`. Key interfaces:
+Most types live in `src/types/index.ts`. Data files that own a self-contained schema export their own types alongside the data: `src/data/items.ts` (`ItemEntry`, `ItemCategory`, `RecycleOutput`, `ItemImg`), `src/data/workbenches.ts` (`Workbench`, `WorkbenchTier`, `RecipeCost`), `src/data/projects.ts` (`Project`, `ProjectStage`, `StageRequirement`), `src/data/events.ts` (`LiveEvent`), `src/data/map_conditions.ts` (`MapCondition`, `ConditionClass`, `MapId`), and `src/data/loot_zones.ts` (`LootZone`, `MapZoneCatalog`, `ZoneCategory`, `LootMarkerKind`, `MapLevel`). Key shared interfaces:
 - `Weapon` - intrinsic weapon definition with stats, slots, grades
 - `WeaponGuide` - advisory weapon data (weakness, builds, avoid list, conditionals, tips)
 - `ModFamily` - mod with tiers, effects, weapon compatibility

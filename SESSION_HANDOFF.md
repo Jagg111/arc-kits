@@ -72,6 +72,42 @@ Read these first each session:
 - `src/data/mods.ts` defines `Horizontal Grip` as Legendary-only.
 - This should be reconciled before relying on that preset behavior.
 
+## Looter Feature — Phase 1 (Data Recon & Modeling) Shipped
+GitHub issue: [#3](https://github.com/Jagg111/arc-kits/issues/3). Phase 1 = data layer only, no UI yet.
+
+### Files landed in `src/data/`
+- `items.ts` — 273-entry master item index across 7 wiki categories (basic / topside / refined / nature / trinket / recyclable / quick_use). Each row carries rarity, stack size, sell price, recycle output graph, and wiki thumbnail (`{file, hash}` — hash is non-derivable, stored per row). Generated from `.claude/tmp/items_final.json` (raw wiki HTML parse) via `.claude/tmp/gen_items.cjs`. `MATERIAL_INFO` in `constants.ts` is now a derived view over `ITEMS` — Builder cost pills unchanged.
+- `workbenches.ts` — 7 benches (Gunsmith, Gear Bench, Medical Lab, Explosives, Utility, Refiner + Scrappy) with per-tier `RecipeCost[]`. Scrappy is modeled as `isScrappy: true` with 5 tiers (levels 2–5; level 1 is default). Recipes derived from items.ts's `uses` field via `.claude/tmp/gen_workbenches.cjs`. Dev-time guard validates every `itemId` resolves in `ITEMS`.
+- `expedition.ts` — Single `CURRENT_EXPEDITION` config for the active cycle (no historical timeline). `inDepartureWindow()` and `daysUntilDeparture()` helpers. `EXPEDITION_POLICY` constant lists what's lost vs preserved on departure.
+- `projects.ts` — 3 projects (Expedition 5-stage, Avian Alarm 5-stage, Trophy Display 5-stage). Hand-authored from in-game screenshots in `.claude/tmp/screenshots/`. Stage requirements are a tagged union: `items` (commits), `task` (location-tagged objective — Avian Alarm Stage 1 has `mapId: "riven_tides"`), or `value_by_category` (Expedition Stage 5 bulk coin commit). Avian Alarm carries `umbrella: "Last Resort"` linking it to the live event.
+- `events.ts` — Single `CURRENT_EVENT` for the active limited-time event. Currently Miniature Voyages (Last Resort umbrella, ends ~2026-05-26). Models event metadata + `prioritizeItemIds` (5 ship model ids) only — no merit-tier tracking; user completion state is for the Looter persistence hook.
+- `map_conditions.ts` — Catalog of all 16 known hourly-rotating modifiers (7 Major + 9 Minor). `lootBoostItemIds` for named-item conditions (Husk Graveyard → ARC parts, Bird City → 6 exclusive ducks), `lootBoostCategories` for broad ones (Lush Blooms → nature), `lootBoostNote` for free-text. `suppressesLoot: true` flag handles Close Scrutiny (the one Major that reduces general loot). `MAP_IDS` placeholder mirrors what `loot_zones.ts` will own when it lands.
+
+### Open items
+- **Loot zones** (`loot_zones.ts`) — deferred. Needs focused recon of 6 per-map wiki pages for POI lists + zone↔loot weighting. Recommended as its own session.
+- **Expedition LOAD STAGE category mapping** — Stage 5's in-game "Combat Items / Survival Items / Provisions / Materials" buckets don't map cleanly to our 7 `ItemCategory` values. Encoded as best-effort with inline notes. Revisit if Looter prioritizer needs precise targeting.
+- **End-time precision** — Expedition project (~2026-06-22) and Avian Alarm / Miniature Voyages (~2026-05-26) endsAt values are hour-precision approximations from in-game timer readouts. Fine for "days remaining" UI.
+
+### What's not modeled (out of scope for Phase 1)
+- Per-tier merit progress for events
+- Historical expedition cycles (only the active one is tracked)
+- Specific drop-rate weights on map conditions (just boost categories)
+- User state (Looter persistence hook is Phase 4)
+
+### Tools & generators in `.claude/tmp/`
+- `items_final.json` — authoritative wiki Loot page extract (regenerate from `loot.html` via `parse2.cjs` if wiki updates)
+- `gen_items.cjs` — emits the `ITEMS` body of items.ts
+- `gen_workbenches.cjs` — derives workbench recipes from `items_final.json` uses field
+- `emit_items_ts.cjs` / `emit_workbenches_ts.cjs` — wrap the bodies with the typed file headers
+- `screenshots/` — 15 in-game screenshots of project stages (source of truth for projects.ts)
+
+### Next phases (per issue #3)
+- **Phase 2** — Static HTML mockups in `.claude/prototypes/looter/`
+- **Phase 3** — GitHub Action that scrapes arcraiders.com/map-conditions → commits JSON snapshot
+- **Phase 4** — `useLooterState` hook with localStorage + JSON export/import
+- **Phase 5** — Prioritizer engine in `src/looter/engine/`
+- **Phase 6** — Tab wiring, mobile, theming, cross-links to Advisor
+
 ## Advisor V1 — Shipped
 - Engine (`src/advisor/engine/`) wired to UI (`src/components/advisor/`) — fully live.
 - Golden matrix: 10/10 passing (`src/data/advisor_golden_cases.ts`, CLI: `scripts/advisor/cli.ts`).

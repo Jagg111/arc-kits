@@ -77,7 +77,7 @@ All **game-specific** color values are centralized in `src/data/constants.ts` as
 - `AMMO_COLORS` — ammo type to `var(--color-ammo-*)`
 - `RARITY_COLORS` — rarity tier to `var(--color-rarity-*)`
 - `GRADE_COLORS` — letter grade (S/A/B/C/D/F) to `var(--color-grade-*)`
-- `MATERIAL_INFO` — crafting material name to `{ rarity, img }` (rarity resolves to color via `RARITY_COLORS`)
+- `MATERIAL_INFO` — derived view over `ITEMS` (in `src/data/items.ts`) keyed by display name, returning `{ rarity, img }` for builder cost lookups. Source of truth is `ITEMS`; this shim exists so legacy callers don't churn.
 
 Components import the relevant map and index into it at render time. Never hardcode game color values in components. The actual hex values for each theme live in CSS custom properties in `src/index.css`.
 
