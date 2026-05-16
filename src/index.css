@@ -43,6 +43,11 @@
   --color-filter-bar-bg:   #0f1a2e;  /* tinted surface for advisor filter bar */
   --color-warning:         #f59e0b;  /* amber-500 — warning synergy tags */
 
+  /* ── Looter: priority buckets ── */
+  --color-bucket-hi:       #ef4444;  /* red-500 — 🔥 High priority */
+  --color-bucket-soon:     #f59e0b;  /* amber-500 — ⏱ Soon */
+  --color-bucket-evt:      #10b981;  /* emerald-500 — 🌱 Eventual */
+
   /* ── Game colors: Ammo types ── */
   --color-ammo-light:      #e6da35;
   --color-ammo-medium:     #6285fc;
@@ -103,6 +108,11 @@
   --color-brand-to:        #dc2626;  /* red-600 — header gradient end */
   --color-filter-bar-bg:   #e0dcd4;  /* warm tinted surface for advisor filter bar */
   --color-warning:         #d97706;  /* amber-600 — warning synergy tags */
+
+  /* ── Looter: priority buckets (darker for light backgrounds) ── */
+  --color-bucket-hi:       #b91c1c;  /* red-700 */
+  --color-bucket-soon:     #b45309;  /* amber-700 */
+  --color-bucket-evt:      #047857;  /* emerald-700 */
 
   /* ── Game colors: Ammo types (darker for light backgrounds) ── */
   --color-ammo-light:      #a89200;  /* dark gold */
@@ -165,6 +175,10 @@
   --color-brand-to: var(--color-brand-to);
   --color-filter-bar-bg: var(--color-filter-bar-bg);
   --color-warning: var(--color-warning);
+
+  --color-bucket-hi: var(--color-bucket-hi);
+  --color-bucket-soon: var(--color-bucket-soon);
+  --color-bucket-evt: var(--color-bucket-evt);
 
   /* Game colors */
   --color-ammo-light: var(--color-ammo-light);

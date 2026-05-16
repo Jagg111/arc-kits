@@ -25,6 +25,7 @@ import Footer from "./components/layout/Footer";
 import WeaponPicker from "./components/weapons/WeaponPicker";
 import WeaponBuilder from "./components/builder/WeaponBuilder";
 import AdvisorPage from "./components/advisor/AdvisorPage";
+import LooterPage from "./components/looter/LooterPage";
 import type { AppView, GuideBuild } from "./types";
 
 export default function App() {
@@ -97,6 +98,8 @@ export default function App() {
             )}
           </div>
         )}
+
+        {activeView === "looter" && <LooterPage />}
 
         {activeView === "advisor" && (
           <AdvisorPage

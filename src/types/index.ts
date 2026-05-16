@@ -144,7 +144,7 @@ export interface CumulativeEffect {
 }
 
 // Top-level app view (which tab/page is active)
-export type AppView = "weapons" | "advisor";
+export type AppView = "weapons" | "advisor" | "looter";
 
 // Advisor questionnaire enums
 export type AdvisorLocationId =

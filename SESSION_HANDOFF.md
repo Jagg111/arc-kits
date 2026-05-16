@@ -101,12 +101,46 @@ GitHub issue: [#3](https://github.com/Jagg111/arc-kits/issues/3). Phase 1 = data
 - `emit_items_ts.cjs` / `emit_workbenches_ts.cjs` — wrap the bodies with the typed file headers
 - `screenshots/` — 15 in-game screenshots of project stages (source of truth for projects.ts)
 
-### Next phases (per issue #3)
-- **Phase 2** — Static HTML mockups in `.claude/prototypes/looter/`
-- **Phase 3** — GitHub Action that scrapes arcraiders.com/map-conditions → commits JSON snapshot
-- **Phase 4** — `useLooterState` hook with localStorage + JSON export/import
-- **Phase 5** — Prioritizer engine in `src/looter/engine/`
-- **Phase 6** — Tab wiring, mobile, theming, cross-links to Advisor
+### Scope decision (2026-05-16): MVP vs deferred slice
+The original Phase 3–6 plan has been re-sliced. The live map-conditions pipeline + the map-ranker half of the prioritizer are **deferred to a separate deliverable** (tracked in its own GitHub issue). Rationale: that piece is its own project (external relay infra, parsing brittleness, ranking heuristics) and the rest of the prototype value — priority buckets, hunt list, persistence — is independently shippable and useful without live-rotation data.
+
+### MVP scope (ship first, under issue #3)
+Phases renumbered after the slice; ordering is UI-first to make behavior eyeball-checkable cheaply, persistence last because the state shape is the same in-memory or persisted.
+- **Phase 2** ✅ — Static HTML mockups in `.claude/prototypes/looter/`. Chosen direction: **G+ v3a (Priority Buckets)**.
+- **Phase 3** ✅ — Page shell wired into the app. See "Phase 3 shipped" below.
+- **Phase 4** (partially anticipated in Phase 3) — Extract the material-demand aggregator into a pure module + add bench `targetTier` consumption + per-material drop-POI mapping. Phase 3 already implements real aggregation inline (reads `stageBucket + goalOn + lineDone`, tags contributions by bucket, sorts) — but it lives in `LooterPage.tsx` as `buildMockHuntList()` and the primary-map field is hardcoded. Phase 4 is mostly an extract + name + targetTier/POI pass, not a rewrite. Output shape reserves an empty `recommendedMaps: RankedMap[]` slot for #4 to fill.
+- **Phase 5** — Persistence: `useLooterState` hook with localStorage + JSON export/import. Promotes Phase 3's in-memory state owner; UI unchanged. The hook accepts an `initial` arg today, which Phase 5 should use only when no localStorage entry exists (otherwise the seeded demo state will clobber persisted user state on every mount).
+
+Known cost of this order: users between Phase 3 and Phase 5 lose state on refresh. Accepted.
+
+### Phase 3 — Shipped (2026-05-16)
+- Looter tab live at the top-level (`AppView` extended). Tab routing in `App.tsx`; tab button in `Header.tsx`.
+- Components under `src/components/looter/`: `LooterPage`, `PriorityBoard`, `HuntBrief`, `GoalCard`, `StageBlock`, `BucketBadge`, `types.ts`. Page-owned state via `src/hooks/useLooterState.ts` (in-memory, `useState`-backed; same public API Phase 5 will promote to localStorage).
+- Material chip styling unified with the Builder: `src/components/shared/MaterialPill.tsx` is the structured-input (`itemId + qty`) sibling of `CostPill`. Used in PriorityBoard summary chips and StageBlock item lines. `CostPill` remains unchanged for the Builder.
+- Theme tokens added in `src/index.css`: `--color-bucket-hi/soon/evt` (dark + light), registered in `@theme inline`.
+- **Drag between Priority Board columns** is implemented via native HTML5 DnD on chips → column drop zones. Within-column reordering is intentionally absent — buckets carry the engine signal, ordinal position within a bucket is not read. Click-to-cycle on the chip and on the stage's bucket badge is the keyboard/touch fallback (HTML5 DnD has no touch support).
+- **Wiki thumbnail size** is `100px` everywhere in the Looter (`MaterialPill`). 96px is *not* universally pre-cached on the MediaWiki backend — many items 404 at 96 (including all ship models and Oil). 100 is the smallest size every item in `ITEMS` has cached. CostPill (Builder) still uses 96 because the Builder pulls from a curated material subset that doesn't hit the gap.
+- **Deferred-feature placeholders** for #4: runner-up map accordion, "switch primary to X" link, Advisor cross-link with map pre-filter — rendered as dimmed cards inside `HuntBrief` so the layout reserves the real estate.
+- **Seeded demo state**: `LooterPage.initialState()` populates `stageBucket` / `goalOn` so the page isn't blank on first visit. This is load-bearing for first-run UX in Phase 3 — Phase 5 should keep the seed but apply it only when no persisted state exists.
+- Mobile (under 1080px): right rail collapses below the goal card list. Priority Board columns stack vertically under `md:` (768px).
+- Build: `tsc -b && vite build` clean.
+
+Excluded from MVP (lives in #4): Runner-up map accordion, "switch primary to X" link, Looter → Advisor cross-link with map pre-filter.
+
+### Deferred — separate deliverable ([#4](https://github.com/Jagg111/arc-kits/issues/4))
+- **Live map-conditions pipeline.** Settled design: scrape `arcraiders.com/map-conditions/map/<slug>` (Next.js SSR, parseable from `curl`; no CORS on the origin), GHA writes JSON to a **Gist** (no repo commits), SPA fetches from `gist.githubusercontent.com`. Parse by visible condition name (matched against `MAP_CONDITIONS` catalog), not by hashed CSS class names. Probe and pin the page's render timezone before parsing display-string times.
+- **Map-ranker engine.** Overlays live conditions onto material demand to produce ranked maps + recommended POIs. Consumes the Phase 4 aggregator output + the Gist snapshot.
+
+### Phase 2 — Chosen Direction (G+ v3a): key contracts for downstream phases
+
+The chosen layout encodes design decisions that downstream phases must honor:
+
+- **Priority is per-stage and bucketed**, not per-goal and not strict ordinal. Each stage/tier of every goal independently sits in 🔥 High / ⏱ Soon / 🌱 Eventual / skipped. A bench's T1 can be High while its T2 is Eventual — this is the load-bearing requirement that killed simpler models in exploration.
+- **Stage completion is derived**, not a separate stored flag. A stage is "done" iff every line checkbox under it is ticked. Persistence (Phase 4) stores only the set of completed line ids — `useLooterState` should expose a `lineDone: Set<string>` and compute stage-done from it. This makes reversibility free: unticking any line reopens the stage.
+- **Bench tiers are independent stages**, each with its own bucket badge and a `skip` toggle. A "skipped" tier is distinct from a low-priority one — it's removed from material demand entirely.
+- **Engine consumes stage-priority signals** (Phase 5). Material demand needs to be tagged with its originating stage's bucket so the prioritizer can weight High ≫ Soon ≫ Eventual when ranking maps. Goal-level priority is not a useful abstraction here.
+- **Engine returns ranked maps**, not top-1. The chosen layout exposes a "Runner-up" map accordion with a "switch primary to X" link — the engine API should naturally support `recommendMaps(): RankedMap[]`.
+- **Hunt list is a derived view** over (active stages × their materials × map drop tables). The "138 metal_parts" total is a sum across all non-skipped, un-ticked stages that need it, with per-stage breakdown preserved for the tooltip.
 
 ## Advisor V1 — Shipped
 - Engine (`src/advisor/engine/`) wired to UI (`src/components/advisor/`) — fully live.

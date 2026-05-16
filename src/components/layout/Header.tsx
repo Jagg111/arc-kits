@@ -70,6 +70,9 @@ export default function Header({
           Weapons
         </button>
       )}
+      <button className={tabClass(activeView === "looter")} onClick={() => onChangeView("looter")}>
+        Looter
+      </button>
     </div>
   );
 
