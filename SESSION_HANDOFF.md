@@ -109,9 +109,7 @@ Phases renumbered after the slice; ordering is UI-first to make behavior eyeball
 - **Phase 2** ✅ — Static HTML mockups in `.claude/prototypes/looter/`. Chosen direction: **G+ v3a (Priority Buckets)**.
 - **Phase 3** ✅ — Page shell wired into the app. See "Phase 3 shipped" below.
 - **Phase 4** (partially anticipated in Phase 3) — Extract the material-demand aggregator into a pure module + add bench `targetTier` consumption + per-material drop-POI mapping. Phase 3 already implements real aggregation inline (reads `stageBucket + goalOn + lineDone`, tags contributions by bucket, sorts) — but it lives in `LooterPage.tsx` as `buildMockHuntList()` and the primary-map field is hardcoded. Phase 4 is mostly an extract + name + targetTier/POI pass, not a rewrite. Output shape reserves an empty `recommendedMaps: RankedMap[]` slot for #4 to fill.
-- **Phase 5** — Persistence: `useLooterState` hook with localStorage + JSON export/import. Promotes Phase 3's in-memory state owner; UI unchanged. The hook accepts an `initial` arg today, which Phase 5 should use only when no localStorage entry exists (otherwise the seeded demo state will clobber persisted user state on every mount).
-
-Known cost of this order: users between Phase 3 and Phase 5 lose state on refresh. Accepted.
+- **Phase 5** ✅ — Persistence shipped. `useLooterState` reads/writes a single versioned key (`arc-kits.looter.v1`) in localStorage. `initial` (the seeded demo state) is applied only when no stored entry exists, so returning users keep their progress. `Set` (lineDone) is serialized as an array; malformed blobs fall back to `initial` with a console warning. Public API unchanged — `LooterPage` consumes it identically. JSON export/import deferred (out of MVP).
 
 ### Phase 3 — Shipped (2026-05-16)
 - Looter tab live at the top-level (`AppView` extended). Tab routing in `App.tsx`; tab button in `Header.tsx`.
