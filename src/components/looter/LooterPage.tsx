@@ -12,204 +12,19 @@
 // ============================================================================
 
 import { useMemo } from "react";
-import { ITEMS } from "../../data/items";
 import { PROJECTS, PROJECT_ORDER, daysUntilEnd } from "../../data/projects";
 import { CURRENT_EVENT, daysUntilEventEnd } from "../../data/events";
 import { WORKBENCHES } from "../../data/workbenches";
 import { daysUntilDeparture } from "../../data/expedition";
 import { useLooterState } from "../../hooks/useLooterState";
+import { buildHuntList } from "../../looter/engine";
+import { allStages as buildAllStages } from "../../looter/engine/stages";
 import PriorityBoard from "./PriorityBoard";
 import HuntBrief from "./HuntBrief";
 import GoalCard from "./GoalCard";
-import type { Bucket, HuntList, HuntListLine, Stage } from "./types";
+import type { Bucket, Stage } from "./types";
 
-// ── Stage generators ────────────────────────────────────────────────────────
-
-function projectStages(): Stage[] {
-  const out: Stage[] = [];
-  for (const projectId of PROJECT_ORDER) {
-    const project = PROJECTS[projectId];
-    if (!project) continue;
-    const goalId = `proj:${project.id}`;
-    for (const stage of project.stages) {
-      const stageId = `${goalId}:s${stage.level}`;
-      const stageLabel = `Stage ${stage.level} · ${stage.name}`;
-      const r = stage.requirement;
-      if (r.kind === "items") {
-        out.push({
-          stageId,
-          goalId,
-          goalName: project.name,
-          goalKind: "project",
-          stageLabel,
-          kind: "items",
-          lines: r.items.map((it) => ({
-            lineId: `${stageId}:${it.itemId}`,
-            kind: "item" as const,
-            itemId: it.itemId,
-            itemName: ITEMS[it.itemId]?.name ?? it.itemId,
-            qty: it.qty,
-          })),
-        });
-      } else if (r.kind === "task") {
-        out.push({
-          stageId,
-          goalId,
-          goalName: project.name,
-          goalKind: "project",
-          stageLabel,
-          kind: "task",
-          lines: [
-            {
-              lineId: `${stageId}:task`,
-              kind: "task" as const,
-              label: r.description,
-              mapId: r.mapId,
-            },
-          ],
-        });
-      } else {
-        out.push({
-          stageId,
-          goalId,
-          goalName: project.name,
-          goalKind: "project",
-          stageLabel,
-          kind: "value_by_category",
-          lines: r.buckets.map((b, i) => ({
-            lineId: `${stageId}:bucket${i}`,
-            kind: "bucket" as const,
-            label: `${b.category} commit`,
-            coins: b.coins,
-          })),
-        });
-      }
-    }
-  }
-  return out;
-}
-
-function eventStages(): Stage[] {
-  if (!CURRENT_EVENT) return [];
-  const goalId = `event:${CURRENT_EVENT.id}`;
-  return [
-    {
-      stageId: goalId,
-      goalId,
-      goalName: CURRENT_EVENT.name,
-      goalKind: "event",
-      stageLabel: "Ship Models · extract with any",
-      kind: "event",
-      lines: CURRENT_EVENT.prioritizeItemIds.map((id) => ({
-        lineId: `${goalId}:${id}`,
-        kind: "item" as const,
-        itemId: id,
-        itemName: ITEMS[id]?.name ?? id,
-        qty: 1,
-      })),
-    },
-  ];
-}
-
-function benchStages(): Stage[] {
-  const out: Stage[] = [];
-  for (const bench of Object.values(WORKBENCHES)) {
-    const goalId = `bench:${bench.id}`;
-    for (const tier of bench.tiers) {
-      const stageId = `${goalId}:t${tier.level}`;
-      out.push({
-        stageId,
-        goalId,
-        goalName: bench.name,
-        goalKind: "bench",
-        stageLabel: `T${tier.level}`,
-        kind: "items",
-        lines: tier.cost.map((c) => ({
-          lineId: `${stageId}:${c.itemId}`,
-          kind: "item" as const,
-          itemId: c.itemId,
-          itemName: ITEMS[c.itemId]?.name ?? c.itemId,
-          qty: c.qty,
-        })),
-      });
-    }
-  }
-  return out;
-}
-
-// ── Phase 3 mock hunt list ──────────────────────────────────────────────────
-// Phase 4 replaces this with a real aggregator producing the same `HuntList`
-// shape. The `recommendedMaps` slot is intentionally empty here — Phase 4 + #4
-// (live map-conditions pipeline) fill it.
-
-function buildMockHuntList(
-  stages: Stage[],
-  stageBucket: Record<string, Bucket>,
-  goalOn: Record<string, boolean>,
-  lineDone: Set<string>,
-): HuntList {
-  // Aggregate item-line demand across active, non-skipped, un-ticked lines,
-  // tagging each contribution with its originating stage bucket. This matches
-  // the eventual aggregator shape (per Phase 2 design contract) but ignores
-  // bench-target-tier, drop-rate weights, and map fit — Phase 4 + #4 add those.
-  const byItem: Record<
-    string,
-    { total: number; breakdown: HuntListLine["breakdown"] }
-  > = {};
-
-  for (const stage of stages) {
-    if (!goalOn[stage.goalId]) continue;
-    const bucket = stageBucket[stage.stageId] ?? "soon";
-    if (bucket === "skip") continue;
-    for (const line of stage.lines) {
-      if (line.kind !== "item") continue;
-      if (lineDone.has(line.lineId)) continue;
-      const entry = byItem[line.itemId] ?? { total: 0, breakdown: [] };
-      entry.total += line.qty;
-      entry.breakdown.push({
-        bucket: bucket as "hi" | "soon" | "evt",
-        source: `${stage.goalName} ${stage.stageLabel.replace(/^Stage /, "S").replace(/ · .+$/, "")}`,
-        qty: line.qty,
-      });
-      byItem[line.itemId] = entry;
-    }
-  }
-
-  // Sort: any line with an "hi" bucket first, then "soon", then "evt", then by total desc.
-  const bucketRank = (bs: HuntListLine["breakdown"]) =>
-    bs.some((b) => b.bucket === "hi") ? 0 : bs.some((b) => b.bucket === "soon") ? 1 : 2;
-
-  const materials: HuntListLine[] = Object.entries(byItem)
-    .map(([itemId, v]) => ({
-      itemId,
-      itemName: ITEMS[itemId]?.name ?? itemId,
-      total: v.total,
-      breakdown: v.breakdown,
-    }))
-    .sort((a, b) => {
-      const ra = bucketRank(a.breakdown);
-      const rb = bucketRank(b.breakdown);
-      if (ra !== rb) return ra - rb;
-      return b.total - a.total;
-    })
-    .slice(0, 12);
-
-  // Static placeholder primary map. Phase 4 + #4 produce this dynamically.
-  const primaryMap = materials.length > 0
-    ? {
-        mapId: "dam_battlegrounds",
-        name: "Dam Battlegrounds",
-        condition: "⚡ Lush Blooms (mock)",
-        focusPOIs: ["Scrap Yard", "Workshop"],
-      }
-    : undefined;
-
-  return {
-    primaryMap,
-    recommendedMaps: [],
-    materials,
-  };
-}
+// Stage generators live in src/looter/engine/stages.ts so the CLI can reuse them.
 
 // ── Initial demo state ──────────────────────────────────────────────────────
 // Sensible defaults so the page isn't blank on first visit. State is in-memory
@@ -272,14 +87,18 @@ function initialState() {
 export default function LooterPage() {
   const state = useLooterState(initialState());
 
-  const allStages = useMemo<Stage[]>(
-    () => [...eventStages(), ...projectStages(), ...benchStages()],
-    [],
-  );
+  const allStages = useMemo<Stage[]>(() => buildAllStages(), []);
 
   const huntList = useMemo(
-    () => buildMockHuntList(allStages, state.stageBucket, state.goalOn, state.lineDone),
-    [allStages, state.stageBucket, state.goalOn, state.lineDone],
+    () =>
+      buildHuntList({
+        stages: allStages,
+        stageBucket: state.stageBucket,
+        goalOn: state.goalOn,
+        lineDone: state.lineDone,
+        benchTargetTier: state.benchTargetTier,
+      }),
+    [allStages, state.stageBucket, state.goalOn, state.lineDone, state.benchTargetTier],
   );
 
   const expeditionDays = daysUntilDeparture();
@@ -343,7 +162,6 @@ export default function LooterPage() {
         stageBucket={state.stageBucket}
         goalOn={state.goalOn}
         lineDone={state.lineDone}
-        onCycleBucket={state.cycleBucket}
         onSetBucket={state.setBucket}
       />
 
@@ -417,6 +235,10 @@ export default function LooterPage() {
                 onToggleGoal={() => state.toggleGoal(goalId)}
                 onCycleBucket={state.cycleBucket}
                 onToggleLine={state.toggleLine}
+                benchId={bench.id}
+                benchMaxTier={bench.maxTier}
+                benchTargetTier={state.benchTargetTier[bench.id] ?? bench.maxTier}
+                onSetBenchTargetTier={state.setBenchTargetTier}
               />
             );
           })}

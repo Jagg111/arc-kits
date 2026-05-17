@@ -23,6 +23,12 @@ interface GoalCardProps {
   onToggleGoal: () => void;
   onCycleBucket: (stageId: string) => void;
   onToggleLine: (lineId: string) => void;
+  /** Bench-only: current target tier and setter. Tiers above this are
+   *  excluded from material demand by the aggregator. */
+  benchId?: string;
+  benchMaxTier?: number;
+  benchTargetTier?: number;
+  onSetBenchTargetTier?: (benchId: string, tier: number) => void;
 }
 
 export default function GoalCard({
@@ -38,6 +44,10 @@ export default function GoalCard({
   onToggleGoal,
   onCycleBucket,
   onToggleLine,
+  benchId,
+  benchMaxTier,
+  benchTargetTier,
+  onSetBenchTargetTier,
 }: GoalCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded ?? false);
 
@@ -94,6 +104,37 @@ export default function GoalCard({
           ▶
         </span>
       </div>
+      {expanded && on && goalKind === "bench" && benchId && benchMaxTier && onSetBenchTargetTier && (
+        <div className="px-3.5 py-2 border-b border-border-subtle bg-surface-alt/50 flex items-center gap-2 text-xs">
+          <span className="text-text-secondary">Target tier:</span>
+          {Array.from({ length: benchMaxTier }, (_, i) => i + 1).map((t) => {
+            const active = (benchTargetTier ?? benchMaxTier) === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSetBenchTargetTier(benchId, t);
+                }}
+                className="px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+                style={{
+                  borderColor: active ? "var(--color-accent)" : "var(--color-border)",
+                  backgroundColor: active
+                    ? "color-mix(in srgb, var(--color-accent) 18%, transparent)"
+                    : "transparent",
+                  color: active ? "var(--color-accent-text)" : "var(--color-text-secondary)",
+                }}
+              >
+                T{t}
+              </button>
+            );
+          })}
+          <span className="text-[10px] text-text-muted ml-1">
+            tiers above target are excluded from demand
+          </span>
+        </div>
+      )}
       {expanded && on && (
         <div>
           {stages.map((stage) => (

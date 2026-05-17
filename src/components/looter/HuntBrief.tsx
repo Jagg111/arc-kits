@@ -99,10 +99,28 @@ export default function HuntBrief({ huntList }: HuntBriefProps) {
                       style={{ width: 28, height: 28 }}
                     />
                   )}
-                  <span className="font-semibold text-[13px]" style={{
-                    color: item ? `var(--color-rarity-${item.rarity.toLowerCase()})` : "var(--color-text-primary)"
-                  }}>
+                  <span
+                    className="font-semibold text-[13px] relative group cursor-help"
+                    title={mat.dropPOIs && mat.dropPOIs.length > 0 ? `Drops at: ${mat.dropPOIs.join(", ")}` : undefined}
+                    style={{
+                      color: item ? `var(--color-rarity-${item.rarity.toLowerCase()})` : "var(--color-text-primary)",
+                    }}
+                  >
                     {mat.itemName}
+                    {mat.dropPOIs && mat.dropPOIs.length > 0 && (
+                      <span
+                        className="pointer-events-none absolute left-0 top-full mt-1 px-2 py-1.5 rounded text-[10px] font-normal whitespace-nowrap z-20 hidden group-hover:block"
+                        style={{
+                          background: "var(--color-surface)",
+                          border: "1px solid var(--color-border)",
+                          color: "var(--color-text-secondary)",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                        }}
+                      >
+                        <strong className="text-text-primary font-medium">Drops at:</strong>{" "}
+                        {mat.dropPOIs.join(", ")}
+                      </span>
+                    )}
                   </span>
                   <span className="flex-1 border-b border-dotted border-border self-center mx-0.5" />
                   <span className="font-bold text-sm">

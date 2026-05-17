@@ -2,7 +2,9 @@
 // FILE: components/looter/PriorityBoard.tsx
 // PURPOSE: Bird's-eye view at the top of the Looter page. Three columns
 //          (🔥 High / ⏱ Soon / 🌱 Eventual) listing every non-skipped stage
-//          as a chip. Click a chip to cycle its bucket — drag is deferred.
+//          as a chip. Drag chips between columns to change bucket. Click-to-
+//          cycle lives on the StageBlock badge inside goal cards, not here —
+//          the board's job is the at-a-glance overview, not a fast editor.
 //
 //          Each column shows a "Needs across this bucket" summary of the top
 //          materials in that bucket. Phase 3 derives these from the same
@@ -19,7 +21,6 @@ interface PriorityBoardProps {
   stageBucket: Record<string, Bucket>;
   goalOn: Record<string, boolean>;
   lineDone: Set<string>;
-  onCycleBucket: (stageId: string) => void;
   onSetBucket: (stageId: string, bucket: Bucket) => void;
 }
 
@@ -38,7 +39,6 @@ export default function PriorityBoard({
   stageBucket,
   goalOn,
   lineDone,
-  onCycleBucket,
   onSetBucket,
 }: PriorityBoardProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -86,7 +86,7 @@ export default function PriorityBoard({
           Priority Board
         </h2>
         <span className="text-[11px] text-text-muted hidden sm:inline">
-          click a chip or any stage badge to cycle priority
+          drag chips between columns to change priority · use the stage badges below to cycle
         </span>
         <button
           type="button"
@@ -168,22 +168,20 @@ export default function PriorityBoard({
                   const total = stage.lines.length;
                   const done = stage.lines.filter((l) => lineDone.has(l.lineId)).length;
                   return (
-                    <button
+                    <div
                       key={stage.stageId}
-                      type="button"
                       draggable
                       onDragStart={(e) => {
                         e.dataTransfer.effectAllowed = "move";
                         e.dataTransfer.setData(DND_MIME, stage.stageId);
                       }}
-                      onClick={() => onCycleBucket(stage.stageId)}
-                      className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 mb-1 rounded border border-border bg-bg-base text-xs hover:border-accent cursor-grab active:cursor-grabbing"
-                      title="Drag to another bucket, or click to cycle"
+                      className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 mb-1 rounded border border-border bg-bg-base text-xs hover:border-accent cursor-grab active:cursor-grabbing select-none"
+                      title="Drag to another bucket"
                     >
                       <span className="text-text-muted text-[10px]">⋮⋮</span>
                       <span className="flex-1 truncate">{stage.goalName} · {stage.stageLabel}</span>
                       <span className="text-[10px] text-text-muted">{done}/{total}</span>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
