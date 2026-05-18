@@ -13,7 +13,7 @@ interface StageBlockProps {
   stage: Stage;
   bucket: Bucket;
   lineDone: Set<string>;
-  onCycleBucket: () => void;
+  onSetBucket: (bucket: Bucket) => void;
   onToggleLine: (lineId: string) => void;
   tinted?: boolean;  // bench tier stages get a faint indigo wash in the prototype
 }
@@ -22,7 +22,7 @@ export default function StageBlock({
   stage,
   bucket,
   lineDone,
-  onCycleBucket,
+  onSetBucket,
   onToggleLine,
   tinted,
 }: StageBlockProps) {
@@ -35,19 +35,13 @@ export default function StageBlock({
     <div
       className="grid gap-2.5 items-start px-3 py-2 border-b border-border-subtle last:border-b-0"
       style={{
-        gridTemplateColumns: "96px 1fr",
+        gridTemplateColumns: "auto 1fr",
         backgroundColor: tinted ? "color-mix(in srgb, var(--color-accent) 3%, transparent)" : undefined,
-        opacity: skipped ? 0.55 : 1,
+        opacity: skipped ? 0.7 : 1,
       }}
     >
-      <div className="flex flex-col items-start gap-1">
-        <BucketBadge bucket={bucket} done={isDone && !skipped} onClick={onCycleBucket} />
-        {!isDone && !skipped && (
-          <div className="text-[9px] text-text-muted">click to cycle</div>
-        )}
-        {isDone && !skipped && (
-          <div className="text-[9px] text-text-muted">untick to reopen</div>
-        )}
+      <div className="flex flex-col items-start">
+        <BucketBadge bucket={bucket} onSelect={onSetBucket} />
       </div>
       <div>
         <div
@@ -75,7 +69,6 @@ export default function StageBlock({
                   type="checkbox"
                   checked={done}
                   onChange={() => onToggleLine(line.lineId)}
-                  disabled={skipped}
                   style={{ accentColor: "var(--color-accent)" }}
                 />
                 <MaterialPill itemId={line.itemId} qty={line.qty} done={done} />
@@ -96,7 +89,6 @@ export default function StageBlock({
                   type="checkbox"
                   checked={done}
                   onChange={() => onToggleLine(line.lineId)}
-                  disabled={skipped}
                   style={{ accentColor: "var(--color-accent)" }}
                 />
                 <span className="flex-1">{line.label}</span>

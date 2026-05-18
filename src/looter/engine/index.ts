@@ -9,7 +9,6 @@
 //
 // Phase 4 scope:
 //   - Material-demand aggregation (replaces the inline mock in LooterPage)
-//   - benchTargetTier consumption (tiers above target are dropped)
 //   - dropPOIs derivation per material (was previously the unused HuntListLine slot)
 //
 // The `recommendedMaps` slot on HuntList stays empty — that's #4 (live
@@ -30,9 +29,7 @@ export function buildHuntList(input: LooterEngineInput): HuntList {
   const ranked = aggregateDemand({
     stages: input.stages,
     stageBucket: input.stageBucket,
-    goalOn: input.goalOn,
     lineDone: input.lineDone,
-    benchTargetTier: input.benchTargetTier,
   });
 
   const materials: HuntListLine[] = ranked.slice(0, maxRows).map((line) => ({

@@ -19,7 +19,6 @@ import type { Bucket, Stage } from "./types";
 interface PriorityBoardProps {
   stages: Stage[];
   stageBucket: Record<string, Bucket>;
-  goalOn: Record<string, boolean>;
   lineDone: Set<string>;
   onSetBucket: (stageId: string, bucket: Bucket) => void;
 }
@@ -37,7 +36,6 @@ const DND_MIME = "application/x-arc-stage-id";
 export default function PriorityBoard({
   stages,
   stageBucket,
-  goalOn,
   lineDone,
   onSetBucket,
 }: PriorityBoardProps) {
@@ -47,8 +45,7 @@ export default function PriorityBoard({
   const byBucket = useMemo(() => {
     const map: Record<ActiveBucket, Stage[]> = { hi: [], soon: [], evt: [] };
     for (const stage of stages) {
-      if (!goalOn[stage.goalId]) continue;
-      const b = stageBucket[stage.stageId] ?? "soon";
+      const b = stageBucket[stage.stageId] ?? "skip";
       if (b === "skip") continue;
       const total = stage.lines.length;
       const done = stage.lines.filter((l) => lineDone.has(l.lineId)).length;
@@ -56,7 +53,7 @@ export default function PriorityBoard({
       map[b].push(stage);
     }
     return map;
-  }, [stages, stageBucket, goalOn, lineDone]);
+  }, [stages, stageBucket, lineDone]);
 
   const summary = useMemo(() => {
     const summarize = (list: Stage[]) => {
@@ -155,7 +152,6 @@ export default function PriorityBoard({
                           qty={qty}
                           showName
                           size="sm"
-                          qtyPrefix=""
                         />
                       ))}
                     </div>

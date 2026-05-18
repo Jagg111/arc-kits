@@ -22,70 +22,12 @@ import { allStages as buildAllStages } from "../../looter/engine/stages";
 import PriorityBoard from "./PriorityBoard";
 import HuntBrief from "./HuntBrief";
 import GoalCard from "./GoalCard";
-import type { Bucket, Stage } from "./types";
-
-// Stage generators live in src/looter/engine/stages.ts so the CLI can reuse them.
-
-// ── Initial demo state ──────────────────────────────────────────────────────
-// Sensible defaults so the page isn't blank on first visit. State is in-memory
-// only in Phase 3, so this resets on every refresh.
-
-function initialState() {
-  const stageBucket: Record<string, Bucket> = {};
-  const goalOn: Record<string, boolean> = {};
-  const benchTargetTier: Record<string, number> = {};
-
-  // Projects: cycle-scoped on, persistent off
-  for (const projectId of PROJECT_ORDER) {
-    const p = PROJECTS[projectId];
-    if (!p) continue;
-    goalOn[`proj:${p.id}`] = p.cycleScoped;
-    for (const stage of p.stages) {
-      const stageId = `proj:${p.id}:s${stage.level}`;
-      // Expedition: S2 soon, S3+ eventual; everything else soon
-      if (p.id === "expedition") {
-        stageBucket[stageId] = stage.level <= 2 ? "soon" : "evt";
-      } else if (p.id === "avian_alarm") {
-        stageBucket[stageId] = stage.level === 1 ? "soon" : "evt";
-      } else {
-        stageBucket[stageId] = "evt";
-      }
-    }
-  }
-
-  // Event: on, high
-  if (CURRENT_EVENT) {
-    const goalId = `event:${CURRENT_EVENT.id}`;
-    goalOn[goalId] = true;
-    stageBucket[goalId] = "hi";
-  }
-
-  // Benches: gunsmith + gear_bench on, others off; T1 soon, T2+ eventual
-  const activeBenches = new Set(["gunsmith", "gear_bench"]);
-  for (const bench of Object.values(WORKBENCHES)) {
-    const goalId = `bench:${bench.id}`;
-    goalOn[goalId] = activeBenches.has(bench.id);
-    benchTargetTier[bench.id] = bench.maxTier;
-    for (const tier of bench.tiers) {
-      const stageId = `${goalId}:t${tier.level}`;
-      stageBucket[stageId] = tier.level === 1 ? "soon" : "evt";
-    }
-  }
-  // Gunsmith T1 high (load-bearing demo signal)
-  stageBucket["bench:gunsmith:t1"] = "hi";
-
-  return {
-    stageBucket,
-    lineDone: new Set<string>(),
-    goalOn,
-    benchTargetTier,
-  };
-}
+import type { Stage } from "./types";
 
 // ── Component ───────────────────────────────────────────────────────────────
 
 export default function LooterPage() {
-  const state = useLooterState(initialState());
+  const state = useLooterState();
 
   const allStages = useMemo<Stage[]>(() => buildAllStages(), []);
 
@@ -94,11 +36,9 @@ export default function LooterPage() {
       buildHuntList({
         stages: allStages,
         stageBucket: state.stageBucket,
-        goalOn: state.goalOn,
         lineDone: state.lineDone,
-        benchTargetTier: state.benchTargetTier,
       }),
-    [allStages, state.stageBucket, state.goalOn, state.lineDone, state.benchTargetTier],
+    [allStages, state.stageBucket, state.lineDone],
   );
 
   const expeditionDays = daysUntilDeparture();
@@ -118,9 +58,6 @@ export default function LooterPage() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-6">
       <h1 className="text-xl font-bold mb-1">Looter</h1>
-      <p className="text-xs text-text-muted mb-3">
-        Phase 3 · in-memory state (resets on refresh) · map ranking lands with live conditions (#4)
-      </p>
 
       {/* ── Timers ── */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -160,7 +97,6 @@ export default function LooterPage() {
       <PriorityBoard
         stages={allStages}
         stageBucket={state.stageBucket}
-        goalOn={state.goalOn}
         lineDone={state.lineDone}
         onSetBucket={state.setBucket}
       />
@@ -178,14 +114,12 @@ export default function LooterPage() {
                 name={ev.name}
                 goalKind="event"
                 stages={stagesByGoal.get(evGoalId) ?? []}
-                on={state.goalOn[evGoalId] ?? false}
                 daysRemaining={eventDays}
                 urgent={(eventDays ?? Infinity) <= 14}
                 defaultExpanded
                 stageBucket={state.stageBucket}
                 lineDone={state.lineDone}
-                onToggleGoal={() => state.toggleGoal(evGoalId)}
-                onCycleBucket={state.cycleBucket}
+                onSetBucket={state.setBucket}
                 onToggleLine={state.toggleLine}
               />
             );
@@ -204,14 +138,12 @@ export default function LooterPage() {
                 name={p.name}
                 goalKind="project"
                 stages={stagesByGoal.get(goalId) ?? []}
-                on={state.goalOn[goalId] ?? false}
                 daysRemaining={days}
                 urgent={(days ?? Infinity) <= 14}
                 defaultExpanded={p.id === "expedition"}
                 stageBucket={state.stageBucket}
                 lineDone={state.lineDone}
-                onToggleGoal={() => state.toggleGoal(goalId)}
-                onCycleBucket={state.cycleBucket}
+                onSetBucket={state.setBucket}
                 onToggleLine={state.toggleLine}
               />
             );
@@ -227,18 +159,12 @@ export default function LooterPage() {
                 name={bench.name}
                 goalKind="bench"
                 stages={stagesByGoal.get(goalId) ?? []}
-                on={state.goalOn[goalId] ?? false}
                 daysRemaining={null}
                 defaultExpanded={bench.id === "gunsmith"}
                 stageBucket={state.stageBucket}
                 lineDone={state.lineDone}
-                onToggleGoal={() => state.toggleGoal(goalId)}
-                onCycleBucket={state.cycleBucket}
+                onSetBucket={state.setBucket}
                 onToggleLine={state.toggleLine}
-                benchId={bench.id}
-                benchMaxTier={bench.maxTier}
-                benchTargetTier={state.benchTargetTier[bench.id] ?? bench.maxTier}
-                onSetBenchTargetTier={state.setBenchTargetTier}
               />
             );
           })}

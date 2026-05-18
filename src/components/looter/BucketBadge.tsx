@@ -1,61 +1,63 @@
 // ============================================================================
 // FILE: components/looter/BucketBadge.tsx
-// PURPOSE: Click-to-cycle bucket badge shown on every stage. Cycles
-//          High → Soon → Eventual → Skipped → High. Done state (all lines
-//          checked) renders as a static green pill — click is a no-op since
-//          completion is derived, not a manual state.
+// PURPOSE: Segmented control for selecting a stage's priority bucket.
+//          Four options stacked vertically (Hi / Soon / Evt / Skip); active
+//          one highlighted. Done state is signalled by the stage label — this
+//          component always renders the 4 buttons to avoid layout shifts.
 // ============================================================================
 
 import type { Bucket } from "./types";
 
 interface BucketBadgeProps {
   bucket: Bucket;
-  done?: boolean;
-  onClick?: () => void;
+  onSelect: (b: Bucket) => void;
 }
 
-const STYLES: Record<Bucket, { color: string; label: string; icon: string }> = {
-  hi:   { color: "var(--color-bucket-hi)",   label: "High",     icon: "🔥" },
-  soon: { color: "var(--color-bucket-soon)", label: "Soon",     icon: "⏱" },
-  evt:  { color: "var(--color-bucket-evt)",  label: "Eventual", icon: "🌱" },
-  skip: { color: "var(--color-text-muted)",  label: "Skipped",  icon: "—" },
+const OPTIONS: { value: Bucket; label: string }[] = [
+  { value: "hi",   label: "🔥 Hi"   },
+  { value: "soon", label: "⏱ Soon"  },
+  { value: "evt",  label: "🌱 Evt"  },
+  { value: "skip", label: "— Skip"  },
+];
+
+const ACTIVE_COLOR: Record<Bucket, string> = {
+  hi:   "var(--color-bucket-hi)",
+  soon: "var(--color-bucket-soon)",
+  evt:  "var(--color-bucket-evt)",
+  skip: "var(--color-text-muted)",
 };
 
-export default function BucketBadge({ bucket, done, onClick }: BucketBadgeProps) {
-  if (done) {
-    const c = "var(--color-success)";
-    return (
-      <span
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide border"
-        style={{
-          color: c,
-          backgroundColor: `color-mix(in srgb, ${c} 15%, transparent)`,
-          borderColor: `color-mix(in srgb, ${c} 40%, transparent)`,
-        }}
-      >
-        ✓ done
-      </span>
-    );
-  }
-
-  const s = STYLES[bucket];
-  const isSkip = bucket === "skip";
-
+export default function BucketBadge({ bucket, onSelect }: BucketBadgeProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide border cursor-pointer"
-      style={{
-        color: s.color,
-        backgroundColor: isSkip ? "transparent" : `color-mix(in srgb, ${s.color} 15%, transparent)`,
-        borderColor: isSkip ? "var(--color-border)" : `color-mix(in srgb, ${s.color} 40%, transparent)`,
-        borderStyle: isSkip ? "dashed" : "solid",
-      }}
-      title="Click to cycle priority"
-    >
-      <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: s.color, display: isSkip ? "none" : "inline-block" }} />
-      <span>{s.icon} {s.label}</span>
-    </button>
+    <div className="flex flex-col gap-0.5">
+      {OPTIONS.map(({ value, label }) => {
+        const active = bucket === value;
+        const color = ACTIVE_COLOR[value];
+        return (
+          <button
+            key={value}
+            type="button"
+            onClick={() => onSelect(value)}
+            className="w-full px-1.5 py-0.5 rounded-sm text-[10px] font-semibold uppercase tracking-wide border cursor-pointer transition-colors text-center"
+            style={
+              active
+                ? {
+                    color: value === "skip" ? "var(--color-text-secondary)" : color,
+                    backgroundColor: `color-mix(in srgb, ${color} ${value === "skip" ? 20 : 15}%, transparent)`,
+                    borderColor: value === "skip" ? "var(--color-text-muted)" : `color-mix(in srgb, ${color} 40%, transparent)`,
+                    borderStyle: "solid",
+                  }
+                : {
+                    color: "var(--color-text-muted)",
+                    backgroundColor: "transparent",
+                    borderColor: "var(--color-border-subtle)",
+                  }
+            }
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
   );
 }

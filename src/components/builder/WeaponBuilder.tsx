@@ -19,7 +19,8 @@
 
 import { useState, useEffect } from "react";
 import type { Weapon, EquippedState, SlotType, Rarity, CumulativeEffect, WeaponGuide } from "../../types";
-import { MATERIAL_INFO, RARITY_COLORS } from "../../data/constants";
+import { ITEM_ID_BY_NAME } from "../../data/constants";
+import MaterialPill from "../shared/MaterialPill";
 import WeaponHeader from "./WeaponHeader";
 import BuildCard from "./BuildCard";
 import WeaponIntel from "./WeaponIntel";
@@ -222,24 +223,12 @@ export default function WeaponBuilder({
                 <h4 className="text-sm text-text-secondary font-semibold mb-3">
                   Total Cost
                 </h4>
-                <div className="space-y-2">
-                  {Object.entries(buildCost).map(([item, qty]) => {
-                    const info = MATERIAL_INFO[item];
-                    const color = info ? RARITY_COLORS[info.rarity] : "#9ca3af";
-                    return (
-                      <div
-                        key={item}
-                        className="flex items-center justify-between text-sm bg-surface-alt rounded-lg px-3 py-2"
-                      >
-                        <span className="flex items-center gap-2 text-text-secondary">
-                          {info?.img && (
-                            <img src={info.img} alt={item} loading="lazy" className="w-5 h-5 object-contain" />
-                          )}
-                          {item}
-                        </span>
-                        <span className="font-bold" style={{ color }}>{qty}x</span>
-                      </div>
-                    );
+                <div className="flex flex-wrap gap-1.5">
+                  {Object.entries(buildCost).map(([name, qty]) => {
+                    const itemId = ITEM_ID_BY_NAME[name];
+                    return itemId
+                      ? <MaterialPill key={name} itemId={itemId} qty={qty} />
+                      : <span key={name} className="text-xs text-text-secondary">{qty}× {name}</span>;
                   })}
                 </div>
               </div>

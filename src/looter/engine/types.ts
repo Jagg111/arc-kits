@@ -12,11 +12,7 @@ export type { Bucket, HuntList, HuntListLine, RankedMap, Stage };
 export interface LooterEngineInput {
   stages: Stage[];
   stageBucket: Record<string, Bucket>;
-  goalOn: Record<string, boolean>;
   lineDone: Set<string>;
-  /** Per-bench target tier. Bench stages above the target are excluded from
-   *  demand. Keys are bench ids (e.g. "gunsmith"); values are tier levels. */
-  benchTargetTier: Record<string, number>;
   /** Optional cap on how many hunt-list rows to return. Default 12. */
   maxRows?: number;
   /** Optional cap on dropPOIs per material. Default 4. */

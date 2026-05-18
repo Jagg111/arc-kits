@@ -14,40 +14,26 @@ interface GoalCardProps {
   name: string;
   goalKind: "project" | "bench" | "event";
   stages: Stage[];
-  on: boolean;
   daysRemaining: number | null;
   urgent?: boolean;
   defaultExpanded?: boolean;
   stageBucket: Record<string, Bucket>;
   lineDone: Set<string>;
-  onToggleGoal: () => void;
-  onCycleBucket: (stageId: string) => void;
+  onSetBucket: (stageId: string, bucket: Bucket) => void;
   onToggleLine: (lineId: string) => void;
-  /** Bench-only: current target tier and setter. Tiers above this are
-   *  excluded from material demand by the aggregator. */
-  benchId?: string;
-  benchMaxTier?: number;
-  benchTargetTier?: number;
-  onSetBenchTargetTier?: (benchId: string, tier: number) => void;
 }
 
 export default function GoalCard({
   name,
   goalKind,
   stages,
-  on,
   daysRemaining,
   urgent,
   defaultExpanded,
   stageBucket,
   lineDone,
-  onToggleGoal,
-  onCycleBucket,
+  onSetBucket,
   onToggleLine,
-  benchId,
-  benchMaxTier,
-  benchTargetTier,
-  onSetBenchTargetTier,
 }: GoalCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded ?? false);
 
@@ -59,10 +45,7 @@ export default function GoalCard({
   const pct = totalLines === 0 ? 0 : Math.round((doneLines / totalLines) * 100);
 
   return (
-    <div
-      className="rounded-lg overflow-hidden mb-2.5 border border-border-subtle bg-surface"
-      style={{ opacity: on ? 1 : 0.55 }}
-    >
+    <div className="rounded-lg overflow-hidden mb-2.5 border border-border-subtle bg-surface">
       <div
         className={`flex items-center gap-2.5 px-3.5 py-3 cursor-pointer ${expanded ? "bg-surface-alt border-b border-border-subtle" : "hover:bg-surface-alt"}`}
         onClick={() => setExpanded((e) => !e)}
@@ -83,20 +66,6 @@ export default function GoalCard({
             {daysRemaining}d
           </span>
         )}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleGoal();
-          }}
-          className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
-          style={{
-            backgroundColor: on ? "var(--color-success)" : "var(--color-border)",
-            color: on ? "#000" : "var(--color-text-muted)",
-          }}
-        >
-          {on ? "ON" : "OFF"}
-        </button>
         <span
           className="text-text-muted transition-transform"
           style={{ transform: expanded ? "rotate(90deg)" : "none" }}
@@ -104,46 +73,15 @@ export default function GoalCard({
           ▶
         </span>
       </div>
-      {expanded && on && goalKind === "bench" && benchId && benchMaxTier && onSetBenchTargetTier && (
-        <div className="px-3.5 py-2 border-b border-border-subtle bg-surface-alt/50 flex items-center gap-2 text-xs">
-          <span className="text-text-secondary">Target tier:</span>
-          {Array.from({ length: benchMaxTier }, (_, i) => i + 1).map((t) => {
-            const active = (benchTargetTier ?? benchMaxTier) === t;
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSetBenchTargetTier(benchId, t);
-                }}
-                className="px-2 py-0.5 rounded-full text-[11px] font-semibold border"
-                style={{
-                  borderColor: active ? "var(--color-accent)" : "var(--color-border)",
-                  backgroundColor: active
-                    ? "color-mix(in srgb, var(--color-accent) 18%, transparent)"
-                    : "transparent",
-                  color: active ? "var(--color-accent-text)" : "var(--color-text-secondary)",
-                }}
-              >
-                T{t}
-              </button>
-            );
-          })}
-          <span className="text-[10px] text-text-muted ml-1">
-            tiers above target are excluded from demand
-          </span>
-        </div>
-      )}
-      {expanded && on && (
+      {expanded && (
         <div>
           {stages.map((stage) => (
             <StageBlock
               key={stage.stageId}
               stage={stage}
-              bucket={stageBucket[stage.stageId] ?? "soon"}
+              bucket={stageBucket[stage.stageId] ?? "skip"}
               lineDone={lineDone}
-              onCycleBucket={() => onCycleBucket(stage.stageId)}
+              onSetBucket={(bucket) => onSetBucket(stage.stageId, bucket)}
               onToggleLine={onToggleLine}
               tinted={goalKind === "bench"}
             />

@@ -89,6 +89,12 @@ export const MATERIAL_INFO: Record<string, { rarity: Rarity; img: string }> =
     Object.values(ITEMS).map((it) => [it.name, { rarity: it.rarity, img: itemImgUrl(it.img) }])
   );
 
+// Reverse lookup: material display name → ITEMS key (itemId).
+// Bridges the builder's name-keyed buildCost to MaterialPill's itemId input.
+export const ITEM_ID_BY_NAME: Record<string, string> = Object.fromEntries(
+  Object.values(ITEMS).map((it) => [it.name, it.id])
+);
+
 // Weapon images — wiki thumbnail URLs keyed by weapon id.
 // Same pattern as MATERIAL_INFO and mod icons in mods.ts.
 const WI = (hash: string, file: string) =>

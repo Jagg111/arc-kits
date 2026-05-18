@@ -20,8 +20,6 @@ interface MaterialPillProps {
   done?: boolean;
   /** "sm" matches the builder's CostPill density; "md" is the Looter default. */
   size?: "sm" | "md";
-  /** Prefix shown before qty. Default "×". Pass "" to drop it. */
-  qtyPrefix?: string;
 }
 
 export default function MaterialPill({
@@ -30,7 +28,6 @@ export default function MaterialPill({
   showName = true,
   done = false,
   size = "md",
-  qtyPrefix = "×",
 }: MaterialPillProps) {
   const item = ITEMS[itemId];
   const color = item ? RARITY_COLORS[item.rarity] : "var(--color-text-muted)";
@@ -57,8 +54,8 @@ export default function MaterialPill({
           style={{ width: imgPx, height: imgPx }}
         />
       )}
+      <span className="font-semibold tabular-nums">{qty}x</span>
       {showName && <span className="truncate">{item?.name ?? itemId}</span>}
-      <span className="font-semibold tabular-nums">{qtyPrefix}{qty}</span>
     </span>
   );
 }
