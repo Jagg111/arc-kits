@@ -14,13 +14,11 @@
 import { useMemo } from "react";
 import { PROJECTS, PROJECT_ORDER, daysUntilEnd } from "../../data/projects";
 import { CURRENT_EVENT, daysUntilEventEnd } from "../../data/events";
-import { WORKBENCHES } from "../../data/workbenches";
+import { WORKBENCHES, WORKBENCH_ORDER } from "../../data/workbenches";
 import { daysUntilDeparture } from "../../data/expedition";
 import { useLooterState } from "../../hooks/useLooterState";
-import { buildHuntList } from "../../looter/engine";
 import { allStages as buildAllStages } from "../../looter/engine/stages";
 import PriorityBoard from "./PriorityBoard";
-import HuntBrief from "./HuntBrief";
 import GoalCard from "./GoalCard";
 import type { Stage } from "./types";
 
@@ -30,16 +28,6 @@ export default function LooterPage() {
   const state = useLooterState();
 
   const allStages = useMemo<Stage[]>(() => buildAllStages(), []);
-
-  const huntList = useMemo(
-    () =>
-      buildHuntList({
-        stages: allStages,
-        stageBucket: state.stageBucket,
-        lineDone: state.lineDone,
-      }),
-    [allStages, state.stageBucket, state.lineDone],
-  );
 
   const expeditionDays = daysUntilDeparture();
   const eventDays = daysUntilEventEnd();
@@ -101,9 +89,33 @@ export default function LooterPage() {
         onSetBucket={state.setBucket}
       />
 
-      {/* ── Desktop split: cards (main) + hunt brief (right rail) ── */}
+      {/* ── Desktop split: workbenches (left) + events/projects/hunt (right) ── */}
       <div className="grid gap-5 items-start grid-cols-1 looter-split">
-        <div className="min-w-0 looter-split-main">
+        <div className="min-w-0">
+          <SectionHead icon="🛠️" label="Workbenches" count={`${WORKBENCH_ORDER.length} total`} />
+          {WORKBENCH_ORDER.map((bid) => {
+            const bench = WORKBENCHES[bid];
+            if (!bench) return null;
+            const goalId = `bench:${bench.id}`;
+            return (
+              <GoalCard
+                key={goalId}
+                goalId={goalId}
+                name={bench.name}
+                goalKind="bench"
+                stages={stagesByGoal.get(goalId) ?? []}
+                daysRemaining={null}
+                defaultExpanded={bench.id === "scrappy"}
+                stageBucket={state.stageBucket}
+                lineDone={state.lineDone}
+                onSetBucket={state.setBucket}
+                onToggleLine={state.toggleLine}
+              />
+            );
+          })}
+        </div>
+
+        <div className="min-w-0">
           <SectionHead icon="🎉" label="Events" count={CURRENT_EVENT ? "1 active" : "0 active"} />
           {CURRENT_EVENT && (() => {
             const ev = CURRENT_EVENT;
@@ -149,36 +161,12 @@ export default function LooterPage() {
             );
           })}
 
-          <SectionHead icon="🛠️" label="Workbenches" count={`${Object.keys(WORKBENCHES).length} total`} />
-          {Object.values(WORKBENCHES).map((bench) => {
-            const goalId = `bench:${bench.id}`;
-            return (
-              <GoalCard
-                key={goalId}
-                goalId={goalId}
-                name={bench.name}
-                goalKind="bench"
-                stages={stagesByGoal.get(goalId) ?? []}
-                daysRemaining={null}
-                defaultExpanded={bench.id === "gunsmith"}
-                stageBucket={state.stageBucket}
-                lineDone={state.lineDone}
-                onSetBucket={state.setBucket}
-                onToggleLine={state.toggleLine}
-              />
-            );
-          })}
-        </div>
-
-        <div className="min-w-0 looter-split-rail">
-          <HuntBrief huntList={huntList} />
         </div>
       </div>
 
       <style>{`
         @media (min-width: 1080px) {
           .looter-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-          .looter-split-rail { position: sticky; top: 80px; }
         }
         @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); } 50% { box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15); } }
       `}</style>

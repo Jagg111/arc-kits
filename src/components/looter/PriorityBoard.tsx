@@ -162,6 +162,7 @@ export default function PriorityBoard({
                 {chips.map((stage) => {
                   const total = stage.lines.length;
                   const done = stage.lines.filter((l) => lineDone.has(l.lineId)).length;
+                  const itemLines = stage.lines.filter((l) => l.kind === "item");
                   return (
                     <div
                       key={stage.stageId}
@@ -170,12 +171,27 @@ export default function PriorityBoard({
                         e.dataTransfer.effectAllowed = "move";
                         e.dataTransfer.setData(DND_MIME, stage.stageId);
                       }}
-                      className="flex items-center gap-1.5 w-full text-left px-2 py-1.5 mb-1 rounded border border-border bg-bg-base text-xs hover:border-accent cursor-grab active:cursor-grabbing select-none"
+                      className="flex flex-col gap-1 w-full text-left px-2 py-1.5 mb-1 rounded border border-border bg-bg-base text-xs hover:border-accent cursor-grab active:cursor-grabbing select-none"
                       title="Drag to another bucket"
                     >
-                      <span className="text-text-muted text-[10px]">⋮⋮</span>
-                      <span className="flex-1 truncate">{stage.goalName} · {stage.stageLabel}</span>
-                      <span className="text-[10px] text-text-muted">{done}/{total}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-text-muted text-[10px]">⋮⋮</span>
+                        <span className="flex-1 truncate">{stage.goalName} · {stage.stageLabel}</span>
+                        <span className="text-[10px] text-text-muted">{done}/{total}</span>
+                      </div>
+                      {itemLines.length > 0 && (
+                        <div className="flex flex-wrap gap-1 pl-4">
+                          {itemLines.map((line) => (
+                            <MaterialPill
+                              key={line.lineId}
+                              itemId={line.itemId}
+                              qty={line.qty}
+                              done={lineDone.has(line.lineId)}
+                              size="sm"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

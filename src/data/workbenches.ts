@@ -121,13 +121,13 @@ export const WORKBENCHES: Record<string, Workbench> = {
 
 // Display order for the Looter UI / bench picker.
 export const WORKBENCH_ORDER: string[] = [
+  "scrappy",
   "gunsmith",
   "gear_bench",
   "medical_lab",
   "explosives_station",
   "utility_station",
   "refiner",
-  "scrappy",
 ];
 
 // Dev-time sanity check: every recipe itemId must exist in ITEMS.
