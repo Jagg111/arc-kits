@@ -39,7 +39,7 @@ export const WORKBENCHES: Record<string, Workbench> = {
     maxTier: 3,
     tiers: [
       { level: 1, cost: [{ itemId: "metal_parts", qty: 20 }, { itemId: "rubber_parts", qty: 30 }, { itemId: "wasp_driver", qty: 8 }] },
-      { level: 2, cost: [{ itemId: "mechanical_components", qty: 5 }, { itemId: "rusted_tools", qty: 3 }] },
+      { level: 2, cost: [{ itemId: "mechanical_components", qty: 5 }, { itemId: "rusted_tools", qty: 3 }, { itemId: "wasp_driver", qty: 8 }] },
       { level: 3, cost: [{ itemId: "advanced_mechanical_components", qty: 5 }, { itemId: "rusted_gear", qty: 3 }, { itemId: "sentinel_firing_core", qty: 4 }] },
     ],
   },
