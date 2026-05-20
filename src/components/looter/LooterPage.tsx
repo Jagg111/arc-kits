@@ -15,7 +15,6 @@ import { useMemo } from "react";
 import { PROJECTS, PROJECT_ORDER, daysUntilEnd } from "../../data/projects";
 import { CURRENT_EVENT, daysUntilEventEnd } from "../../data/events";
 import { WORKBENCHES, WORKBENCH_ORDER } from "../../data/workbenches";
-import { daysUntilDeparture } from "../../data/expedition";
 import { useLooterState } from "../../hooks/useLooterState";
 import { allStages as buildAllStages } from "../../looter/engine/stages";
 import PriorityBoard from "./PriorityBoard";
@@ -29,7 +28,6 @@ export default function LooterPage() {
 
   const allStages = useMemo<Stage[]>(() => buildAllStages(), []);
 
-  const expeditionDays = daysUntilDeparture();
   const eventDays = daysUntilEventEnd();
 
   // Group stages by goal for the card list, preserving section ordering
@@ -46,41 +44,6 @@ export default function LooterPage() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 py-6">
       <h1 className="text-xl font-bold mb-1">Looter</h1>
-
-      {/* ── Timers ── */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <div
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm border"
-          style={{
-            borderColor: "color-mix(in srgb, var(--color-accent) 35%, transparent)",
-            backgroundColor: "color-mix(in srgb, var(--color-accent) 8%, transparent)",
-          }}
-        >
-          <span>🚀</span>
-          <span className="text-text-secondary">Expedition departs in</span>
-          <span className="font-bold" style={{ color: "var(--color-accent-text)" }}>
-            {expeditionDays} days
-          </span>
-        </div>
-        {eventDays !== null && CURRENT_EVENT && (
-          <div
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm border"
-            style={{
-              borderColor: "var(--color-warning)",
-              backgroundColor: "color-mix(in srgb, var(--color-warning) 12%, transparent)",
-              animation: eventDays <= 14 ? "pulse 2.4s ease-in-out infinite" : undefined,
-            }}
-          >
-            <span>⏳</span>
-            <span className="text-text-secondary">
-              {CURRENT_EVENT.umbrella ?? CURRENT_EVENT.name} ends in
-            </span>
-            <span className="font-bold" style={{ color: "var(--color-warning)" }}>
-              {eventDays} days
-            </span>
-          </div>
-        )}
-      </div>
 
       <PriorityBoard
         stages={allStages}
