@@ -66,8 +66,7 @@ export default function PriorityBoard({
         }
       }
       return Object.entries(totals)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6);
+        .sort((a, b) => b[1] - a[1]);
     };
     return {
       hi: summarize(byBucket.hi),
