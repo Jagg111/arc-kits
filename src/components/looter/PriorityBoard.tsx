@@ -39,7 +39,7 @@ export default function PriorityBoard({
   lineDone,
   onSetBucket,
 }: PriorityBoardProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [dragOverBucket, setDragOverBucket] = useState<ActiveBucket | null>(null);
 
   const byBucket = useMemo(() => {
@@ -86,13 +86,21 @@ export default function PriorityBoard({
         </span>
         <button
           type="button"
-          onClick={() => setCollapsed((c) => !c)}
-          className="ml-auto text-[11px] text-text-muted hover:text-text-primary cursor-pointer"
+          onClick={() => setExpanded((e) => !e)}
+          className="ml-auto text-text-muted hover:text-text-primary cursor-pointer"
         >
-          {collapsed ? "expand ▾" : "collapse ▴"}
+          <svg
+            className={`w-4 h-4 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
         </button>
       </div>
-      {!collapsed && (
+      {expanded && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
           {(["hi", "soon", "evt"] as ActiveBucket[]).map((b) => {
             const s = COL_STYLES[b];

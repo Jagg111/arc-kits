@@ -46,9 +46,10 @@ export default function GoalCard({
 
   return (
     <div className="rounded-lg overflow-hidden mb-2.5 border border-border-subtle bg-surface">
-      <div
-        className={`flex items-center gap-2.5 px-3.5 py-3 cursor-pointer ${expanded ? "bg-surface-alt border-b border-border-subtle" : "hover:bg-surface-alt"}`}
+      <button
+        type="button"
         onClick={() => setExpanded((e) => !e)}
+        className={`w-full flex items-center gap-2.5 px-3.5 py-3 text-left ${expanded ? "bg-surface-alt border-b border-border-subtle" : "hover:bg-surface-alt"}`}
       >
         <span className="font-semibold flex-1 text-sm">{name}</span>
         <span className="text-[11px] text-text-muted">{totalLines === 0 ? "persistent" : `${doneLines}/${totalLines}`}</span>
@@ -66,13 +67,16 @@ export default function GoalCard({
             {daysRemaining}d
           </span>
         )}
-        <span
-          className="text-text-muted transition-transform"
-          style={{ transform: expanded ? "rotate(90deg)" : "none" }}
+        <svg
+          className={`w-4 h-4 text-text-muted transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
         >
-          ▶
-        </span>
-      </div>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
       {expanded && (
         <div>
           {stages.map((stage) => (
